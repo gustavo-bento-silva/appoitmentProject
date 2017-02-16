@@ -5,6 +5,7 @@ namespace PageNavFrameWork{
 	public enum PagesEnum {
 		None = 0,
 		Example=1,
-		CalendarPage=2
+		CalendarPage=2,
+		AppoitmentPage=3
 	}
 }

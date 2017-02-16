@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Linq;
 
 public class Calendar : MonoBehaviour {
 	
@@ -13,6 +14,8 @@ public class Calendar : MonoBehaviour {
 		DateTime date = DateTime.Now;
 		GameObject goPrefab = PageNavFrameWork.PageNav.GetPageNavInstance().GetPagePrefabByEnum(PageNavFrameWork.PagesEnum.CalendarPage);
 		GameObject page = GameObject.Instantiate(goPrefab);
+		page.GetComponent<CalendarPageController>().FillList();
+
 		for(int i = 0; i < numberMaxOfMonths; i++)
 		{
 			month = (int)date.Month + i;

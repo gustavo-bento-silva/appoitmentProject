@@ -10,7 +10,12 @@ public class CalendarPageController : PageController{
 	public int index;
 	public CreateCalendarAsChild[] child;
 
-	void Awake () {
+	void Start () {
+
+	}
+
+	public void FillList()
+	{
 		calendar = new CalendarController[child.Length];
 		for (index = 0; index < child.Length; index++)
 		{
@@ -20,5 +25,12 @@ public class CalendarPageController : PageController{
 	
 	void Update () {
 
+	}
+
+	public void OnLoadAppointmentPage()
+	{
+		GameObject goPrefab = PageNavFrameWork.PageNav.GetPageNavInstance().GetPagePrefabByEnum(PageNavFrameWork.PagesEnum.AppoitmentPage);
+		GameObject page = GameObject.Instantiate(goPrefab);
+		PageNavFrameWork.PageNav.GetPageNavInstance().PushPageToStack(page);
 	}
 }

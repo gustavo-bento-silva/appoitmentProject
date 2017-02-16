@@ -8,8 +8,8 @@ public class CreateCalendarAsChild : MonoBehaviour {
 
 	public void FillList()
 	{
-		Object obj = GameObject.Instantiate((Object)calendarPrefab, this.gameObject.transform);
-		GameObject go = obj as GameObject;
+		GameObject go = GameObject.Instantiate(calendarPrefab);
+		go.transform.SetParent(gameObject.transform, false);
 		controller.calendar[controller.index] = go.GetComponent<CalendarController>();
 	}
 }

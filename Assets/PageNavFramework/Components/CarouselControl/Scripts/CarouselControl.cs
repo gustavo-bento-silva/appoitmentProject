@@ -27,7 +27,7 @@ public class CarouselControl : MonoBehaviour {
 	private Vector2 pressPosition;
 	private Vector2 releasePosition;
 	
-	void Awake () {
+	void Start () {
 		_currentElement = StartingElement;
 		_scroll= gameObject.GetComponent<ScrollRect> ();
 		if(autorun){
