@@ -9,12 +9,14 @@ public class AppoitmentPageController : PageController{
 	public DateTime date;
 	public GameObject cellTimePrefab;
 	public GameObject content;
+	public Text day;
 
 	int cellHeigth = 172;
 	int cellSpacing = 5;
 
 	void Start () {
 
+		day.text = PlayerPreferences.TranslateDay(date.Day);
 		int quantity = PlayerPreferences.endTime - PlayerPreferences.initialTime;
 		float time = PlayerPreferences.initialTime;
 		if(!PlayerPreferences.oneInOneHour)
@@ -44,9 +46,10 @@ public class AppoitmentPageController : PageController{
 			if(borderHeigth > 0){
 				(content.transform as RectTransform).sizeDelta = new Vector2 (0,borderHeigth);
 			}
+			(content.transform as RectTransform).position = new Vector3(content.transform.position.x, -500, content.transform.position.z);
 		}
 	}
-	
+
 	void SaveAppointment()
 	{
 

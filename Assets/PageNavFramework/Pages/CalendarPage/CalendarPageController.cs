@@ -6,6 +6,7 @@ using System;
 
 public class CalendarPageController : PageController{
 
+	public DateTime date;
 	public CalendarController[] calendar;
 	public int index;
 	public CreateCalendarAsChild[] child;
