@@ -6,10 +6,20 @@ using System;
 public class GetButtonDay : MonoBehaviour {
 
 	public CalendarPageController calendarPage;
+	public Text dayText;
+
+	public void Start ()
+	{
+		dayText = gameObject.GetComponentInChildren<Text>();
+	}
 
 	public void OnButtonSelected()
 	{
 		CalendarController cpc = gameObject.transform.parent.parent.GetComponent<CalendarController>();
-		calendarPage.date = new System.DateTime(Int32.Parse(cpc._year.text), Int32.Parse(cpc._month.text), Int32.Parse(gameObject.GetComponentInChildren<Text>().text));
+		int month = PlayerPreferences.TranslateMonth(cpc._month.text);
+		int year = int.Parse(cpc._year.text);
+		int day = int.Parse(dayText.gameObject.name);
+		calendarPage.date = new System.DateTime(year, month, day);
+		Debug.Log (calendarPage.date.Day + "/" + calendarPage.date.Month + "/" + calendarPage.date.Year);
 	}
 }

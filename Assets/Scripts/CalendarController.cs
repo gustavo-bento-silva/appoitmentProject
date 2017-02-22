@@ -93,6 +93,7 @@ public class CalendarController : MonoBehaviour {
 				}
 				else{
 					linesText[i][j].text = day.ToString();
+					linesText[i][j].name = day.ToString();
 					day++;
 				}
 			}
