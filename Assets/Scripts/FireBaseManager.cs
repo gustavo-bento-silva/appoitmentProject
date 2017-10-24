@@ -3,6 +3,7 @@ using System.Collections;
 using Firebase;
 using Firebase.Unity.Editor;
 using Firebase.Database;
+using UnityEngine.UI;
 
 public enum DBTable
 {
@@ -14,20 +15,72 @@ public enum DBTable
 	
 public class FireBaseManager : MonoBehaviour
 {
+	public static FireBaseManager _instance;
 
 	string myProjectURL = "https://appointmentproject-a7233.firebaseio.com/";
 	DatabaseReference reference;
+	Firebase.Auth.FirebaseAuth auth;
+	public Firebase.Auth.FirebaseUser user;
 
-	// Use this for initialization
+	public static FireBaseManager GetFireBaseInstance(){
+		return _instance;
+	}
+
+	void Awake (){
+		if (_instance == null) {
+			_instance = this;
+		}
+	}
+
 	void Start ()
 	{
 		FirebaseApp.DefaultInstance.SetEditorDatabaseUrl (myProjectURL);
 		reference = FirebaseDatabase.DefaultInstance.RootReference;
-		UserModel user = CreateNewUser ("Gustavo");
+
+		auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+
+		/*UserModel user = CreateNewUser ("Gustavo");
 		ResponsableModel responsable = CreateNewResponsable ("Geber");
 
-		CreateNewAppoitment ("2017-10-24", user, responsable, "08:00");
+		CreateNewAppoitment ("2017-10-24", user, responsable, "08:00");*/
 
+	}
+
+	public void UserLogin(string email, string password){
+		auth.SignInWithEmailAndPasswordAsync(email, password).ContinueWith(task => {
+			if (task.IsCanceled) {
+				Debug.LogError("SignInWithEmailAndPasswordAsync was canceled.");
+				return;
+			}
+			if (task.IsFaulted) {
+				Debug.LogError("SignInWithEmailAndPasswordAsync encountered an error: " + task.Exception);
+				return;
+			}
+
+			user = task.Result;
+			Debug.LogFormat("User signed in successfully: {0} ({1})",
+				user.DisplayName, user.UserId);
+		});
+	}
+
+	public void CreateNewUserWithEmailAndPassword(string email, string password)
+	{
+		auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWith(task => {
+			if (task.IsCanceled) {
+				Debug.LogError("CreateUserWithEmailAndPasswordAsync was canceled.");
+				return;
+			}
+			if (task.IsFaulted) {
+				Debug.LogError("CreateUserWithEmailAndPasswordAsync encountered an error: " + task.Exception);
+				return;
+			}
+
+			// Firebase user has been created.
+			user = task.Result;
+			CreateNewUser(user.UserId, user.DisplayName);
+			Debug.LogFormat("Firebase user created successfully: {0} ({1})",
+				user.DisplayName, user.UserId);
+		});
 	}
 
 	private void CreateNewAppoitment (string data, UserModel user, ResponsableModel responsable, string time)
@@ -45,9 +98,8 @@ public class FireBaseManager : MonoBehaviour
 		reference.Child (DBTable.Responsable.ToString ()).Child (responsable.responsableID + "/appointments").SetValueAsync (responsable.appoitments);
 	}
 
-	private UserModel CreateNewUser (string name)
+	private UserModel CreateNewUser (string userID, string name)
 	{
-		string userID = reference.Child (DBTable.User.ToString ()).Push ().Key;
 		UserModel user = new UserModel (userID, name);
 		string json = JsonUtility.ToJson (user);
 
@@ -55,9 +107,8 @@ public class FireBaseManager : MonoBehaviour
 		return user;
 	}
 
-	private ResponsableModel CreateNewResponsable (string name)
+	private ResponsableModel CreateNewResponsable (string responsableID, string name)
 	{
-		string responsableID = reference.Child (DBTable.Responsable.ToString ()).Push ().Key;
 		ResponsableModel responsable = new ResponsableModel (responsableID, name);
 		string json = JsonUtility.ToJson (responsable);
 
@@ -91,21 +142,3 @@ public class FireBaseManager : MonoBehaviour
 //		Debug.Log ("!!!!" + args.Snapshot.);
 	}
 }
-
-
-//	.GetValueAsync ().ContinueWith ((System.Threading.Tasks.Task<DataSnapshot> arg) => {
-//		if (arg.IsFaulted) {
-//			Debug.Log ("Deu ruim!");
-//		} else if (arg.IsCompleted) {
-//
-//			Debug.Log ("Deu bom!");
-//			//				DataSnapshot snapshot = arg.Result;
-//
-//			//				foreach (var appointment in snapshot.Children) {
-//			//					var key = appointment.Value.ToString ();
-//			//					var mDate = appointment.Child ("data").Value.ToString ();
-//			//					var responsable = appointment.Child ("responsable").Value.ToString ();
-//			//					var time = appointment.Child ("time").Value.ToString ();
-//			//				}
-//		}
-//	});
