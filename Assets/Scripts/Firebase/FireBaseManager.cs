@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 using Firebase;
 using Firebase.Unity.Editor;
@@ -83,7 +84,7 @@ public class FireBaseManager : MonoBehaviour
 		});
 	}
 
-	private void CreateNewAppoitment (string data, UserModel user, ResponsableModel responsable, string time)
+	private void CreateNewAppoitment (DateTime data, UserModel user, ResponsableModel responsable, string time)
 	{
 		string appoitmentID = reference.Child (DBTable.Appoitments.ToString ()).Push ().Key;
 		AppointmentModel appointment = new AppointmentModel (data, user.userID, responsable.responsableID, time);

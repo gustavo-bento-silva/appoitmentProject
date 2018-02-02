@@ -15,7 +15,7 @@ public class CalendarController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		InitializeVariables ();
-		FillCalendar (9, 2017);
+		FillCalendar (DateTime.Now.Month, DateTime.Now.Year);
 	}
 	
 	// Update is called once per frame

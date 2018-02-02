@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="$PROJECT_DIR$" t="IncludeRecursive">
+      <e p="appoitmentProject.sln" t="IncludeFlat" />
+      <e p="Assembly-CSharp-Editor-firstpass.csproj" t="IncludeRecursive" />
+      <e p="Assembly-CSharp-Editor.csproj" t="IncludeRecursive" />
+      <e p="Assembly-CSharp-firstpass.csproj" t="IncludeRecursive" />
+      <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
+      <e p="Assets" t="Include">
+        <e p="Firebase" t="Include">
+          <e p="Editor" t="Include">
+            <e p="AppDependencies.xml" t="Include" />
+            <e p="AuthDependencies.xml" t="Include" />
+            <e p="FirebaseAuth_v4.2.1_manifest.txt" t="Include" />
+            <e p="FirebaseDatabase_v4.2.1_manifest.txt" t="Include" />
+          </e>
+          <e p="m2repository" t="Include">
+            <e p="com" t="Include">
+              <e p="google" t="Include">
+                <e p="Firebase" t="Include">
+                  <e p="firebase-app-unity" t="Include">
+                    <e p="maven-metadata.xml" t="Include" />
+                  </e>
+                  <e p="firebase-auth-unity" t="Include">
+                    <e p="maven-metadata.xml" t="Include" />
+                  </e>
+                </e>
+              </e>
+            </e>
+          </e>
+          <e p="Plugins" t="Include">
+            <e p="Http" t="Include">
+              <e p="link.xml" t="Include" />
+            </e>
+            <e p="link.xml" t="Include" />
+          </e>
+        </e>
+        <e p="PageNavFramework" t="Include">
+          <e p="Components" t="Include">
+            <e p="CarouselControl" t="Include">
+              <e p="Scripts" t="Include">
+                <e p="CarouselControl.cs" t="Include" />
+              </e>
+            </e>
+            <e p="ColoredProgressCompare" t="Include">
+              <e p="Scripts" t="Include">
+                <e p="ColoredProgressCompare.cs" t="Include" />
+              </e>
+            </e>
+            <e p="ColumnGraphControl" t="Include">
+              <e p="Scripts" t="Include">
+                <e p="ColumnGraphControl.cs" t="Include" />
+              </e>
+            </e>
+            <e p="NavigationBarControl" t="Include">
+              <e p="Scripts" t="Include">
+                <e p="NavigationBarControl.cs" t="Include" />
+              </e>
+            </e>
+            <e p="ProgressBarControl" t="Include">
+              <e p="Scripts" t="Include">
+                <e p="ProgressBarControl.cs" t="Include" />
+              </e>
+            </e>
+            <e p="ProgressCompare" t="Include">
+              <e p="Scripts" t="Include">
+                <e p="ProgressCompare.cs" t="Include" />
+              </e>
+            </e>
+            <e p="RadioButtonsControl" t="Include">
+              <e p="Script" t="Include">
+                <e p="RadioButtonsControl.cs" t="Include" />
+              </e>
+            </e>
+            <e p="StarsControl" t="Include">
+              <e p="Scripts" t="Include">
+                <e p="StarsControl.cs" t="Include" />
+              </e>
+            </e>
+            <e p="TabsControl" t="Include">
+              <e p="Scripts" t="Include">
+                <e p="TabsControl.cs" t="Include" />
+              </e>
+            </e>
+            <e p="Toggle" t="Include">
+              <e p="Scripts" t="Include">
+                <e p="ClickToggle.cs" t="Include" />
+              </e>
+            </e>
+            <e p="WebPhotoRound" t="Include">
+              <e p="Script" t="Include">
+                <e p="WebImage.cs" t="Include" />
+              </e>
+            </e>
+          </e>
+          <e p="FrameWorkFiles" t="Include">
+            <e p="Editor" t="Include">
+              <e p="AnchorToCornersScript.cs" t="Include" />
+              <e p="PageNavEditorWindow.cs" t="Include" />
+            </e>
+            <e p="Scripts" t="Include">
+              <e p="PageArgs.cs" t="Include" />
+              <e p="PageArgsHolder.cs" t="Include" />
+              <e p="PageController.cs" t="Include" />
+              <e p="PageEnumHolder.cs" t="Include" />
+              <e p="PageNavSettings.cs" t="Include" />
+              <e p="PagesEnum.cs" t="Include" />
+              <e p="PageTransition.cs" t="Include" />
+              <e p="ToolsScripts" t="Include">
+                <e p="AddGameObjectAsSon.cs" t="Include" />
+                <e p="AnchorTool.cs" t="Include" />
+                <e p="ArrangeAnchors.cs" t="Include" />
+                <e p="ArrangeAnchorsRecursive.cs" t="Include" />
+                <e p="Editor" t="Include">
+                  <e p="ToolsHotKeyScript.cs" t="Include" />
+                </e>
+                <e p="EnumFileCreator.cs" t="Include" />
+                <e p="GameObjectExtension.cs" t="Include" />
+                <e p="InsertScriptToObjects.cs" t="Include" />
+                <e p="Pulse.cs" t="Include" />
+              </e>
+            </e>
+            <e p="Templates" t="Include">
+              <e p="PageControllerClassTemplate.txt" t="Include" />
+              <e p="PageNavTemplate" t="Include">
+                <e p="Scripts" t="Include">
+                  <e p="PageNav.cs" t="Include" />
+                </e>
+              </e>
+            </e>
+          </e>
+          <e p="Pages" t="Include">
+            <e p="CalendarPage" t="Include">
+              <e p="CalendarPageController.cs" t="Include" />
+            </e>
+            <e p="ExamplePage" t="Include">
+              <e p="ExamplePageController.cs" t="Include" />
+            </e>
+            <e p="ExamplePageDois" t="Include">
+              <e p="ExamplePageDoisController.cs" t="Include" />
+            </e>
+            <e p="ScheduleDetailPage" t="Include">
+              <e p="ScheduleDetailPageController.cs" t="Include" />
+            </e>
+          </e>
+          <e p="Transitions" t="Include">
+            <e p="SlideTransition" t="Include">
+              <e p="SlideTransition.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="PlayServicesResolver" t="Include">
+          <e p="Editor" t="Include">
+            <e p="play-services-resolver_v1.2.59.0.txt" t="Include" />
+          </e>
+        </e>
+        <e p="Plugins" t="Include">
+          <e p="Android" t="Include">
+            <e p="Firebase" t="Include">
+              <e p="AndroidManifest.xml" t="Include" />
+              <e p="res" t="Include">
+                <e p="values" t="Include">
+                  <e p="google-services.xml" t="Include" />
+                </e>
+              </e>
+            </e>
+            <e p="firebase-analytics-impl-license-11.4.2" t="Include">
+              <e p="AndroidManifest.xml" t="Include" />
+              <e p="third_party_licenses.txt" t="Include" />
+            </e>
+            <e p="firebase-analytics-license-11.4.2" t="Include">
+              <e p="AndroidManifest.xml" t="Include" />
+              <e p="third_party_licenses.txt" t="Include" />
+            </e>
+            <e p="firebase-auth-license-11.4.2" t="Include">
+              <e p="AndroidManifest.xml" t="Include" />
+              <e p="third_party_licenses.txt" t="Include" />
+            </e>
+            <e p="firebase-common-11.4.2" t="Include">
+              <e p="AndroidManifest.xml" t="Include" />
+            </e>
+            <e p="firebase-common-license-11.4.2" t="Include">
+              <e p="AndroidManifest.xml" t="Include" />
+              <e p="third_party_licenses.txt" t="Include" />
+            </e>
+            <e p="firebase-core-11.4.2" t="Include">
+              <e p="AndroidManifest.xml" t="Include" />
+              <e p="R.txt" t="Include" />
+            </e>
+            <e p="firebase-iid-11.4.2" t="Include">
+              <e p="AndroidManifest.xml" t="Include" />
+            </e>
+            <e p="firebase-iid-license-11.4.2" t="Include">
+              <e p="AndroidManifest.xml" t="Include" />
+              <e p="third_party_licenses.txt" t="Include" />
+            </e>
+            <e p="play-services-base-license-11.4.2" t="Include">
+              <e p="AndroidManifest.xml" t="Include" />
+              <e p="third_party_licenses.txt" t="Include" />
+            </e>
+            <e p="play-services-basement-license-11.4.2" t="Include">
+              <e p="AndroidManifest.xml" t="Include" />
+              <e p="third_party_licenses.txt" t="Include" />
+            </e>
+            <e p="play-services-tasks-license-11.4.2" t="Include">
+              <e p="AndroidManifest.xml" t="Include" />
+              <e p="third_party_licenses.txt" t="Include" />
+            </e>
+          </e>
+          <e p="Editor" t="Include">
+            <e p="JetBrains" t="Include">
+              <e p="Unity3DRider.cs" t="Include" />
+            </e>
+          </e>
+          <e p="Pixelplacement" t="Include">
+            <e p="iTween" t="Include">
+              <e p="iTween.cs" t="Include" />
+              <e p="ReadMe!" t="Include">
+                <e p="ReadMe!.txt" t="Include" />
+              </e>
+              <e p="Sample" t="Include">
+                <e p="MoveSample.cs" t="Include" />
+                <e p="RotateSample.cs" t="Include" />
+                <e p="SampleInfo.cs" t="Include" />
+              </e>
+            </e>
+          </e>
+        </e>
+        <e p="Prefabs" t="Include">
+          <e p="Calendar" t="Include">
+            <e p="Scripts" t="Include">
+              <e p="Calendar.cs" t="Include" />
+              <e p="CalendarController.cs" t="Include" />
+            </e>
+          </e>
+          <e p="Login" t="Include">
+            <e p="CreateNewUserPopup.cs" t="Include" />
+            <e p="LoginPopup.cs" t="Include" />
+          </e>
+          <e p="MainPage" t="Include">
+            <e p="MainPageController.cs" t="Include" />
+          </e>
+          <e p="PageManager" t="Include">
+            <e p="PageManager.cs" t="Include" />
+          </e>
+          <e p="PopupController.cs" t="Include" />
+          <e p="SchedulePageCellTime" t="Include">
+            <e p="Scripts" t="Include">
+              <e p="DayController.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="Scripts" t="Include">
+          <e p="Firebase" t="Include">
+            <e p="FireBaseManager.cs" t="Include" />
+          </e>
+          <e p="GetButtonDay.cs" t="Include" />
+          <e p="Model" t="Include">
+            <e p="AppointmentInsideModel.cs" t="Include" />
+            <e p="AppointmentModel.cs" t="Include" />
+            <e p="ResponsableModel.cs" t="Include" />
+            <e p="UserModel.cs" t="Include" />
+          </e>
+          <e p="PlayerPreferences" t="Include">
+            <e p="PlayerPreferences.cs" t="Include" />
+          </e>
+        </e>
+      </e>
+      <e p="Library" t="ExcludeRecursive" />
+      <e p="obj" t="ExcludeRecursive" />
+      <e p="packages" t="ExcludeRecursive" />
+      <e p="Temp" t="ExcludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+      </e>
+    </e>
+    <e p="$USER_HOME$/Library/Caches/Rider2017.3/resharper-host/local/Transient/ReSharperHost/v11/SolutionCaches/_appoitmentProject.-1732402008.00" t="ExcludeRecursive" />
+  </component>
+</project>
