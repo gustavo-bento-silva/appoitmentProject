@@ -140,6 +140,9 @@
             <e p="ExamplePageDois" t="Include">
               <e p="ExamplePageDoisController.cs" t="Include" />
             </e>
+            <e p="ScheduleAppointment" t="Include">
+              <e p="ScheduleAppointmentController.cs" t="Include" />
+            </e>
             <e p="ScheduleDetailPage" t="Include">
               <e p="ScheduleDetailPageController.cs" t="Include" />
             </e>
@@ -252,6 +255,7 @@
           </e>
         </e>
         <e p="Scripts" t="Include">
+          <e p="DataMockedManager.cs" t="Include" />
           <e p="Firebase" t="Include">
             <e p="FireBaseManager.cs" t="Include" />
           </e>
@@ -259,10 +263,12 @@
           <e p="Model" t="Include">
             <e p="AppointmentInsideModel.cs" t="Include" />
             <e p="AppointmentModel.cs" t="Include" />
+            <e p="CompanyModel.cs" t="Include" />
             <e p="ResponsableModel.cs" t="Include" />
             <e p="UserModel.cs" t="Include" />
           </e>
           <e p="PlayerPreferences" t="Include">
+            <e p="PlayerData.cs" t="Include" />
             <e p="PlayerPreferences.cs" t="Include" />
           </e>
         </e>

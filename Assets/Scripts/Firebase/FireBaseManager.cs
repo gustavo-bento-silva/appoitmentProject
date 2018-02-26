@@ -84,10 +84,10 @@ public class FireBaseManager : MonoBehaviour
 		});
 	}
 
-	private void CreateNewAppoitment (DateTime data, UserModel user, ResponsableModel responsable, string time)
+	private void CreateNewAppoitment (DateTime data, UserModel user, ResponsableModel responsable, string description = " ", int duration = 30)
 	{
 		string appoitmentID = reference.Child (DBTable.Appoitments.ToString ()).Push ().Key;
-		AppointmentModel appointment = new AppointmentModel (data, user.userID, responsable.responsableID, time);
+		AppointmentModel appointment = new AppointmentModel (data, user.userID, responsable.responsableID, description, duration);
 
 		user.appoitments[appoitmentID] = (object)responsable.responsableID;
 		responsable.appoitments[appoitmentID] = (object)user.userID;
@@ -126,6 +126,12 @@ public class FireBaseManager : MonoBehaviour
 	private void CreateTable(DBTable table, string tableID, string json) 
 	{
 		reference.Child (table.ToString ()).Child (tableID).SetRawJsonValueAsync (json);
+	}
+
+	void GetAllResponsibles()
+	{
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Appoitments.ToString ()).Child("data").EqualTo (date)
+			.ValueChanged += HandleValueChanged;
 	}
 
 	void GetDaySchedule (string date)

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using PageNavFrameWork;
 using UnityEngine.UI;
 
 public class DayController : MonoBehaviour
@@ -16,6 +17,12 @@ public class DayController : MonoBehaviour
 	// Update is called once per frame
 	void Update () {
 	
+	}
+
+	public void OnCellClick()
+	{
+		var pageNav = PageNav.GetPageNavInstance();
+		pageNav.OpenModal(pageNav.GetPagePrefabByEnum(PagesEnum.ExamplePage));
 	}
 
 	public static GameObject Instantiate(Transform CellPrefabTransform, Transform listContentReference, string time, string description)

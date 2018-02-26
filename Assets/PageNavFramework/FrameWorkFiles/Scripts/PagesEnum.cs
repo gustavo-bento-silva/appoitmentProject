@@ -7,6 +7,7 @@ namespace PageNavFrameWork{
 		ExamplePage=1,
 		ExamplePageDois=2,
 		CalendarPage=3,
-		ScheduleDetailPage=4
+		ScheduleDetailPage=4,
+		ScheduleAppointment=5
 	}
 }
