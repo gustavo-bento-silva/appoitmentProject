@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using Firebase;
 using Firebase.Unity.Editor;
 using Firebase.Database;
@@ -11,12 +12,24 @@ public enum DBTable
 	Appoitments,
 	User,
 	Responsable,
+	Company,
+	Appointment,
 	Data
+}
+
+public enum Parameters
+{
+	appointments,
+	date,
+	responsables
 }
 	
 public class FireBaseManager : MonoBehaviour
 {
 	public static FireBaseManager _instance;
+
+	public static List<ResponsableModel> responsibles = new List<ResponsableModel>();
+	public static List<ResponsableModel> userAppoitments = new List<ResponsableModel>();
 
 	string myProjectURL = "https://appointmentproject-a7233.firebaseio.com/";
 	DatabaseReference reference;
@@ -28,6 +41,11 @@ public class FireBaseManager : MonoBehaviour
 	}
 
 	void Awake (){
+		
+		FirebaseApp.DefaultInstance.SetEditorDatabaseUrl (myProjectURL);
+		reference = FirebaseDatabase.DefaultInstance.RootReference;
+		auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+		
 		if (_instance == null) {
 			_instance = this;
 		}
@@ -35,10 +53,6 @@ public class FireBaseManager : MonoBehaviour
 
 	void Start ()
 	{
-		FirebaseApp.DefaultInstance.SetEditorDatabaseUrl (myProjectURL);
-		reference = FirebaseDatabase.DefaultInstance.RootReference;
-
-		auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
 
 		/*UserModel user = CreateNewUser ("Gustavo");
 		ResponsableModel responsable = CreateNewResponsable ("Geber");
@@ -84,22 +98,39 @@ public class FireBaseManager : MonoBehaviour
 		});
 	}
 
-	private void CreateNewAppoitment (DateTime data, UserModel user, ResponsableModel responsable, string description = " ", int duration = 30)
+	public void CreateNewAppoitment (DateTime data, UserModel user, ResponsableModel responsable, string description = " ", int duration = 30)
 	{
 		string appoitmentID = reference.Child (DBTable.Appoitments.ToString ()).Push ().Key;
 		AppointmentModel appointment = new AppointmentModel (data, user.userID, responsable.responsableID, description, duration);
 
 		user.appoitments[appoitmentID] = (object)responsable.responsableID;
-		responsable.appoitments[appoitmentID] = (object)user.userID;
+//		responsable.appoitments[appoitmentID] = (object)user.userID;
 
 		string json = JsonUtility.ToJson (appointment);
 
 		CreateTable (DBTable.Appoitments, appoitmentID, json);
+		reference.Child (DBTable.Appoitments.ToString ()).Child (appoitmentID).Child(Parameters.date.ToString()).SetValueAsync (data.ToString(Constants.dateformat));
 		reference.Child (DBTable.User.ToString ()).Child (user.userID + "/appointments").SetValueAsync (user.appoitments);
-		reference.Child (DBTable.Responsable.ToString ()).Child (responsable.responsableID + "/appointments").SetValueAsync (responsable.appoitments);
+//		reference.Child (DBTable.Responsable.ToString ()).Child (responsable.responsableID + "/appointments").SetValueAsync (responsable.appoitments);
 	}
 
-	private UserModel CreateNewUser (string userID, string name)
+	public CompanyModel CreateNewCompany(string name)
+	{
+		string companyID = reference.Child (DBTable.Company.ToString ()).Push ().Key;
+		CompanyModel company = new CompanyModel(companyID, name);
+
+		string json = JsonUtility.ToJson (company);
+		CreateTable(DBTable.Company, companyID, json);
+		return company;
+	}
+
+	public void AddEmployeeToCompany(string companyID, ResponsableModel responsableModel)
+	{
+		string json = JsonUtility.ToJson (responsableModel);
+		reference.Child (DBTable.Company.ToString ()).Child(companyID).Child (Parameters.responsables.ToString()).Child(responsableModel.responsableID).SetRawJsonValueAsync (json);
+	}
+
+	public UserModel CreateNewUser (string userID, string name)
 	{
 		UserModel user = new UserModel (userID, name);
 		string json = JsonUtility.ToJson (user);
@@ -108,30 +139,45 @@ public class FireBaseManager : MonoBehaviour
 		return user;
 	}
 
-	private ResponsableModel CreateNewResponsable (string responsableID, string name)
+	public ResponsableModel CreateNewResponsableToCompany (string companyID, string name)
 	{
-		ResponsableModel responsable = new ResponsableModel (responsableID, name);
+		string responsibleID = reference.Child (DBTable.Responsable.ToString ()).Push ().Key;
+		ResponsableModel responsable = new ResponsableModel (responsibleID, name);
 		string json = JsonUtility.ToJson (responsable);
 
-		CreateTable (DBTable.Responsable, responsableID, json);
+		CreateTable (DBTable.Responsable, responsibleID, json);
+		AddEmployeeToCompany(companyID, responsable);
 		return responsable;
 	}
 
-	/*private void AddAppoitmentForUser (UserModel user, ResponsableModel responsable, AppointmentModel appoitment)
-	{
-
-		reference.Child (table.ToString ()).Child (tableID).S;
-	}*/
-
-	private void CreateTable(DBTable table, string tableID, string json) 
+	public void CreateTable(DBTable table, string tableID, string json) 
 	{
 		reference.Child (table.ToString ()).Child (tableID).SetRawJsonValueAsync (json);
 	}
 
-	void GetAllResponsibles()
+	public void GetAllResponsiblesFromCompany(String companyID)
 	{
-		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Appoitments.ToString ()).Child("data").EqualTo (date)
-			.ValueChanged += HandleValueChanged;
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child(companyID).Child(Parameters.responsables.ToString())
+			.GetValueAsync().ContinueWith(task => {
+			if (task.IsFaulted) {
+				// Handle the error...
+			}
+			else if (task.IsCompleted) {
+				DataSnapshot snapshot = task.Result;
+				responsibles.Clear();
+				foreach (var responsible in snapshot.Children)
+				{
+					string json = responsible.GetRawJsonValue();
+					var mresponsible = JsonUtility.FromJson<ResponsableModel>(json);
+					var a = 2;
+				}
+
+				foreach (var print in responsibles)
+				{
+					Debug.Log(print.name);
+				}
+			}
+		});
 	}
 
 	void GetDaySchedule (string date)

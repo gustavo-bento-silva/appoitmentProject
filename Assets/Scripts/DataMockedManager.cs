@@ -12,8 +12,14 @@ public class DataMockedManager : MonoBehaviour
 
 	void Awake()
 	{
-		appointmentList = CreateApoointmentList();
-		companyData = CreateCompanyData();
+	}
+
+	void Start()
+	{
+//		appointmentList = CreateApoointmentList();
+//		companyData = CreateCompanyData();
+//		CreateAppointments();
+		GetAllResponsables();
 	}
 
 	List<AppointmentModel> CreateApoointmentList()
@@ -26,25 +32,26 @@ public class DataMockedManager : MonoBehaviour
 
 	CompanyModel CreateCompanyData()
 	{
-		var company = new CompanyModel("12345", "Empresa");
-		var employee1 = new ResponsableModel("1234", "Funcionario 1");
-		var employee2 = new ResponsableModel("1235", "Funcionario 2");
-		var employee3 = new ResponsableModel("1236", "Funcionario 3");
-		var employee4 = new ResponsableModel("1237", "Funcionario 4");
-		var employee5 = new ResponsableModel("1238", "Funcionario 5");
+		var companyData = FireBaseManager.GetFireBaseInstance().CreateNewCompany("Empresa");
+
+		employers.Add(FireBaseManager.GetFireBaseInstance().CreateNewResponsableToCompany(companyData.companyID, "Funcionario 1"));
+		employers.Add(FireBaseManager.GetFireBaseInstance().CreateNewResponsableToCompany(companyData.companyID, "Funcionario 2"));
+		employers.Add(FireBaseManager.GetFireBaseInstance().CreateNewResponsableToCompany(companyData.companyID, "Funcionario 3"));
+		employers.Add(FireBaseManager.GetFireBaseInstance().CreateNewResponsableToCompany(companyData.companyID, "Funcionario 4"));
 		
-		employers.Add(employee1);
-		employers.Add(employee2);
-		employers.Add(employee3);
-		employers.Add(employee4);
-		employers.Add(employee5);
-		
-		company.employees.Add("1", employee1);
-		company.employees.Add("2", employee2);
-		company.employees.Add("3", employee3);
-		company.employees.Add("4", employee4);
-		company.employees.Add("5", employee5);
-		
-		return company;
+		return companyData;
+	}
+
+	void GetAllResponsables()
+	{
+		FireBaseManager.GetFireBaseInstance().GetAllResponsiblesFromCompany("-L6MAdWzOuaopL3vJqN4");
+		var a = 2;
+	}
+
+	void CreateAppointments()
+	{
+		FireBaseManager.GetFireBaseInstance().CreateNewAppoitment(DateTime.Today, new UserModel("1", "Gustavo"), new ResponsableModel("1", "Bento"));
+		FireBaseManager.GetFireBaseInstance().CreateNewAppoitment(DateTime.Today, new UserModel("2", "Thamyris"), new ResponsableModel("2", "Galvão"));
+		FireBaseManager.GetFireBaseInstance().CreateNewAppoitment(DateTime.Today, new UserModel("3", "Marcia"), new ResponsableModel("3", "Perli"));
 	}
 }

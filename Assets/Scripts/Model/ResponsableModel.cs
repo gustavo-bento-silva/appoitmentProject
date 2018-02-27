@@ -1,18 +1,21 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+[Serializable]
 public class ResponsableModel : MonoBehaviour {
 	
 	public string responsableID;
 	public string name;
-	[SerializeField]
-	public Dictionary<string, object> appoitments;
+	
+//	[NonSerialized]
+//	public Dictionary<string, object> appoitments;
 
 	public ResponsableModel (string responsableID, string name)
 	{
 		this.responsableID = responsableID;
 		this.name = name;
-		appoitments = new Dictionary<string, object> ();
+//		appoitments = new Dictionary<string, object> ();
 	}
 }

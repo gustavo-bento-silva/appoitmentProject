@@ -255,6 +255,7 @@
           </e>
         </e>
         <e p="Scripts" t="Include">
+          <e p="Constants.cs" t="Include" />
           <e p="DataMockedManager.cs" t="Include" />
           <e p="Firebase" t="Include">
             <e p="FireBaseManager.cs" t="Include" />

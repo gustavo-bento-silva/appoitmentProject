@@ -4,6 +4,7 @@ using System.Collections;
 
 public class AppointmentModel : MonoBehaviour {
 
+	[SerializeField]
 	public DateTime data;
 	public string userID;
 	public string responsableID;
