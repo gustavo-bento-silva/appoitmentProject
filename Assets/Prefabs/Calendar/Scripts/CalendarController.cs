@@ -3,19 +3,22 @@ using System.Collections;
 using System;
 using UnityEngine.UI;
 
-public class CalendarController : MonoBehaviour {
-
+public class CalendarController : MonoBehaviour
+{
+	public int id;
 	public GameObject[] lines;
 	public Text _month;
 	public Text _year;
 	public Color todayColor;
 
+	private DateTime currentDateTime = DateTime.Now;
 	Image[][] background;
 	Text[][] linesText;
 	// Use this for initialization
 	void Start () {
 		InitializeVariables ();
-		FillCalendar (DateTime.Now.Month, DateTime.Now.Year);
+		DateTime dateTime = currentDateTime.AddMonths(id);
+		FillCalendar(dateTime.Month, dateTime.Year);
 	}
 	
 	// Update is called once per frame

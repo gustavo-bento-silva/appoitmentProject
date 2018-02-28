@@ -1,11 +1,14 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class UserModel : MonoBehaviour {
+[Serializable]
+public class UserModel {
 
 	public string userID;
 	public string name;
+	
 	[SerializeField]
 	public Dictionary<string, object> appoitments;
 

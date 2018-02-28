@@ -28,9 +28,6 @@ public class FireBaseManager : MonoBehaviour
 {
 	public static FireBaseManager _instance;
 
-	public static List<ResponsableModel> responsibles = new List<ResponsableModel>();
-	public static List<ResponsableModel> userAppoitments = new List<ResponsableModel>();
-
 	string myProjectURL = "https://appointmentproject-a7233.firebaseio.com/";
 	DatabaseReference reference;
 	Firebase.Auth.FirebaseAuth auth;
@@ -53,7 +50,7 @@ public class FireBaseManager : MonoBehaviour
 
 	void Start ()
 	{
-
+		
 		/*UserModel user = CreateNewUser ("Gustavo");
 		ResponsableModel responsable = CreateNewResponsable ("Geber");
 
@@ -92,26 +89,27 @@ public class FireBaseManager : MonoBehaviour
 
 			// Firebase user has been created.
 			user = task.Result;
-			CreateNewUser(user.UserId, user.DisplayName);
+//			CreateNewUser(user.UserId, user.DisplayName);
 			Debug.LogFormat("Firebase user created successfully: {0} ({1})",
 				user.DisplayName, user.UserId);
 		});
 	}
 
-	public void CreateNewAppoitment (DateTime data, UserModel user, ResponsableModel responsable, string description = " ", int duration = 30)
+	public void CreateNewAppoitment (UserModel user, ResponsableModel responsable, AppointmentModel appointment)
 	{
 		string appoitmentID = reference.Child (DBTable.Appoitments.ToString ()).Push ().Key;
-		AppointmentModel appointment = new AppointmentModel (data, user.userID, responsable.responsableID, description, duration);
+		appointment.AppointmentID = appoitmentID;
 
-		user.appoitments[appoitmentID] = (object)responsable.responsableID;
+//		TODO Get appointments dinamicaly
+//		user.appoitments[appoitmentID] = (object)responsable.responsableID;
 //		responsable.appoitments[appoitmentID] = (object)user.userID;
 
 		string json = JsonUtility.ToJson (appointment);
 
 		CreateTable (DBTable.Appoitments, appoitmentID, json);
-		reference.Child (DBTable.Appoitments.ToString ()).Child (appoitmentID).Child(Parameters.date.ToString()).SetValueAsync (data.ToString(Constants.dateformat));
-		reference.Child (DBTable.User.ToString ()).Child (user.userID + "/appointments").SetValueAsync (user.appoitments);
-//		reference.Child (DBTable.Responsable.ToString ()).Child (responsable.responsableID + "/appointments").SetValueAsync (responsable.appoitments);
+		reference.Child (DBTable.Appoitments.ToString ()).Child (appoitmentID).Child(Parameters.date.ToString()).SetValueAsync (appointment.data.ToString(Constants.dateformat));
+		reference.Child (DBTable.User.ToString ()).Child (user.userID).Child(Parameters.appointments + "/" + appoitmentID).SetRawJsonValueAsync(json);
+		reference.Child (DBTable.Responsable.ToString ()).Child (responsable.responsableID).Child(Parameters.appointments + "/" + appoitmentID).SetRawJsonValueAsync(json);
 	}
 
 	public CompanyModel CreateNewCompany(string name)
@@ -130,8 +128,9 @@ public class FireBaseManager : MonoBehaviour
 		reference.Child (DBTable.Company.ToString ()).Child(companyID).Child (Parameters.responsables.ToString()).Child(responsableModel.responsableID).SetRawJsonValueAsync (json);
 	}
 
-	public UserModel CreateNewUser (string userID, string name)
+	public UserModel CreateNewUser (/*string userID,*/ string name)
 	{
+		string userID = reference.Child (DBTable.User.ToString ()).Push ().Key;
 		UserModel user = new UserModel (userID, name);
 		string json = JsonUtility.ToJson (user);
 
@@ -155,7 +154,7 @@ public class FireBaseManager : MonoBehaviour
 		reference.Child (table.ToString ()).Child (tableID).SetRawJsonValueAsync (json);
 	}
 
-	public void GetAllResponsiblesFromCompany(String companyID)
+	public void GetAllResponsiblesFromCompany(String companyID, Delegates.GetAllResponsibles getAllResponsiblesListener)
 	{
 		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child(companyID).Child(Parameters.responsables.ToString())
 			.GetValueAsync().ContinueWith(task => {
@@ -164,18 +163,14 @@ public class FireBaseManager : MonoBehaviour
 			}
 			else if (task.IsCompleted) {
 				DataSnapshot snapshot = task.Result;
-				responsibles.Clear();
+				List<ResponsableModel> responsibles = new List<ResponsableModel>();
 				foreach (var responsible in snapshot.Children)
 				{
 					string json = responsible.GetRawJsonValue();
-					var mresponsible = JsonUtility.FromJson<ResponsableModel>(json);
-					var a = 2;
+					responsibles.Add(JsonUtility.FromJson<ResponsableModel>(json));
 				}
 
-				foreach (var print in responsibles)
-				{
-					Debug.Log(print.name);
-				}
+				getAllResponsiblesListener(responsibles);
 			}
 		});
 	}
@@ -185,6 +180,41 @@ public class FireBaseManager : MonoBehaviour
 		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Appoitments.ToString ()).Child("data").EqualTo (date)
 			.ValueChanged += HandleValueChanged;
 
+	}
+
+	public void GetUserByID(string userID, Delegates.GetUserByID getUserById)
+	{
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.User.ToString ()).Child(userID)
+			.GetValueAsync().ContinueWith(task => {
+				if (task.IsFaulted) {
+					// Handle the error...
+				}
+				else if (task.IsCompleted) {
+					DataSnapshot snapshot = task.Result;
+					var userJson = snapshot.GetRawJsonValue();
+					var user = JsonUtility.FromJson<UserModel>(userJson);
+					getUserById (user);
+					
+				}
+			});
+	}	
+	
+	public void GetResponsibleByID(string responsibleID, Delegates.GetResponsiblesByID getResponsiblesById)
+	{
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsable.ToString ()).Child(responsibleID)
+		.GetValueAsync().ContinueWith(task => {
+			if (task.IsFaulted) {
+				// Handle the error...
+			}
+			else if (task.IsCompleted) {
+				DataSnapshot snapshot = task.Result;
+				var userJson = snapshot.GetRawJsonValue();
+				var responsible = JsonUtility.FromJson<ResponsableModel>(userJson);
+				getResponsiblesById (responsible);
+					
+			}
+		});
+		
 	}
 
 	void HandleValueChanged(object sender, ValueChangedEventArgs args) {
