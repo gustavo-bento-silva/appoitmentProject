@@ -4,19 +4,15 @@ using System.Collections;
 using System.Collections.Generic;
 
 [System.Serializable]
-public class ResponsableModel {
-	
+public class ResponsableModel : UserModel
+{
 	[SerializeField]
-	public string responsableID;
-	public string name;
+	public Dictionary<string, object> servicesProvided;
 	
-//	[NonSerialized]
-	public Dictionary<string, object> appoitments;
 
-	public ResponsableModel (string responsableID, string name)
+	public ResponsableModel(string responsibleId, string name) : base(responsibleId, name, Constants.UserType.Responsable)
 	{
-		this.responsableID = responsableID;
-		this.name = name;
-		appoitments = new Dictionary<string, object> ();
+		servicesProvided = new Dictionary<string, object> ();
 	}
+		
 }

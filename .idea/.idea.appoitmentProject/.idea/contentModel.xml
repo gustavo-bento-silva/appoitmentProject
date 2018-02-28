@@ -269,6 +269,7 @@
             <e p="AppointmentModel.cs" t="Include" />
             <e p="CompanyModel.cs" t="Include" />
             <e p="ResponsableModel.cs" t="Include" />
+            <e p="ServicesProvidedModel.cs" t="Include" />
             <e p="UserModel.cs" t="Include" />
           </e>
           <e p="PlayerPreferences" t="Include">

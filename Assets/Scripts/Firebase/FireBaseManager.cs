@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Firebase;
 using Firebase.Unity.Editor;
 using Firebase.Database;
@@ -21,7 +22,8 @@ public enum Parameters
 {
 	appointments,
 	date,
-	responsables
+	responsables,
+	servicesProvided
 }
 	
 public class FireBaseManager : MonoBehaviour
@@ -101,7 +103,7 @@ public class FireBaseManager : MonoBehaviour
 		appointment.AppointmentID = appoitmentID;
 
 //		TODO Get appointments dinamicaly
-//		user.appoitments[appoitmentID] = (object)responsable.responsableID;
+//		user.appoitments[appoitmentID] = (object)responsable.userID;
 //		responsable.appoitments[appoitmentID] = (object)user.userID;
 
 		string json = JsonUtility.ToJson (appointment);
@@ -109,7 +111,7 @@ public class FireBaseManager : MonoBehaviour
 		CreateTable (DBTable.Appoitments, appoitmentID, json);
 		reference.Child (DBTable.Appoitments.ToString ()).Child (appoitmentID).Child(Parameters.date.ToString()).SetValueAsync (appointment.data.ToString(Constants.dateformat));
 		reference.Child (DBTable.User.ToString ()).Child (user.userID).Child(Parameters.appointments + "/" + appoitmentID).SetRawJsonValueAsync(json);
-		reference.Child (DBTable.Responsable.ToString ()).Child (responsable.responsableID).Child(Parameters.appointments + "/" + appoitmentID).SetRawJsonValueAsync(json);
+		reference.Child (DBTable.Responsable.ToString ()).Child (responsable.userID).Child(Parameters.appointments + "/" + appoitmentID).SetRawJsonValueAsync(json);
 	}
 
 	public CompanyModel CreateNewCompany(string name)
@@ -122,10 +124,24 @@ public class FireBaseManager : MonoBehaviour
 		return company;
 	}
 
+	public void AddServicesToCompany(CompanyModel company, List<ServicesProvidedModel> services)
+	{
+		var servicesDictionary = new Dictionary<string, object>();
+		foreach (var service in services)
+		{
+			service.serviceID = reference.Child (DBTable.Company.ToString ()).Push ().Key;
+			servicesDictionary[service.serviceID] = (object)service;
+			company.servicesProvided.Add(service.serviceID, (object)service);
+		}
+		string json = JsonUtility.ToJson (servicesDictionary);
+		reference.Child (DBTable.Company.ToString ()).Child (company.companyID).Child(Parameters.servicesProvided.ToString()).SetRawJsonValueAsync(json);
+
+	}
+
 	public void AddEmployeeToCompany(string companyID, ResponsableModel responsableModel)
 	{
 		string json = JsonUtility.ToJson (responsableModel);
-		reference.Child (DBTable.Company.ToString ()).Child(companyID).Child (Parameters.responsables.ToString()).Child(responsableModel.responsableID).SetRawJsonValueAsync (json);
+		reference.Child (DBTable.Company.ToString ()).Child(companyID).Child (Parameters.responsables.ToString()).Child(responsableModel.userID).SetRawJsonValueAsync (json);
 	}
 
 	public UserModel CreateNewUser (/*string userID,*/ string name)
@@ -138,13 +154,15 @@ public class FireBaseManager : MonoBehaviour
 		return user;
 	}
 
-	public ResponsableModel CreateNewResponsableToCompany (string companyID, string name)
+	public ResponsableModel CreateNewResponsableToCompany (string companyID, string name, List<ServicesProvidedModel> servicesProvided)
 	{
 		string responsibleID = reference.Child (DBTable.Responsable.ToString ()).Push ().Key;
 		ResponsableModel responsable = new ResponsableModel (responsibleID, name);
+		responsable.servicesProvided = servicesProvided.ToDictionary(x => x.serviceID, x => (object)x);
 		string json = JsonUtility.ToJson (responsable);
 
 		CreateTable (DBTable.Responsable, responsibleID, json);
+		CreateTable (DBTable.User, responsibleID, json);
 		AddEmployeeToCompany(companyID, responsable);
 		return responsable;
 	}

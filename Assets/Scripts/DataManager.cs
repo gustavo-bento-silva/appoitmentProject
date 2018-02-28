@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class DataManager : MonoBehaviour
@@ -16,7 +17,8 @@ public class DataManager : MonoBehaviour
 
 	void Start()
 	{
-		GetUserByID();
+//		GetUserByID();
+		CreateCompanyData();
 	}
 
 	List<AppointmentModel> CreateApoointmentList()
@@ -29,12 +31,20 @@ public class DataManager : MonoBehaviour
 
 	CompanyModel CreateCompanyData()
 	{
-		var companyData = FireBaseManager.GetFireBaseInstance().CreateNewCompany("Empresa");
+		companyData = FireBaseManager.GetFireBaseInstance().CreateNewCompany("Minha Empresa");
+		
+		var servicesList = new List<ServicesProvidedModel>();
+		servicesList.Add(new ServicesProvidedModel("Cabeleireiro", 1));
+		servicesList.Add(new ServicesProvidedModel("Manicure", 0.5f));
+		servicesList.Add(new ServicesProvidedModel("Pedicure", 1.5f));
+		FireBaseManager.GetFireBaseInstance().AddServicesToCompany(companyData, servicesList);
+		
+		employers.Add(FireBaseManager.GetFireBaseInstance().CreateNewResponsableToCompany(companyData.companyID, "Funcionario 1", new List<ServicesProvidedModel> {servicesList[0]}));
+		employers.Add(FireBaseManager.GetFireBaseInstance().CreateNewResponsableToCompany(companyData.companyID, "Funcionario 2", new List<ServicesProvidedModel> {servicesList[1]}));
+		employers.Add(FireBaseManager.GetFireBaseInstance().CreateNewResponsableToCompany(companyData.companyID, "Funcionario 3", new List<ServicesProvidedModel> {servicesList[2]}));
+		employers.Add(FireBaseManager.GetFireBaseInstance().CreateNewResponsableToCompany(companyData.companyID, "Funcionario 4", servicesList));
 
-		employers.Add(FireBaseManager.GetFireBaseInstance().CreateNewResponsableToCompany(companyData.companyID, "Funcionario 1"));
-		employers.Add(FireBaseManager.GetFireBaseInstance().CreateNewResponsableToCompany(companyData.companyID, "Funcionario 2"));
-		employers.Add(FireBaseManager.GetFireBaseInstance().CreateNewResponsableToCompany(companyData.companyID, "Funcionario 3"));
-		employers.Add(FireBaseManager.GetFireBaseInstance().CreateNewResponsableToCompany(companyData.companyID, "Funcionario 4"));
+		companyData.employees = employers.ToDictionary(x => x.userID, x => (object) x);
 		
 		return companyData;
 	}
@@ -52,7 +62,7 @@ public class DataManager : MonoBehaviour
 
 	public static void CreateNewAppointment(UserModel user, ResponsableModel responsible)
 	{
-		var appointment = new AppointmentModel(DateTime.Now, user.userID, responsible.responsableID);
+		var appointment = new AppointmentModel(DateTime.Now, user.userID, responsible.userID);
 		FireBaseManager.GetFireBaseInstance().CreateNewAppoitment(user, responsible, appointment);
 	}
 
