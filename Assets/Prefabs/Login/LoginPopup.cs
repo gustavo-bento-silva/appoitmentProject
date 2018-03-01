@@ -8,6 +8,6 @@ public class LoginPopup : MonoBehaviour {
 
 	void LoginClick ()
 	{
-		FireBaseManager.GetFireBaseInstance ().UserLogin (email.text, password.text);
+		FirebaseAuth.GetFireBaseAuthInstance().UserLogin (email.text, password.text);
 	}
 }

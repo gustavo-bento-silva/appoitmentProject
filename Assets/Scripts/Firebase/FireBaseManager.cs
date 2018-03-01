@@ -32,8 +32,6 @@ public class FireBaseManager : MonoBehaviour
 
 	string myProjectURL = "https://appointmentproject-a7233.firebaseio.com/";
 	DatabaseReference reference;
-	Firebase.Auth.FirebaseAuth auth;
-	public Firebase.Auth.FirebaseUser user;
 
 	public static FireBaseManager GetFireBaseInstance(){
 		return _instance;
@@ -43,7 +41,6 @@ public class FireBaseManager : MonoBehaviour
 		
 		FirebaseApp.DefaultInstance.SetEditorDatabaseUrl (myProjectURL);
 		reference = FirebaseDatabase.DefaultInstance.RootReference;
-		auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
 		
 		if (_instance == null) {
 			_instance = this;
@@ -58,43 +55,6 @@ public class FireBaseManager : MonoBehaviour
 
 		CreateNewAppoitment ("2017-10-24", user, responsable, "08:00");*/
 
-	}
-
-	public void UserLogin(string email, string password){
-		auth.SignInWithEmailAndPasswordAsync(email, password).ContinueWith(task => {
-			if (task.IsCanceled) {
-				Debug.LogError("SignInWithEmailAndPasswordAsync was canceled.");
-				return;
-			}
-			if (task.IsFaulted) {
-				Debug.LogError("SignInWithEmailAndPasswordAsync encountered an error: " + task.Exception);
-				return;
-			}
-
-			user = task.Result;
-			Debug.LogFormat("User signed in successfully: {0} ({1})",
-				user.DisplayName, user.UserId);
-		});
-	}
-
-	public void CreateNewUserWithEmailAndPassword(string email, string password)
-	{
-		auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWith(task => {
-			if (task.IsCanceled) {
-				Debug.LogError("CreateUserWithEmailAndPasswordAsync was canceled.");
-				return;
-			}
-			if (task.IsFaulted) {
-				Debug.LogError("CreateUserWithEmailAndPasswordAsync encountered an error: " + task.Exception);
-				return;
-			}
-
-			// Firebase user has been created.
-			user = task.Result;
-//			CreateNewUser(user.UserId, user.DisplayName);
-			Debug.LogFormat("Firebase user created successfully: {0} ({1})",
-				user.DisplayName, user.UserId);
-		});
 	}
 
 	public void CreateNewAppoitment (UserModel user, ResponsableModel responsable, AppointmentModel appointment)

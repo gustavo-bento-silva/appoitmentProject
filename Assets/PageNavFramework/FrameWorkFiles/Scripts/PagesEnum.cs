@@ -4,10 +4,10 @@ using System.Collections;
 namespace PageNavFrameWork{
 	public enum PagesEnum {
 		None = 0,
-		ExamplePage=1,
-		ExamplePageDois=2,
-		CalendarPage=3,
-		ScheduleDetailPage=4,
-		ScheduleAppointment=5
+		CalendarPage=1,
+		ScheduleDetailPage=2,
+		ScheduleAppointment=3,
+		LoginPage=4,
+		LoginWithEmailPopup=5
 	}
 }

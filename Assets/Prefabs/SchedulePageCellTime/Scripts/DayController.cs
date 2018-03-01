@@ -22,7 +22,7 @@ public class DayController : MonoBehaviour
 	public void OnCellClick()
 	{
 		var pageNav = PageNav.GetPageNavInstance();
-		pageNav.OpenModal(pageNav.GetPagePrefabByEnum(PagesEnum.ExamplePage));
+//		pageNav.OpenModal(pageNav.GetPagePrefabByEnum(PagesEnum.ExamplePage));
 	}
 
 	public static GameObject Instantiate(Transform CellPrefabTransform, Transform listContentReference, string time, string description)

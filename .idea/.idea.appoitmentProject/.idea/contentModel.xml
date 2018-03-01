@@ -134,11 +134,11 @@
             <e p="CalendarPage" t="Include">
               <e p="CalendarPageController.cs" t="Include" />
             </e>
-            <e p="ExamplePage" t="Include">
-              <e p="ExamplePageController.cs" t="Include" />
+            <e p="LoginPage" t="Include">
+              <e p="LoginPageController.cs" t="Include" />
             </e>
-            <e p="ExamplePageDois" t="Include">
-              <e p="ExamplePageDoisController.cs" t="Include" />
+            <e p="LoginWithEmailPopup" t="Include">
+              <e p="LoginWithEmailPopupController.cs" t="Include" />
             </e>
             <e p="ScheduleAppointment" t="Include">
               <e p="ScheduleAppointmentController.cs" t="Include" />
@@ -256,11 +256,18 @@
         </e>
         <e p="Scripts" t="Include">
           <e p="Constants.cs" t="Include" />
-          <e p="DataManager.cs" t="Include" />
+          <e p="Data" t="Include">
+            <e p="DataManager.cs" t="Include" />
+            <e p="PlayerPreferences" t="Include">
+              <e p="PlayerData.cs" t="Include" />
+              <e p="PlayerPreferences.cs" t="Include" />
+            </e>
+          </e>
           <e p="Delegates" t="Include">
             <e p="Delegates.cs" t="Include" />
           </e>
           <e p="Firebase" t="Include">
+            <e p="FirebaseAuth.cs" t="Include" />
             <e p="FireBaseManager.cs" t="Include" />
           </e>
           <e p="GetButtonDay.cs" t="Include" />
@@ -271,10 +278,6 @@
             <e p="ResponsableModel.cs" t="Include" />
             <e p="ServicesProvidedModel.cs" t="Include" />
             <e p="UserModel.cs" t="Include" />
-          </e>
-          <e p="PlayerPreferences" t="Include">
-            <e p="PlayerData.cs" t="Include" />
-            <e p="PlayerPreferences.cs" t="Include" />
           </e>
         </e>
       </e>

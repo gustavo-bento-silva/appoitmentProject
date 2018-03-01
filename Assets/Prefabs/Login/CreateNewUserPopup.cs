@@ -8,6 +8,6 @@ public class CreateNewUserPopup : MonoBehaviour {
 
 	void CreateNewUserClick ()
 	{
-		FireBaseManager.GetFireBaseInstance ().CreateNewUserWithEmailAndPassword(email.text, password.text);
+		FirebaseAuth.GetFireBaseAuthInstance().CreateNewUserWithEmailAndPassword(email.text, password.text);
 	}
 }

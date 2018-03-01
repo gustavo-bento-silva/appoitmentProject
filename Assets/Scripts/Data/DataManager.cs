@@ -18,7 +18,7 @@ public class DataManager : MonoBehaviour
 	void Start()
 	{
 //		GetUserByID();
-		CreateCompanyData();
+//		CreateCompanyData();
 	}
 
 	List<AppointmentModel> CreateApoointmentList()

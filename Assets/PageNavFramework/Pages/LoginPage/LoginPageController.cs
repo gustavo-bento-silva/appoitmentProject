@@ -2,15 +2,13 @@ using UnityEngine;
 using System.Collections;
 using PageNavFrameWork;
 
-public class ExamplePageController : PageController{
+public class LoginPageController : PageController{
 
 	void Start () {
-		
+
 	}
 	
 	void Update () {
-		
+
 	}
-	
-	
 }
