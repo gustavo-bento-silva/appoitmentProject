@@ -6,24 +6,28 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using System;
 
-namespace PageNavFrameWork{
-	public class PageNav : MonoBehaviour {
+namespace PageNavFrameWork
+{
+	public class PageNav : MonoBehaviour
+	{
 
 		private static PageNav _instance = null;
 
 		public PageNavSettings settings;
 		public Transform Container;
 		public Transform CachingContainer;
-		public PagesEnum InitialPage= PagesEnum.None;
+		public PagesEnum InitialPage = PagesEnum.None;
 		public PagesEnum LoadingPage = PagesEnum.None;
+		public PagesEnum ErrorPopup = PagesEnum.None;
+		public PagesEnum SuccessPopup = PagesEnum.None;
 		public PageTransition DefaultPageTransition = null;
 		public PageTransition DefaultModalTransition = null;
 		[HideInInspector]
 		private PageController _CurrentPage = null;
 		public bool UseAndroidBackButton = true;
 
-		public int PageStackLength{
-			get{
+		public int PageStackLength {
+			get {
 				return PagesStack.Count;
 			}
 		}
@@ -31,46 +35,51 @@ namespace PageNavFrameWork{
 		private const int positionOffSet = 300;
 		private Vector3 sideMenuInitialPosition;
 		private RectTransform _loadingPage = null;
+		private RectTransform _successPopup = null;
+		private RectTransform _errorPopup = null;
 		private GameObject _PopUp = null;
 		private PageController _PopUpController = null;
 		private bool mutex = false;
 		private bool transitionMutex = false;
-		private Dictionary<PagesEnum,GameObject> CachedPages = new Dictionary<PagesEnum, GameObject>();
+		private Dictionary<PagesEnum,GameObject> CachedPages = new Dictionary<PagesEnum, GameObject> ();
 		private bool deactivateBehindPage = true;
 
 		[SerializeField]
-		private Stack<PageController> PagesStack = new Stack <PageController>();
+		private Stack<PageController> PagesStack = new Stack <PageController> ();
 
 		/// <summary>
 		/// Gets the menu instance. The return may be NULL.
 		/// </summary>
-		public static PageNav GetPageNavInstance(){
+		public static PageNav GetPageNavInstance ()
+		{
 			return _instance;
 		}
-			
-		void Awake()
+
+		void Awake ()
 		{
-			if(_instance  == null){
+			if (_instance == null) {
 				_instance = this;
 			}
 		}
 
 		
-		void Start () 
+		void Start ()
 		{
-			if(Container == null){
+			if (Container == null) {
 				Container = transform.Find ("Container").transform;
 			}
 
 			//Load Cached pages
-			LoadCachedPages();
+			LoadCachedPages ();
+
+			InstatiateSuccessAndErrorPopupAndHide ();
 
 			//instantiate loading page, and hide it
 			if (LoadingPage != PagesEnum.None) {
-				if(settings.PagesCacheSettings[((int)LoadingPage)-1]){
-					_loadingPage = CachedPages[LoadingPage].transform as RectTransform;
-				}else{
-					_loadingPage = Instantiate (GetPagePrefabByEnum(LoadingPage)).transform as RectTransform;
+				if (settings.PagesCacheSettings [((int)LoadingPage) - 1]) {
+					_loadingPage = CachedPages [LoadingPage].transform as RectTransform;
+				} else {
+					_loadingPage = Instantiate (GetPagePrefabByEnum (LoadingPage)).transform as RectTransform;
 				}
 
 				_loadingPage.SetParent (this.transform, false);
@@ -88,36 +97,67 @@ namespace PageNavFrameWork{
 			}
 		}
 
-		
-		void Update () 
+		void InstatiateSuccessAndErrorPopupAndHide ()
 		{
-			if(Input.GetKeyDown(KeyCode.Escape) && UseAndroidBackButton){
+			if (ErrorPopup != PagesEnum.None) {
+				if (settings.PagesCacheSettings [((int)ErrorPopup) - 1]) {
+					_errorPopup = CachedPages [ErrorPopup].transform as RectTransform;
+				} else {
+					_errorPopup = Instantiate (GetPagePrefabByEnum (ErrorPopup)).transform as RectTransform;
+				}
+
+				_errorPopup.SetParent (this.transform, false);
+				ArrangePageTransform (_errorPopup.gameObject);
+				SetLoadingVisibility (false);
+			} else {
+				Debug.LogWarning ("The PageNav has no ErrorPopup");
+			}
+			if (SuccessPopup != PagesEnum.None) {
+				if (settings.PagesCacheSettings [((int)SuccessPopup) - 1]) {
+					_successPopup = CachedPages [SuccessPopup].transform as RectTransform;
+				} else {
+					_successPopup = Instantiate (GetPagePrefabByEnum (SuccessPopup)).transform as RectTransform;
+				}
+
+				_successPopup.SetParent (this.transform, false);
+				ArrangePageTransform (_successPopup.gameObject);
+				SetLoadingVisibility (false);
+			} else {
+				Debug.LogWarning ("The PageNav has no SuccessPopup");
+			}
+		}
+
+		void Update ()
+		{
+			if (Input.GetKeyDown (KeyCode.Escape) && UseAndroidBackButton) {
 				if (_PopUp) {
-					if(_PopUpController.usesBackButton){
+					if (_PopUpController.usesBackButton) {
 						CloseModal ();
 					}
 				} else {
-					if(_CurrentPage.usesBackButton){
+					if (_CurrentPage.usesBackButton) {
 						PopPageFromStack ();
 					}
 				}
 			}
 		}
 
-		void PresentFirstPage(PagesEnum page){
+		void PresentFirstPage (PagesEnum page)
+		{
 			SetLoadingVisibility (true);
-			StartCoroutine (AsyncShowFirstPage(page));
+			StartCoroutine (AsyncShowFirstPage (page));
 		}
 
 
-		private IEnumerator AsyncShowFirstPage(PagesEnum page){
+		private IEnumerator AsyncShowFirstPage (PagesEnum page)
+		{
 
 			var pageInstance = CreatePageInstance (page);
 			PageController pageController = pageInstance.GetComponent<PageController> ();
 			pageInstance.GetComponent<Canvas> ().renderMode = RenderMode.WorldSpace;
 
 			pageInstance.transform.SetParent (this.Container);
-			if(!pageController.isCached){
+			if (!pageController.isCached) {
 				SetComponentsForPages (pageInstance.gameObject);
 			}
 
@@ -134,13 +174,13 @@ namespace PageNavFrameWork{
 			yield return null;
 		}
 
-		void ArrangeNewPageTransform(RectTransform newPage)
+		void ArrangeNewPageTransform (RectTransform newPage)
 		{
 			newPage.anchorMin = Vector2.zero;
 			newPage.anchorMax = new Vector2 (1, 1);
-			newPage.offsetMax = new Vector2((Container.transform as RectTransform).rect.width,0);
-			newPage.offsetMin = new Vector2((Container.transform as RectTransform).rect.width,0);
-			newPage.localScale = new Vector3 (1,1,1);
+			newPage.offsetMax = new Vector2 ((Container.transform as RectTransform).rect.width, 0);
+			newPage.offsetMin = new Vector2 ((Container.transform as RectTransform).rect.width, 0);
+			newPage.localScale = new Vector3 (1, 1, 1);
 		}
 
 		/// <summary>
@@ -153,22 +193,44 @@ namespace PageNavFrameWork{
 			(pageInstance.transform as RectTransform).anchorMax = new Vector2 (1, 1);
 			(pageInstance.transform as RectTransform).offsetMax = Vector2.zero;
 			(pageInstance.transform as RectTransform).offsetMin = Vector2.zero;
-			(pageInstance.transform as RectTransform).localScale = new Vector3 (1,1,1);
+			(pageInstance.transform as RectTransform).localScale = new Vector3 (1, 1, 1);
 		}
 
-		public void SetLoadingVisibility(bool state){
-			if(!_loadingPage){
+		public void SetSuccessVisibility (bool state)
+		{
+			if (!_successPopup) {
 				return;
 			}
+			_successPopup.SetAsLastSibling ();
+			_successPopup.gameObject.SetActive (state);
+		}
+
+		public void SetErrorVisibility (bool state)
+		{
+			if (!_errorPopup) {
+				return;
+			}
+			_errorPopup.SetAsLastSibling ();
+			_errorPopup.gameObject.SetActive (state);
+		}
+
+		public void SetLoadingVisibility (bool state)
+		{
+			if (!_loadingPage) {
+				return;
+			}
+			_loadingPage.SetAsLastSibling ();
 			_loadingPage.gameObject.SetActive (state);
 		}
 
-		public PageController GetCurrentPage(){
+		public PageController GetCurrentPage ()
+		{
 			return _CurrentPage;
 		}
 
-		public void CloseModal(){
-			if(_PopUp && !transitionMutex){
+		public void CloseModal ()
+		{
+			if (_PopUp && !transitionMutex) {
 				transitionMutex = true;
 				PageController pageController = _PopUp.GetComponent<PageController> ();
 				ArrangePageTransform (_CurrentPage.gameObject);
@@ -184,9 +246,10 @@ namespace PageNavFrameWork{
 			}
 		}
 
-		void RemoveCanvasRayCastOfContent(GameObject go){
+		void RemoveCanvasRayCastOfContent (GameObject go)
+		{
 			GraphicRaycaster gr = go.GetComponent<GraphicRaycaster> ();
-			if(gr){
+			if (gr) {
 				GameObject.Destroy (gr);
 			}
 		}
@@ -198,34 +261,38 @@ namespace PageNavFrameWork{
 			GameObject.Destroy (pageInstance.gameObject.GetComponent<Canvas> ());
 		}
 
-		public GameObject GetPagePrefabByEnum(PagesEnum pageEnum){
-			if(pageEnum == PagesEnum.None){
+		public GameObject GetPagePrefabByEnum (PagesEnum pageEnum)
+		{
+			if (pageEnum == PagesEnum.None) {
 				return null;
 			}
 			GameObject prefab = GetPagePrefabOrCachedPage (pageEnum);
-			if(!prefab){
-				Debug.LogWarning ("Trying to get prefab from enum "+pageEnum.ToString()+", but prefab is empty.");
+			if (!prefab) {
+				Debug.LogWarning ("Trying to get prefab from enum " + pageEnum.ToString () + ", but prefab is empty.");
 			}
 			return prefab;
-		}	
+		}
 
-		public PageArgs GetDefaultPageArgs(PagesEnum pageEnum){
-			if(pageEnum == PagesEnum.None){
+		public PageArgs GetDefaultPageArgs (PagesEnum pageEnum)
+		{
+			if (pageEnum == PagesEnum.None) {
 				return null;
 			}
 			int index = (int)pageEnum - 1;
-			return settings.PagesCustomArguments[index];
+			return settings.PagesCustomArguments [index];
 		}
 
-		public void FinishedPageTransitionTo(PageController oldPage, PageController newPage){
-			if(deactivateBehindPage){
+		public void FinishedPageTransitionTo (PageController oldPage, PageController newPage)
+		{
+			if (deactivateBehindPage) {
 				oldPage.gameObject.SetActive (false);
 				oldPage.DisablePage ();
 			}
 			transitionMutex = false;
 		}
 
-		public void FinishedPageTransitionFrom(PageController oldPage, PageController newPage){
+		public void FinishedPageTransitionFrom (PageController oldPage, PageController newPage)
+		{
 			Destroy (newPage.gameObject);
 			transitionMutex = false;
 		}
@@ -234,12 +301,13 @@ namespace PageNavFrameWork{
 		/// Pushs the page to stack. If Page's transition is NULL, then default transition will occur.
 		/// </summary>
 		/// <param name="PageEnum">Page enum.</param>
-		public void PushPageToStack(PagesEnum pageEnum, bool deactivateBehindPage=true){
-			if((int)pageEnum -1 >= settings.PagesPrefabs.Count){
+		public void PushPageToStack (PagesEnum pageEnum, bool deactivateBehindPage = true)
+		{
+			if ((int)pageEnum - 1 >= settings.PagesPrefabs.Count) {
 				Debug.LogWarning ("The pageEnum you are trying to use does not exist!");
 				return;
 			}
-			if(!transitionMutex){
+			if (!transitionMutex) {
 				this.deactivateBehindPage = deactivateBehindPage;
 				transitionMutex = true;
 				var pageInstance = CreatePageInstance (pageEnum);
@@ -267,12 +335,13 @@ namespace PageNavFrameWork{
 		/// </summary>
 		/// <param name="pageEnum">Page enum.</param>
 		/// <param name="args">Arguments.</param>
-		public void PushPageToStackWithArgs(PagesEnum pageEnum, Dictionary<string,object> args, bool deactivateBehindPage=true){
-			if((int)pageEnum -1 >= settings.PagesPrefabs.Count){
+		public void PushPageToStackWithArgs (PagesEnum pageEnum, Dictionary<string,object> args, bool deactivateBehindPage = true)
+		{
+			if ((int)pageEnum - 1 >= settings.PagesPrefabs.Count) {
 				Debug.LogWarning ("The pageEnum you are trying to use does not exist!");
 				return;
 			}
-			if(!transitionMutex){
+			if (!transitionMutex) {
 				this.deactivateBehindPage = deactivateBehindPage;
 				transitionMutex = true;
 				var pageInstance = CreatePageInstance (pageEnum);
@@ -300,17 +369,18 @@ namespace PageNavFrameWork{
 		/// Pushs the page to stack. If Page's transition is NULL, then default transition will occur.
 		/// </summary>
 		/// <param name="PageEnum">Page enum.</param>
-		public void PushPageToStack(GameObject pageInstance, bool deactivateBehindPage=true){
-			if(!pageInstance){
+		public void PushPageToStack (GameObject pageInstance, bool deactivateBehindPage = true)
+		{
+			if (!pageInstance) {
 				return;
 			}
-			if(!transitionMutex){
+			if (!transitionMutex) {
 				this.deactivateBehindPage = deactivateBehindPage;
 				transitionMutex = true;
 				pageInstance.SetActive (true);
 				pageInstance.transform.SetParent (this.Container);
 				PageController pageController = pageInstance.GetComponent<PageController> ();
-				if(!pageController.isCached){
+				if (!pageController.isCached) {
 					SetComponentsForPages (pageInstance.gameObject);
 				}
 				ArrangePageTransform (pageInstance);
@@ -334,18 +404,19 @@ namespace PageNavFrameWork{
 		/// </summary>
 		/// <param name="pageInstance">Page instance.</param>
 		/// <param name="args">Arguments.</param>
-		public void PushPageToStackWithArgs(GameObject pageInstance, Dictionary<string,object> args, bool deactivateBehindPage = true){
-			if(!pageInstance){
+		public void PushPageToStackWithArgs (GameObject pageInstance, Dictionary<string,object> args, bool deactivateBehindPage = true)
+		{
+			if (!pageInstance) {
 				return;
 			}
-			if(!transitionMutex){
+			if (!transitionMutex) {
 				this.deactivateBehindPage = deactivateBehindPage;
 				transitionMutex = true;
 				pageInstance.SetActive (true);
 				pageInstance.transform.SetParent (this.Container);
 				PageController pageController = pageInstance.GetComponent<PageController> ();
 				pageController.InstantiatedWithArgs (args);
-				if(!pageController.isCached){
+				if (!pageController.isCached) {
 					SetComponentsForPages (pageInstance.gameObject);
 				}
 				ArrangePageTransform (pageInstance);
@@ -369,8 +440,9 @@ namespace PageNavFrameWork{
 		/// Pops the page from stack. If amount > stack.size, then, the stack will drop to the first page.
 		/// </summary>
 		/// <param name="amount">Amount of pages to pop.</param>
-		public void PopPageFromStack(){
-			if(PagesStack.Count <= 1){
+		public void PopPageFromStack ()
+		{
+			if (PagesStack.Count <= 1) {
 				return;
 			}
 			if (!transitionMutex) {
@@ -395,18 +467,19 @@ namespace PageNavFrameWork{
 		/// Pops the page from stack. If amount > stack.size, then, the stack will drop to the first page.
 		/// </summary>
 		/// <param name="amount">Amount of pages to pop.</param>
-		public void PopPageFromStack(int amount){
-			if(PagesStack.Count <= 1 || amount <= 0){
+		public void PopPageFromStack (int amount)
+		{
+			if (PagesStack.Count <= 1 || amount <= 0) {
 				return;
 			}
-			if((PagesStack.Count-amount) < 1){
+			if ((PagesStack.Count - amount) < 1) {
 				amount = PagesStack.Count - 1;
 			}
 			if (!transitionMutex) {
 				transitionMutex = true;
 				PageController pageController = PagesStack.Pop ();
 				int size = PagesStack.Count;
-				for(int i=0;i<amount-1;i++){
+				for (int i = 0; i < amount - 1; i++) {
 					GameObject go = PagesStack.Pop ().gameObject;	
 					Destroy (go);
 				}
@@ -428,15 +501,16 @@ namespace PageNavFrameWork{
 		/// <summary>
 		/// Return to first page of the stack.
 		/// </summary>
-		public void DropAllPagesFromStack(){
-			if(PagesStack.Count <= 1){
+		public void DropAllPagesFromStack ()
+		{
+			if (PagesStack.Count <= 1) {
 				return;
 			}
 			if (!transitionMutex) {
 				transitionMutex = true;
 				PageController pageController = PagesStack.Pop ();
 				int size = PagesStack.Count;
-				for(int i=0;i<size-1;i++){
+				for (int i = 0; i < size - 1; i++) {
 					GameObject go = PagesStack.Pop ().gameObject;	
 					Destroy (go);
 				}
@@ -459,38 +533,40 @@ namespace PageNavFrameWork{
 		/// Caches the page, if the page is not already cached.
 		/// </summary>
 		/// <param name="pageEnum">Page enum.</param>
-		public void CachePage(PagesEnum pageEnum){
-			GameObject prefab = GetPagePrefabByEnum(pageEnum);
-			if(prefab.GetComponent<PageController> ().isCached){
+		public void CachePage (PagesEnum pageEnum)
+		{
+			GameObject prefab = GetPagePrefabByEnum (pageEnum);
+			if (prefab.GetComponent<PageController> ().isCached) {
 				return;
 			}
 			GameObject page = Instantiate (prefab);
 			page.SetActive (false);
-			page.name = "[Cached]"+prefab.name;
+			page.name = "[Cached]" + prefab.name;
 			page.transform.SetParent (CachingContainer);
 			PageController pageController = page.GetComponent<PageController> ();
-			if(pageController == null){
-				pageController = page.AddComponent<PageController>();
+			if (pageController == null) {
+				pageController = page.AddComponent<PageController> ();
 			}
 			pageController.isCached = true;
-			CachedPages.Add (pageEnum,page);
+			CachedPages.Add (pageEnum, page);
 		}
 
-		private void LoadCachedPages(){
-			for(int index = 0; index<settings.PagesCacheSettings.Count;index++){
-				if(settings.PagesCacheSettings[index]){
+		private void LoadCachedPages ()
+		{
+			for (int index = 0; index < settings.PagesCacheSettings.Count; index++) {
+				if (settings.PagesCacheSettings [index]) {
 					PagesEnum pageEnum = (PagesEnum)(index + 1);
 					GameObject prefab = settings.PagesPrefabs [index];
 					GameObject page = Instantiate (prefab);
 					page.SetActive (false);
-					page.name = "[Cached]"+prefab.name;
+					page.name = "[Cached]" + prefab.name;
 					page.transform.SetParent (CachingContainer);
 					PageController pageController = page.GetComponent<PageController> ();
-					if(pageController == null){
-						pageController = page.AddComponent<PageController>();
+					if (pageController == null) {
+						pageController = page.AddComponent<PageController> ();
 					}
 					pageController.isCached = true;
-					CachedPages.Add (pageEnum,page);
+					CachedPages.Add (pageEnum, page);
 				}
 			}
 		}
@@ -499,10 +575,9 @@ namespace PageNavFrameWork{
 		{
 			int index = ((int)pageEnum) - 1;
 			GameObject prefab = null;
-			if (settings.PagesCacheSettings[index]) {
+			if (settings.PagesCacheSettings [index]) {
 				prefab = CachedPages [pageEnum];
-			}
-			else {
+			} else {
 				prefab = this.settings.PagesPrefabs [index];
 			}
 			return prefab;
@@ -520,8 +595,9 @@ namespace PageNavFrameWork{
 		/// Opens modal page.
 		/// </summary>
 		/// <param name="pagePrefab0">Page Enum.</param>
-		public void OpenModal(GameObject modalPrefab){
-			if(transitionMutex){
+		public void OpenModal (GameObject modalPrefab)
+		{
+			if (transitionMutex) {
 				return;
 			}
 			transitionMutex = true;
@@ -547,11 +623,13 @@ namespace PageNavFrameWork{
 			pageTransition.initTransitionTo (FinishedModalTransitionTo, this.transform as RectTransform);
 		}
 
-		public void FinishedModalTransitionTo(PageController oldPage, PageController newPage){
+		public void FinishedModalTransitionTo (PageController oldPage, PageController newPage)
+		{
 			transitionMutex = false;
 		}
 
-		public void FinishedModalTransitionFrom(PageController oldPage, PageController newPage){
+		public void FinishedModalTransitionFrom (PageController oldPage, PageController newPage)
+		{
 			Destroy (_PopUp);
 			_PopUp = null;
 			_PopUpController = null;

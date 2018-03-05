@@ -6,11 +6,9 @@ using System.Collections.Generic;
 [System.Serializable]
 public class ResponsableModel : UserModel
 {
-	[SerializeField]
 	public Dictionary<string, object> servicesProvided;
-	
 
-	public ResponsableModel(string responsibleId, string name) : base(responsibleId, name, Constants.UserType.Responsable)
+	public ResponsableModel (UserModel user) : base (user.userID, user.name, Constants.UserType.Responsable)
 	{
 		servicesProvided = new Dictionary<string, object> ();
 	}

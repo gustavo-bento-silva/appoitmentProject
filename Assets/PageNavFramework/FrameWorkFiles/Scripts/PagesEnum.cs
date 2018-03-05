@@ -8,6 +8,10 @@ namespace PageNavFrameWork{
 		ScheduleDetailPage=2,
 		ScheduleAppointment=3,
 		LoginPage=4,
-		LoginWithEmailPopup=5
+		LoginWithEmailPopup=5,
+		CreateNewUserPopup=6,
+		LoadingPage=7,
+		ErrorPopup=8,
+		SuccessPopup=9
 	}
 }

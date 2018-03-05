@@ -3,19 +3,30 @@ using System.Collections;
 using PageNavFrameWork;
 using UnityEngine.UI;
 
-public class LoginWithEmailPopupController : PageController
+public class CreateNewUserPopupController : PageController
 {
+
+	public GameObject name;
+	public GameObject nameError;
 	public GameObject email;
-	public GameObject password;
 	public GameObject emailError;
+	public GameObject password;
 	public GameObject passwordError;
 
-	public void OnLoginClick ()
+	public void CreateNewUser ()
 	{
+		var nameText = name.GetComponent<InputField> ().text;
 		var emailText = email.GetComponent<InputField> ().text;
 		var passwordText = password.GetComponent<InputField> ().text;
 		bool everyThingIsRight = true;
 
+		if (string.IsNullOrEmpty (nameText)) {
+			nameError.SetActive (true);
+			everyThingIsRight = false;
+		} else {
+			nameError.SetActive (false);
+			everyThingIsRight = true;
+		}
 		if (string.IsNullOrEmpty (emailText) || !emailText.Contains ("@")) {
 			emailError.SetActive (true);
 			everyThingIsRight = false;
@@ -30,17 +41,17 @@ public class LoginWithEmailPopupController : PageController
 			passwordError.SetActive (false);
 			everyThingIsRight = true;
 		}
-
 		if (everyThingIsRight) {
 			Loading = true;
-			FirebaseAuth.GetFireBaseAuthInstance ().UserLogin (email.GetComponent<InputField> ().text, email.GetComponent<InputField> ().text, delegate {
-				CloseModal ();
+			FirebaseAuth.GetFireBaseAuthInstance ().CreateNewUserWithEmailAndPassword (nameText, emailText, passwordText, Constants.UserType.Client, delegate {
 				Loading = false;
 				Success = true;
+				CloseModal ();
 			}, delegate(string error) {
 				Loading = false;
 				Error = true;
 			});
-		}		
+		}
 	}
+
 }
