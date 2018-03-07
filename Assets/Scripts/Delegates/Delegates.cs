@@ -5,11 +5,13 @@ using UnityEngine;
 public static class Delegates
 {
 
-	public delegate void GetAllResponsibles (List<ResponsableModel> responsables);
+	public delegate void GetAllServicesProvided (List<ResponsibleModel> responsablesWithServices);
+
+	public delegate void GetAllResponsibles (List<ResponsibleModel> responsables);
 
 	public delegate void GetUserByID (UserModel user);
 
-	public delegate void GetResponsiblesByID (ResponsableModel responsable);
+	public delegate void GetResponsiblesByID (ResponsibleModel responsable);
 
 	public delegate void UserLoginSuccess ();
 
@@ -18,6 +20,8 @@ public static class Delegates
 	public delegate void GeneralListenerSuccess ();
 
 	public delegate void GeneralListenerFail (string error);
+
+	public delegate void GetAllCompanies (List<CompanyModel> companies);
 
 
 	

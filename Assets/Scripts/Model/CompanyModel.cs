@@ -4,15 +4,17 @@ using UnityEngine;
 
 public class CompanyModel : UserModel
 {
-
+	public string city;
+	public string address;
+	public string cep;
 	[SerializeField]
 	public Dictionary<string, object> employees;
-	[SerializeField]
-	public Dictionary<string, object> servicesProvided;
 
-	public CompanyModel (UserModel user) : base (user.userID, user.name, Constants.UserType.Company)
+	public CompanyModel (UserModel user, string city, string address, string cep) : base (user.userID, user.name, user.phone, Constants.UserType.Company)
 	{
+		this.city = city;
+		this.address = address;
+		this.cep = cep;
 		employees = new Dictionary<string, object> ();
-		servicesProvided = new Dictionary<string, object> ();
 	}
 }

@@ -66,6 +66,18 @@ namespace PageNavFrameWork
 			LoadPageNavInstanceToProperty ();
 		}
 
+		public void OpenErrorPopup ()
+		{
+			_error = true;
+			PageNav.GetPageNavInstance ().SetErrorVisibility (true);
+		}
+
+		public void OpenSuccessPopup ()
+		{
+			_success = true;
+			PageNav.GetPageNavInstance ().SetErrorVisibility (true);
+		}
+
 		public void CloseErrorPopup ()
 		{
 			_error = false;

@@ -12,6 +12,8 @@ namespace PageNavFrameWork{
 		CreateNewUserPopup=6,
 		LoadingPage=7,
 		ErrorPopup=8,
-		SuccessPopup=9
+		SuccessPopup=9,
+		SelectCompany=10,
+		HomePage=11
 	}
 }

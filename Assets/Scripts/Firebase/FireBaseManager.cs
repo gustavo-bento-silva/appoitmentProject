@@ -12,7 +12,7 @@ public enum DBTable
 {
 	Appoitments,
 	User,
-	Responsable,
+	Responsible,
 	Company,
 	Appointment,
 	Data
@@ -22,7 +22,7 @@ public enum Parameters
 {
 	appointments,
 	date,
-	responsables,
+	responsibles,
 	servicesProvided
 }
 
@@ -59,7 +59,7 @@ public class FireBaseManager : MonoBehaviour
 
 	}
 
-	public void CreateNewAppoitment (UserModel user, ResponsableModel responsable, AppointmentModel appointment)
+	public void CreateNewAppoitment (UserModel user, ResponsibleModel responsable, AppointmentModel appointment)
 	{
 		string appoitmentID = reference.Child (DBTable.Appoitments.ToString ()).Push ().Key;
 		appointment.AppointmentID = appoitmentID;
@@ -73,58 +73,60 @@ public class FireBaseManager : MonoBehaviour
 		CreateTable (DBTable.Appoitments, appoitmentID, json);
 		reference.Child (DBTable.Appoitments.ToString ()).Child (appoitmentID).Child (Parameters.date.ToString ()).SetValueAsync (appointment.data.ToString (Constants.dateformat));
 		reference.Child (DBTable.User.ToString ()).Child (user.userID).Child (Parameters.appointments + "/" + appoitmentID).SetRawJsonValueAsync (json);
-		reference.Child (DBTable.Responsable.ToString ()).Child (responsable.userID).Child (Parameters.appointments + "/" + appoitmentID).SetRawJsonValueAsync (json);
+		reference.Child (DBTable.Responsible.ToString ()).Child (responsable.userID).Child (Parameters.appointments + "/" + appoitmentID).SetRawJsonValueAsync (json);
 	}
 
-	public CompanyModel CreateNewCompany (string name)
+	public CompanyModel CreateNewCompany (string name, string phone, string city, string address, string cep)
 	{
 		string companyID = reference.Child (DBTable.Company.ToString ()).Push ().Key;
-		CompanyModel company = new CompanyModel (new UserModel (companyID, name));
+		CompanyModel company = new CompanyModel (new UserModel (companyID, name, phone), city, address, cep);
 
 		string json = JsonUtility.ToJson (company);
 		CreateTable (DBTable.Company, companyID, json);
 		return company;
 	}
 
-	public void AddServicesToCompany (CompanyModel company, List<ServicesProvidedModel> services)
+	public void AddServicesToResponsible (string companyID, ResponsibleModel responsible, List<ServicesProvidedModel> services)
 	{
-		var servicesDictionary = new Dictionary<string, object> ();
 		foreach (var service in services) {
 			service.serviceID = reference.Child (DBTable.Company.ToString ()).Push ().Key;
-			servicesDictionary [service.serviceID] = (object)service;
-			company.servicesProvided.Add (service.serviceID, (object)service);
+			responsible.servicesProvided.Add (service.serviceID, (object)service);
+			string json = JsonUtility.ToJson (service);
+			reference.Child (DBTable.Responsible.ToString ()).Child (responsible.userID).Child (Parameters.servicesProvided.ToString ()).Child (service.serviceID).SetRawJsonValueAsync (json);
+			reference.Child (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.responsibles.ToString ()).Child (responsible.userID).Child (Parameters.servicesProvided.ToString ()).Child (service.serviceID).SetRawJsonValueAsync (json);
 		}
-		string json = JsonUtility.ToJson (servicesDictionary);
-		reference.Child (DBTable.Company.ToString ()).Child (company.userID).Child (Parameters.servicesProvided.ToString ()).SetRawJsonValueAsync (json);
 
 	}
 
-	public void AddEmployeeToCompany (string companyID, ResponsableModel responsableModel)
+	public void AddEmployeeToCompany (string companyID, ResponsibleModel responsableModel, List<ServicesProvidedModel> servicesProvided)
 	{
 		string json = JsonUtility.ToJson (responsableModel);
-		reference.Child (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.responsables.ToString ()).Child (responsableModel.userID).SetRawJsonValueAsync (json);
+		reference.Child (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.responsibles.ToString ()).Child (responsableModel.userID).SetRawJsonValueAsync (json).ContinueWith (task => {
+			if (task.IsCompleted) {
+				AddServicesToResponsible (companyID, responsableModel, servicesProvided);
+			}
+		});
 	}
 
-	public UserModel CreateNewUser (/*string userID,*/ string name)
+	public UserModel CreateNewUser (/*string userID,*/ string name, string phone)
 	{
 		string userID = reference.Child (DBTable.User.ToString ()).Push ().Key;
-		UserModel user = new UserModel (userID, name);
+		UserModel user = new UserModel (userID, name, phone);
 		string json = JsonUtility.ToJson (user);
 
 		CreateTable (DBTable.User, userID, json);
 		return user;
 	}
 
-	public ResponsableModel CreateNewResponsableToCompany (string companyID, string name, List<ServicesProvidedModel> servicesProvided)
+	public ResponsibleModel CreateNewResponsibleToCompany (string companyID, string name, List<ServicesProvidedModel> servicesProvided, string phone = "")
 	{
-		string responsibleID = reference.Child (DBTable.Responsable.ToString ()).Push ().Key;
-		ResponsableModel responsable = new ResponsableModel (new UserModel (responsibleID, name));
-		responsable.servicesProvided = servicesProvided.ToDictionary (x => x.serviceID, x => (object)x);
+		string responsibleID = reference.Child (DBTable.Responsible.ToString ()).Push ().Key;
+		ResponsibleModel responsable = new ResponsibleModel (new UserModel (responsibleID, name, phone));
 		string json = JsonUtility.ToJson (responsable);
 
-		CreateTable (DBTable.Responsable, responsibleID, json);
+		CreateTable (DBTable.Responsible, responsibleID, json);
 		CreateTable (DBTable.User, responsibleID, json);
-		AddEmployeeToCompany (companyID, responsable);
+		AddEmployeeToCompany (companyID, responsable, servicesProvided);
 		return responsable;
 	}
 
@@ -135,16 +137,16 @@ public class FireBaseManager : MonoBehaviour
 
 	public void GetAllResponsiblesFromCompany (String companyID, Delegates.GetAllResponsibles getAllResponsiblesListener)
 	{
-		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.responsables.ToString ())
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.responsibles.ToString ())
 			.GetValueAsync ().ContinueWith (task => {
 			if (task.IsFaulted) {
 				// Handle the error...
 			} else if (task.IsCompleted) {
 				DataSnapshot snapshot = task.Result;
-				List<ResponsableModel> responsibles = new List<ResponsableModel> ();
+				List<ResponsibleModel> responsibles = new List<ResponsibleModel> ();
 				foreach (var responsible in snapshot.Children) {
 					string json = responsible.GetRawJsonValue ();
-					responsibles.Add (JsonUtility.FromJson<ResponsableModel> (json));
+					responsibles.Add (JsonUtility.FromJson<ResponsibleModel> (json));
 				}
 
 				getAllResponsiblesListener (responsibles);
@@ -177,19 +179,66 @@ public class FireBaseManager : MonoBehaviour
 
 	public void GetResponsibleByID (string responsibleID, Delegates.GetResponsiblesByID getResponsiblesById)
 	{
-		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsable.ToString ()).Child (responsibleID)
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsible.ToString ()).Child (responsibleID)
 		.GetValueAsync ().ContinueWith (task => {
 			if (task.IsFaulted) {
 				// Handle the error...
 			} else if (task.IsCompleted) {
 				DataSnapshot snapshot = task.Result;
 				var userJson = snapshot.GetRawJsonValue ();
-				var responsible = JsonUtility.FromJson<ResponsableModel> (userJson);
+				var responsible = JsonUtility.FromJson<ResponsibleModel> (userJson);
 				getResponsiblesById (responsible);
 					
 			}
 		});
 		
+	}
+
+	public void GetAllCompanies (Delegates.GetAllCompanies getAllCompanies, Delegates.GeneralListenerFail getAllCompaniesFail)
+	{
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ())
+			.GetValueAsync ().ContinueWith (task => {
+			if (task.IsFaulted) {
+				getAllCompaniesFail (task.Exception.ToString ());
+			} else if (task.IsCompleted) {
+				DataSnapshot snapshot = task.Result;
+				List<CompanyModel> companies = new List<CompanyModel> ();
+				foreach (var company in snapshot.Children) {
+					string json = company.GetRawJsonValue ();
+					CompanyModel mcompany = JsonUtility.FromJson<CompanyModel> (json);
+					companies.Add (mcompany);
+				}
+				getAllCompanies (companies);
+			}
+		});
+
+	}
+
+	public void UpdateServicesFromAllResponsibles (List <ResponsibleModel> responsibles, Delegates.GetAllServicesProvided success, Delegates.GeneralListenerFail fail)
+	{
+		int count = 0;
+		List<ResponsibleModel> responsiblesWithServices = responsibles;
+		foreach (var responsible in responsibles) {
+			FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsible.ToString ()).Child (responsible.userID).Child (Parameters.servicesProvided.ToString ())
+				.GetValueAsync ().ContinueWith (task => {
+				if (task.IsFaulted) {
+					fail (task.Exception.ToString ());
+				} else if (task.IsCompleted) {
+					DataSnapshot snapshot = task.Result;
+					List<ServicesProvidedModel> services = new List<ServicesProvidedModel> ();
+					foreach (var service in snapshot.Children) {
+						string json = service.GetRawJsonValue ();
+						ServicesProvidedModel mservice = JsonUtility.FromJson<ServicesProvidedModel> (json);
+						services.Add (mservice);
+					}
+					responsiblesWithServices [count].servicesProvided = services.ToDictionary (x => x.serviceID, x => (object)x);
+					count++;
+					if (count >= responsibles.Count) {
+						success (responsiblesWithServices);
+					}
+				}
+			});
+		}
 	}
 
 	void HandleValueChanged (object sender, ValueChangedEventArgs args)

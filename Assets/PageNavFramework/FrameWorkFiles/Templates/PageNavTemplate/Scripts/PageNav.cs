@@ -205,21 +205,27 @@ namespace PageNavFrameWork
 			_successPopup.gameObject.SetActive (state);
 		}
 
-		public void SetErrorVisibility (bool state)
+		public void SetErrorVisibility (bool state, string msg = "")
 		{
 			if (!_errorPopup) {
 				return;
 			}
 			_errorPopup.SetAsLastSibling ();
+			if (!string.IsNullOrEmpty (msg)) {
+				Helper.FindComponentInChildWithTag <Text> (_errorPopup.gameObject, "ErrorMessage").text = msg;
+			}
 			_errorPopup.gameObject.SetActive (state);
 		}
 
-		public void SetLoadingVisibility (bool state)
+		public void SetLoadingVisibility (bool state, string msg = "")
 		{
 			if (!_loadingPage) {
 				return;
 			}
 			_loadingPage.SetAsLastSibling ();
+			if (!string.IsNullOrEmpty (msg)) {
+				Helper.FindComponentInChildWithTag <Text> (_successPopup.gameObject, "SuccessMessage").text = msg;
+			}
 			_loadingPage.gameObject.SetActive (state);
 		}
 

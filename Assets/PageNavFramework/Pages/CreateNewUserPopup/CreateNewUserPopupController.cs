@@ -10,12 +10,15 @@ public class CreateNewUserPopupController : PageController
 	public GameObject nameError;
 	public GameObject email;
 	public GameObject emailError;
+	public GameObject phone;
+	public GameObject phoneError;
 	public GameObject password;
 	public GameObject passwordError;
 
 	public void CreateNewUser ()
 	{
 		var nameText = name.GetComponent<InputField> ().text;
+		var phoneText = phone.GetComponent<InputField> ().text;
 		var emailText = email.GetComponent<InputField> ().text;
 		var passwordText = password.GetComponent<InputField> ().text;
 		bool everyThingIsRight = true;
@@ -25,6 +28,13 @@ public class CreateNewUserPopupController : PageController
 			everyThingIsRight = false;
 		} else {
 			nameError.SetActive (false);
+			everyThingIsRight = true;
+		}
+		if (passwordText.Length < 8) {
+			phoneError.SetActive (true);
+			everyThingIsRight = false;
+		} else {
+			phoneError.SetActive (false);
 			everyThingIsRight = true;
 		}
 		if (string.IsNullOrEmpty (emailText) || !emailText.Contains ("@")) {
@@ -43,7 +53,7 @@ public class CreateNewUserPopupController : PageController
 		}
 		if (everyThingIsRight) {
 			Loading = true;
-			FirebaseAuth.GetFireBaseAuthInstance ().CreateNewUserWithEmailAndPassword (nameText, emailText, passwordText, Constants.UserType.Client, delegate {
+			FirebaseAuth.GetFireBaseAuthInstance ().CreateNewUserWithEmailAndPassword (nameText, phoneText, emailText, passwordText, Constants.UserType.Client, delegate {
 				Loading = false;
 				Success = true;
 				CloseModal ();

@@ -50,7 +50,7 @@ public class FirebaseAuth : MonoBehaviour
 		});
 	}
 
-	public void CreateNewUserWithEmailAndPassword (string name, string email, string password, Constants.UserType userType, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	public void CreateNewUserWithEmailAndPassword (string name, string phone, string email, string password, Constants.UserType userType, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
 	{
 		auth.CreateUserWithEmailAndPasswordAsync (email, password).ContinueWith (task => {
 			if (task.IsCanceled) {
@@ -68,11 +68,8 @@ public class FirebaseAuth : MonoBehaviour
 			user = task.Result;
 			PlayerData.auth = auth.CurrentUser;
 			if (userType == Constants.UserType.Client) {
-				PlayerData.user = FireBaseManager.GetFireBaseInstance ().CreateNewUser (name);
-			} else if (userType == Constants.UserType.Company) {
-				PlayerData.user = FireBaseManager.GetFireBaseInstance ().CreateNewCompany (name);
-				
-			} /*else if (userType == Constants.UserType.Responsable) {
+				PlayerData.user = FireBaseManager.GetFireBaseInstance ().CreateNewUser (name, phone);
+			}  /*else if (userType == Constants.UserType.Responsable) {
 				FireBaseManager.GetFireBaseInstance ().CreateNewResponsableToCompany (name);
 			}*/
 
