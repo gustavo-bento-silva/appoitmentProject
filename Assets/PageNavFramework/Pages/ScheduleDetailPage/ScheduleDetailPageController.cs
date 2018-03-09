@@ -4,11 +4,19 @@ using System.Collections;
 using System.Collections.Generic;
 using PageNavFrameWork;
 using UnityEngine.Networking.NetworkSystem;
+using UnityEngine.UI;
 
 public class ScheduleDetailPageController : PageController
 {
 	public RectTransform scrollViewContent;
 	public Transform cellPrefabTransform;
+
+	public Text appointmentData;
+
+	int appointmentDay;
+	int appointmentMonth;
+	int appointmentYear;
+
 	DateTime dt;
 
 	private Vector3 OffSet = new Vector3 (165, -153, 0);
@@ -16,13 +24,14 @@ public class ScheduleDetailPageController : PageController
 
 	void Start ()
 	{
+		UpdateTextData ();
 		var dtNow = DateTime.Now;
 		var minutes = 0;
 		if (!PlayerPreferences.oneInOneHour) {
 			minutes = 30;
 		}
 
-		dt = new DateTime (dtNow.Year, dtNow.Month, dtNow.Day, PlayerPreferences.initialTime, minutes, 0);
+		dt = new DateTime (dtNow.Year, dtNow.Month, dtNow.Day, DataManager.currentResponsible.timeToBeginWork [(int)dtNow.DayOfWeek], minutes, 0);
 		InitializeScheduleTime (CreateApoointmentList ());
 	}
 
@@ -30,11 +39,21 @@ public class ScheduleDetailPageController : PageController
 	{
 	}
 
+	void UpdateTextData ()
+	{
+		appointmentDay = DataManager.dateNewAppointment.Day;
+		appointmentMonth = DataManager.dateNewAppointment.Month;
+		appointmentYear = DataManager.dateNewAppointment.Year;
+	
+		appointmentData.text = string.Format ("Dia {0}/{1}/{2} \nProssifional: {3} \nServiço: {4}", appointmentDay, appointmentMonth, 
+			appointmentYear, DataManager.currentResponsible.name, DataManager.currentservice.name);
+	}
+
 	List<AppointmentModel> CreateApoointmentList ()
 	{
 		var appointmentList = new List<AppointmentModel> ();
-		appointmentList.Add (new AppointmentModel (new DateTime (DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, PlayerPreferences.initialTime, 30, 0),
-			"teste", "Teste", "Ocupado"));
+		appointmentList.Add (new AppointmentModel (new DateTime (DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 
+			DataManager.currentResponsible.timeToBeginWork [(int)DateTime.Now.DayOfWeek], 30, 0), "teste", "Teste", "Ocupado"));
 		return appointmentList;
 	}
 
@@ -51,8 +70,8 @@ public class ScheduleDetailPageController : PageController
 
 	void InitializeScheduleTime (List<AppointmentModel> appointmentList)
 	{
-		var limit = PlayerPreferences.endTime;
-		var begin = PlayerPreferences.initialTime;
+		var limit = 7;//PlayerPreferences.GetEndTimeByDay(appointmentDay);
+		var begin = 1;//PlayerPreferences.initialTime;
 		var isOneInOneHour = PlayerPreferences.oneInOneHour;
 		int index = 0;
 
@@ -65,8 +84,8 @@ public class ScheduleDetailPageController : PageController
 		for (var i = 0; i <= limit; i++) {
 			if (appointmentList != null && index < appointmentList.Count) {
 				if (appointmentList [index].data.Hour == dt.Hour && appointmentList [index].data.Minute == dt.Minute) {
-					DayController.Instantiate (cellPrefabTransform, scrollViewContent,
-						dt.Hour.ToString () + ":" + dt.Minute.ToString ("00"), appointmentList [index].description);
+					var cell = DayController.Instantiate (cellPrefabTransform, scrollViewContent,
+						           dt.Hour.ToString () + ":" + dt.Minute.ToString ("00"), appointmentList [index].description, false);
 					index++;
 				} else {
 					DayController.Instantiate (cellPrefabTransform, scrollViewContent,

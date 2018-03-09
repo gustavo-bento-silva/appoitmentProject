@@ -11,9 +11,10 @@ public class CalendarPageController : PageController
 	public Dropdown responsibleDropdown;
 	public Dropdown servicesDropdown;
 	public GameObject calendars;
+	public CalendarController[] calendarsController;
 
 	private int actualPositionIndex = 0;
-	private int positionXOffset = 1241;
+	private int positionXOffset = 1127;
 
 	void Start ()
 	{
@@ -40,7 +41,14 @@ public class CalendarPageController : PageController
 		DataManager.currentResponsible = DataManager.responsibles [0];
 		GetAllServices ();
 		responsibleDropdown.onValueChanged.AddListener (GetEmployeeSelected);
+		FillCalendars ();
+	}
 
+	void FillCalendars ()
+	{
+		foreach (var calendarController in calendarsController) {
+			calendarController.StartFillCalendar ();
+		}
 	}
 
 	void GetAllServices ()
@@ -71,13 +79,21 @@ public class CalendarPageController : PageController
 
 	void GetServiceSelected (int newPosition)
 	{
-		DataManager.currentResponsible = DataManager.responsibles [newPosition];
+		Loading = true;
+		var servicesList = new List<ServicesProvidedModel> ();
+		foreach (var service in DataManager.currentResponsible.servicesProvided.Values) {
+			servicesList.Add ((ServicesProvidedModel)service);
+		}
+
+		DataManager.currentservice = servicesList [newPosition];
 	}
 
 	void GetEmployeeSelected (int newPosition)
 	{
+		Loading = true;
 		DataManager.currentResponsible = DataManager.responsibles [newPosition];
 		FillDropDownServices ();
+		FillCalendars ();
 	}
 
 	public void OnNextButtonClick ()

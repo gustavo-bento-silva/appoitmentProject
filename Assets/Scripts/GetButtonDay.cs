@@ -19,5 +19,8 @@ public class GetButtonDay : MonoBehaviour
 		int month = PlayerPreferences.TranslateMonth (cpc._month.text);
 		int year = int.Parse (cpc._year.text);
 		int day = int.Parse (dayText.gameObject.name);
+
+		DataManager.dateNewAppointment = new DateTime (year, month, day);
+		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.ScheduleDetailPage);
 	}
 }

@@ -10,8 +10,11 @@ public class DataManager : MonoBehaviour
 	public static List<AppointmentModel> appointmentList;
 	public static CompanyModel companyData;
 	public static ResponsibleModel currentResponsible;
+	public static ServicesProvidedModel currentservice;
 	public static List<CompanyModel> companiesList = new List<CompanyModel> ();
 	public static List<ResponsibleModel> responsibles = new List<ResponsibleModel> ();
+
+	public static DateTime dateNewAppointment;
 
 	void Awake ()
 	{
@@ -24,13 +27,13 @@ public class DataManager : MonoBehaviour
 //		CreateCompanyDataTest2 ();
 	}
 
-	List<AppointmentModel> CreateApoointmentList ()
-	{
-		var appointmentList = new List<AppointmentModel> ();
-		appointmentList.Add (new AppointmentModel (new DateTime (DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, PlayerPreferences.initialTime, 30, 0),
-			"teste", "Teste", "Ocupado"));
-		return appointmentList;
-	}
+	//	List<AppointmentModel> CreateApoointmentList ()
+	//	{
+	//		var appointmentList = new List<AppointmentModel> ();
+	//		appointmentList.Add (new AppointmentModel (new DateTime (DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, PlayerPreferences.initialTime, 30, 0),
+	//			"teste", "Teste", "Ocupado"));
+	//		return appointmentList;
+	//	}
 
 	CompanyModel CreateCompanyData ()
 	{

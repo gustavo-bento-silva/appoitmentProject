@@ -606,10 +606,10 @@ namespace PageNavFrameWork
 			if (transitionMutex) {
 				return;
 			}
+			CloseModal ();
 			transitionMutex = true;
 			GameObject pageInstance = Instantiate (modalPrefab);
 			pageInstance.SetActive (true);
-			CloseModal ();
 			SetLoadingVisibility (false);
 			RectTransform rectTransform = pageInstance.transform as RectTransform;
 			rectTransform.SetParent (this.transform);

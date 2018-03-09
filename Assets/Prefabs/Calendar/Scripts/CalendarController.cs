@@ -10,6 +10,7 @@ public class CalendarController : MonoBehaviour
 	public Text _month;
 	public Text _year;
 	public Color todayColor;
+	public Color busyDayColor;
 
 	private DateTime currentDateTime = DateTime.Now;
 	Image[][] background;
@@ -18,14 +19,18 @@ public class CalendarController : MonoBehaviour
 	void Start ()
 	{
 		InitializeVariables ();
-		DateTime dateTime = currentDateTime.AddMonths (id);
-		FillCalendar (dateTime.Month, dateTime.Year);
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
 	
+	}
+
+	public void StartFillCalendar ()
+	{
+		DateTime dateTime = currentDateTime.AddMonths (id);
+		FillCalendar (dateTime.Month, dateTime.Year);
 	}
 
 	void InitializeVariables ()
@@ -95,6 +100,12 @@ public class CalendarController : MonoBehaviour
 				} else {
 					linesText [i] [j].text = day.ToString ();
 					linesText [i] [j].name = day.ToString ();
+					date = new DateTime (year, month, day);
+					dayOfWeek = (int)date.DayOfWeek;
+					if (!DataManager.currentResponsible.daysOfWork [dayOfWeek]) {
+						linesText [i] [j].transform.parent.GetComponent<Button> ().enabled = false;
+						background [i] [j].color = busyDayColor;
+					}
 					day++;
 				}
 			}

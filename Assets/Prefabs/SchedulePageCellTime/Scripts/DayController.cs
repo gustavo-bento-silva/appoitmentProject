@@ -8,28 +8,35 @@ public class DayController : MonoBehaviour
 
 	public Text description;
 	public Text time;
+	public Image background;
 
 	// Use this for initialization
-	void Start () {
+	void Start ()
+	{
 		
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+	{
 	
 	}
 
-	public void OnCellClick()
+	public void OnCellClick ()
 	{
-		var pageNav = PageNav.GetPageNavInstance();
+		var pageNav = PageNav.GetPageNavInstance ();
 //		pageNav.OpenModal(pageNav.GetPagePrefabByEnum(PagesEnum.ExamplePage));
 	}
 
-	public static GameObject Instantiate(Transform CellPrefabTransform, Transform listContentReference, string time, string description)
+	public static GameObject Instantiate (Transform CellPrefabTransform, Transform listContentReference, string time, string description, bool isFree = true)
 	{
-		GameObject go = GameObject.Instantiate(CellPrefabTransform).gameObject;
-		var dayControler = go.GetComponent<DayController>();
-		go.transform.SetParent(listContentReference, false);
+		GameObject go = GameObject.Instantiate (CellPrefabTransform).gameObject;
+		var dayControler = go.GetComponent<DayController> ();
+		go.transform.SetParent (listContentReference, false);
+		if (!isFree) {
+			dayControler.background.color = Color.red;
+			go.GetComponent<Image> ().color = Color.red;
+		}
 		dayControler.description.text = description;
 		dayControler.time.text = time;
 		return go;
