@@ -28,11 +28,10 @@ public class DayController : MonoBehaviour
 //		pageNav.OpenModal(pageNav.GetPagePrefabByEnum(PagesEnum.ExamplePage));
 	}
 
-	public static GameObject Instantiate (Transform CellPrefabTransform, Transform listContentReference, string time, string description, bool isFree = true)
+	public static GameObject Instantiate (Transform CellPrefabTransform, string time, string description, bool isFree = true)
 	{
 		GameObject go = GameObject.Instantiate (CellPrefabTransform).gameObject;
 		var dayControler = go.GetComponent<DayController> ();
-		go.transform.SetParent (listContentReference, false);
 		if (!isFree) {
 			dayControler.background.color = Color.red;
 			go.GetComponent<Image> ().color = Color.red;

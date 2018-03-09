@@ -17,21 +17,25 @@ public class ScheduleDetailPageController : PageController
 	int appointmentMonth;
 	int appointmentYear;
 
-	DateTime dt;
+	int limit = 7;
+	//PlayerPreferences.GetEndTimeByDay(appointmentDay);
+	int begin = 1;
+	//PlayerPreferences.initialTime;
 
-	private Vector3 OffSet = new Vector3 (165, -153, 0);
-	private float contentOffset = 770;
+	List<GameObject> cellList = new List<GameObject> ();
+
+	DateTime dt;
 
 	void Start ()
 	{
-		UpdateTextData ();
+//		UpdateTextData ();
 		var dtNow = DateTime.Now;
 		var minutes = 0;
 		if (!PlayerPreferences.oneInOneHour) {
 			minutes = 30;
 		}
 
-		dt = new DateTime (dtNow.Year, dtNow.Month, dtNow.Day, DataManager.currentResponsible.timeToBeginWork [(int)dtNow.DayOfWeek], minutes, 0);
+		dt = new DateTime (dtNow.Year, dtNow.Month, dtNow.Day, 7/*DataManager.currentResponsible.timeToBeginWork [(int)dtNow.DayOfWeek]*/, minutes, 0);
 		InitializeScheduleTime (CreateApoointmentList ());
 	}
 
@@ -53,8 +57,14 @@ public class ScheduleDetailPageController : PageController
 	{
 		var appointmentList = new List<AppointmentModel> ();
 		appointmentList.Add (new AppointmentModel (new DateTime (DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 
-			DataManager.currentResponsible.timeToBeginWork [(int)DateTime.Now.DayOfWeek], 30, 0), "teste", "Teste", "Ocupado"));
+			9/*DataManager.currentResponsible.timeToBeginWork [(int)DateTime.Now.DayOfWeek]*/, 30, 0), "teste", "Teste", "Ocupado"));
 		return appointmentList;
+	}
+
+	public void OnButtonClick ()
+	{
+		cellList.ForEach (x => x.transform.SetParent (scrollViewContent, false));
+		ReadjustScrollSize (limit);
 	}
 
 	void ReadjustScrollSize (int size)
@@ -70,34 +80,28 @@ public class ScheduleDetailPageController : PageController
 
 	void InitializeScheduleTime (List<AppointmentModel> appointmentList)
 	{
-		var limit = 7;//PlayerPreferences.GetEndTimeByDay(appointmentDay);
-		var begin = 1;//PlayerPreferences.initialTime;
 		var isOneInOneHour = PlayerPreferences.oneInOneHour;
 		int index = 0;
 
-		appointmentList.Sort ((first, second) => ((first.data).CompareTo (second.data)));
+		if (appointmentList != null)
+			appointmentList.Sort ((first, second) => ((first.data).CompareTo (second.data)));
 
 		if (!isOneInOneHour) {
 			limit = (limit - begin) * 2;
 		}
 
-		for (var i = 0; i <= limit; i++) {
+		for (var i = 0; i < limit; i++) {
 			if (appointmentList != null && index < appointmentList.Count) {
 				if (appointmentList [index].data.Hour == dt.Hour && appointmentList [index].data.Minute == dt.Minute) {
-					var cell = DayController.Instantiate (cellPrefabTransform, scrollViewContent,
-						           dt.Hour.ToString () + ":" + dt.Minute.ToString ("00"), appointmentList [index].description, false);
+					cellList.Add (DayController.Instantiate (cellPrefabTransform, dt.Hour.ToString () + ":" + dt.Minute.ToString ("00"), appointmentList [index].description, false));
 					index++;
 				} else {
-					DayController.Instantiate (cellPrefabTransform, scrollViewContent,
-						dt.Hour.ToString () + ":" + dt.Minute.ToString ("00"), "Livre");
+					cellList.Add (DayController.Instantiate (cellPrefabTransform, dt.Hour.ToString () + ":" + dt.Minute.ToString ("00"), "Livre"));
 				}
 			} else {
-				DayController.Instantiate (cellPrefabTransform, scrollViewContent,
-					dt.Hour.ToString () + ":" + dt.Minute.ToString ("00"), "Livre");
+				cellList.Add (DayController.Instantiate (cellPrefabTransform, dt.Hour.ToString () + ":" + dt.Minute.ToString ("00"), "Livre"));
 			}
 			dt = dt.AddMinutes (isOneInOneHour ? 60 : 30);
 		}
-
-		ReadjustScrollSize (limit);
 	}
 }
