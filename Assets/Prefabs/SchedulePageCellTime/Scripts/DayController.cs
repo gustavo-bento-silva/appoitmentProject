@@ -24,8 +24,23 @@ public class DayController : MonoBehaviour
 
 	public void OnCellClick ()
 	{
+		var date = DataManager.dateNewAppointment;
+		int[] time = new int[2];
+		time = GetTime ();
+		DataManager.dateNewAppointment = new System.DateTime (date.Year, date.Month, date.Day, time [0], time [1], 0);
 		var pageNav = PageNav.GetPageNavInstance ();
-//		pageNav.OpenModal(pageNav.GetPagePrefabByEnum(PagesEnum.ExamplePage));
+		var page = pageNav.GetPagePrefabByEnum (PagesEnum.ConfirmAppointmentPopup);
+		pageNav.OpenModal (page);
+	}
+
+	//0 -> hour, 1 -> minute
+	public int[] GetTime ()
+	{
+		string[] mStringTime = time.text.Split (':');
+		int[] mtime = new int[2];
+		mtime [0] = int.Parse (mStringTime [0]);
+		mtime [1] = int.Parse (mStringTime [1]);
+		return mtime;
 	}
 
 	public static GameObject Instantiate (Transform CellPrefabTransform, string time, string description, bool isFree = true)

@@ -2,21 +2,27 @@
 using UnityEngine;
 using System.Collections;
 
-public class AppointmentModel : MonoBehaviour
+[Serializable]
+public class AppointmentModel
 {
-
-	public String AppointmentID;
-	public DateTime data;
+	public string appointmentID;
+	public string data;
+	public string hour;
+	public string minute;
 	public string userID;
 	public string responsableID;
+	public string responsibleName;
 	public string description;
 	public int durationInMinutes;
 
-	public AppointmentModel(DateTime data, string userID, string responsableID, string description = "", int durationInMinutes = 30)
+	public AppointmentModel (DateTime data, string userID, string responsableID, string responsibleName, string description = "", int durationInMinutes = 30)
 	{
-		this.data = data;
+		this.data = data.ToString (Constants.dateformat);
+		this.hour = data.Hour.ToString ();
+		this.minute = data.Minute.ToString ();
 		this.userID = userID;
 		this.responsableID = responsableID;
+		this.responsibleName = responsibleName;
 		this.description = description;
 		this.durationInMinutes = durationInMinutes;
 	}

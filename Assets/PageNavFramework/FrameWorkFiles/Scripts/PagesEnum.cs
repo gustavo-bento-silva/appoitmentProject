@@ -14,6 +14,8 @@ namespace PageNavFrameWork{
 		ErrorPopup=8,
 		SuccessPopup=9,
 		SelectCompany=10,
-		HomePage=11
+		HomePage=11,
+		ConfirmAppointmentPopup=12,
+		MyAppointmentsPage=13
 	}
 }

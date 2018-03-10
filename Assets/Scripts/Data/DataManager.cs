@@ -6,8 +6,8 @@ using UnityEngine;
 
 public class DataManager : MonoBehaviour
 {
-
-	public static List<AppointmentModel> appointmentList;
+	public static UserModel currentUser;
+	public static List<AppointmentModel> appointmentList = new List<AppointmentModel> ();
 	public static CompanyModel companyData;
 	public static ResponsibleModel currentResponsible;
 	public static ServicesProvidedModel currentservice;
@@ -24,7 +24,8 @@ public class DataManager : MonoBehaviour
 	{
 //		GetUserByID();
 //		CreateCompanyData ();
-//		CreateCompanyDataTest2 ();
+		//		CreateCompanyDataTest2 ();
+		LogUser ("-L7BOJU6OrPM7hzEHumH");
 	}
 
 	//	List<AppointmentModel> CreateApoointmentList ()
@@ -34,6 +35,18 @@ public class DataManager : MonoBehaviour
 	//			"teste", "Teste", "Ocupado"));
 	//		return appointmentList;
 	//	}
+
+	void CreateUserJustForTest ()
+	{
+		FireBaseManager.GetFireBaseInstance ().CreateNewUser ("Gustavinho", "35442543");
+	}
+
+	void LogUser (string ID)
+	{
+		FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel user) {
+			currentUser = user;
+		});
+	}
 
 	CompanyModel CreateCompanyData ()
 	{
@@ -76,16 +89,26 @@ public class DataManager : MonoBehaviour
 	public void GetUserByID ()
 	{
 		FireBaseManager.GetFireBaseInstance ().GetUserByID ("-L6OPA2H1L7PpNcRW7Bh", (user) => {
-			FireBaseManager.GetFireBaseInstance ().GetResponsibleByID ("-L6MAdXb1xHw2o3kWYCx", (responsible) => {
-				CreateNewAppointment (user, responsible);
-			});
+			currentUser = user;
 		});
 	}
 
-	public static void CreateNewAppointment (UserModel user, ResponsibleModel responsible)
+	public static void CreateNewAppointmentToCurrentUser (Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
 	{
-		var appointment = new AppointmentModel (DateTime.Now, user.userID, responsible.userID);
-		FireBaseManager.GetFireBaseInstance ().CreateNewAppoitment (user, responsible, appointment);
+		var appointment = new AppointmentModel (dateNewAppointment, currentUser.userID, currentResponsible.userID, currentResponsible.name, currentservice.name);
+		FireBaseManager.GetFireBaseInstance ().CreateNewAppoitment (currentUser, currentResponsible, appointment, delegate(AppointmentModel mappointment) {
+			currentUser.appoitments.Add (mappointment.appointmentID, appointment);
+			success ();
+		}, fail);
+	}
+
+	public static void CreateNewAppointment (UserModel user, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		var appointment = new AppointmentModel (dateNewAppointment, user.userID, currentResponsible.userID, currentResponsible.name, currentservice.name);
+		FireBaseManager.GetFireBaseInstance ().CreateNewAppoitment (user, currentResponsible, appointment, delegate(AppointmentModel mappointment) {
+			currentUser.appoitments.Add (mappointment.appointmentID, mappointment);
+			success ();
+		}, fail);
 	}
 
 	public static void GetAllResponsablesFromCompany (Delegates.GetAllResponsibles getAllResponsiblesListener)
@@ -98,7 +121,26 @@ public class DataManager : MonoBehaviour
 	{
 		success += (mresponsibles) => responsibles = mresponsibles;
 		FireBaseManager.GetFireBaseInstance ().UpdateServicesFromAllResponsibles (responsibles, success, delegate(string error) {
-			Debug.LogError ("Erro am pegar os servicos: " + error);
+			Debug.LogError ("Erro ao pegar os servicos: " + error);
+		});
+	}
+
+	public static void GetResponsibleAppointments (Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		FireBaseManager.GetFireBaseInstance ().GetResponsibleAppointments (currentResponsible.userID, delegate(List<AppointmentModel> appointments) {
+			appointmentList.Clear ();
+			appointments.ForEach (x => appointmentList.Add (x));
+			success ();
+		}, delegate(string error) {
+			fail (error);
+		});
+	}
+
+	public static void RemoveAppointment (AppointmentModel appointment, Delegates.GeneralListenerSuccess success)
+	{
+		FireBaseManager.GetFireBaseInstance ().DeleteAppointment (appointment, delegate() {
+			currentUser.appoitments.Remove (appointment.appointmentID);
+			success ();
 		});
 	}
 

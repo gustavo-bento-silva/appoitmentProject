@@ -4,10 +4,13 @@ using UnityEngine;
 
 public static class Delegates
 {
+	public delegate void GetResponsibleAppointments (List<AppointmentModel> appointments);
 
 	public delegate void GetAllServicesProvided (List<ResponsibleModel> responsablesWithServices);
 
 	public delegate void GetAllResponsibles (List<ResponsibleModel> responsables);
+
+	public delegate void CreateNewAppointment (AppointmentModel appointment);
 
 	public delegate void GetUserByID (UserModel user);
 
