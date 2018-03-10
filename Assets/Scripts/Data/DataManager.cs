@@ -7,6 +7,7 @@ using UnityEngine;
 public class DataManager : MonoBehaviour
 {
 	public static UserModel currentUser;
+	public static List<MessageModel> userMessages = new List<MessageModel> ();
 	public static List<AppointmentModel> appointmentList = new List<AppointmentModel> ();
 	public static CompanyModel companyData;
 	public static ResponsibleModel currentResponsible;
@@ -25,7 +26,8 @@ public class DataManager : MonoBehaviour
 //		GetUserByID();
 //		CreateCompanyData ();
 		//		CreateCompanyDataTest2 ();
-		LogUser ("-L7BOJU6OrPM7hzEHumH");
+//		CreateUserJustForTest ();
+		LogUser ("-L7FT39g_S2jGWgx4WOc");
 	}
 
 	//	List<AppointmentModel> CreateApoointmentList ()
@@ -45,6 +47,17 @@ public class DataManager : MonoBehaviour
 	{
 		FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel user) {
 			currentUser = user;
+			ActiveListeners ();
+		});
+	}
+
+	void ActiveListeners ()
+	{
+		ActiveUserMessagesListener ();
+		GetCurrentUserMessages (delegate() {
+			
+		}, delegate(string error) {
+			
 		});
 	}
 
@@ -99,6 +112,13 @@ public class DataManager : MonoBehaviour
 		FireBaseManager.GetFireBaseInstance ().CreateNewAppoitment (currentUser, currentResponsible, appointment, delegate(AppointmentModel mappointment) {
 			currentUser.appoitments.Add (mappointment.appointmentID, appointment);
 			success ();
+			string minute = (dateNewAppointment.Minute == 0 ? "00" : "0");
+			var message = string.Format ("{0} realizou novo agendamento de {1} para dia {2}/{3} às {4}:{5}h", currentUser.name, currentservice.name, dateNewAppointment.Day, dateNewAppointment.Month, dateNewAppointment.Hour, minute);
+			CreateNewMessageFromCurrentUserToResponsilbe (currentResponsible.userID, message, delegate() {
+				
+			}, delegate(string error) {
+				
+			});
 		}, fail);
 	}
 
@@ -109,6 +129,16 @@ public class DataManager : MonoBehaviour
 			currentUser.appoitments.Add (mappointment.appointmentID, mappointment);
 			success ();
 		}, fail);
+	}
+
+	public static void CreateNewMessageFromCurrentUserToResponsilbe (string responsibleID, string message, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		var mMessage = new MessageModel (currentUser.name, message, DateTime.Now.ToString (Constants.dateformat));
+		FireBaseManager.GetFireBaseInstance ().CreateNewMessage (mMessage, responsibleID, currentUser.userID, delegate() {
+			success ();
+		}, delegate(string error) {
+			fail (error);
+		});
 	}
 
 	public static void GetAllResponsablesFromCompany (Delegates.GetAllResponsibles getAllResponsiblesListener)
@@ -136,11 +166,48 @@ public class DataManager : MonoBehaviour
 		});
 	}
 
-	public static void RemoveAppointment (AppointmentModel appointment, Delegates.GeneralListenerSuccess success)
+	public static void RemoveAppointmentFromUser (AppointmentModel appointment, Delegates.GeneralListenerSuccess success)
 	{
 		FireBaseManager.GetFireBaseInstance ().DeleteAppointment (appointment, delegate() {
 			currentUser.appoitments.Remove (appointment.appointmentID);
+
+			string minute = (appointment.minute == "0" ? "00" : "0");
+			var message = string.Format ("{0} desmarcou o agendamento de {1} marcado para dia {2} às {3}:{4}h", currentUser.name, appointment.description, appointment.data, appointment.hour, minute);
+			CreateNewMessageFromCurrentUserToResponsilbe (currentResponsible.userID, message, delegate() {
+				
+			}, delegate(string error) {
+				
+			});
 			success ();
+		});
+	}
+
+	public static void RemoveMessage (MessageModel message, Delegates.GeneralListenerSuccess success)
+	{
+		FireBaseManager.GetFireBaseInstance ().DeleteMessage (currentUser, message.id, delegate() {
+			userMessages.Remove (message);
+			success ();
+		});
+	}
+
+	public static void ActiveUserMessagesListener ()
+	{
+		FireBaseManager.GetFireBaseInstance ().ActiveUserMessagesListener (currentUser.userID, delegate(List<MessageModel> messages) {
+			userMessages.Clear ();
+			currentUser.messages.Clear ();
+			currentUser.messages = messages.ToDictionary (x => x.id, y => (object)y);
+			userMessages = messages;
+		});
+	}
+
+	public static void GetCurrentUserMessages (Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		FireBaseManager.GetFireBaseInstance ().GetUserMessages (currentUser.userID, delegate(List<MessageModel> messages) {
+			userMessages.Clear ();
+			userMessages = messages;
+			success ();
+		}, delegate(string error) {
+			fail (error);
 		});
 	}
 

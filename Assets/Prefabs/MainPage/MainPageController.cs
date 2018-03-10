@@ -35,6 +35,13 @@ public class MainPageController : MonoBehaviour
 		OnMenuClick ();
 	}
 
+	public void OnMessagesClick ()
+	{
+		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.MessagesPage);
+		OnMenuClick ();
+	}
+
+
 	public void OnNewAppointmentClick ()
 	{
 		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.SelectCompany);

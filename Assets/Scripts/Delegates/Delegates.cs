@@ -4,6 +4,8 @@ using UnityEngine;
 
 public static class Delegates
 {
+	public delegate void GetUserMessages (List<MessageModel> messages);
+
 	public delegate void GetResponsibleAppointments (List<AppointmentModel> appointments);
 
 	public delegate void GetAllServicesProvided (List<ResponsibleModel> responsablesWithServices);

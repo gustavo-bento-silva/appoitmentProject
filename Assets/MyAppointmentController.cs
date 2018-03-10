@@ -13,7 +13,7 @@ public class MyAppointmentController : MonoBehaviour
 
 	public void OnRemoveClick ()
 	{
-		DataManager.RemoveAppointment (appointment, delegate {
+		DataManager.RemoveAppointmentFromUser (appointment, delegate {
 			GameObject.Destroy (gameObject);
 		});
 	}

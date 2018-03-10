@@ -21,6 +21,7 @@ public enum DBTable
 public enum Parameters
 {
 	appointments,
+	messages,
 	date,
 	responsibles,
 	servicesProvided
@@ -32,6 +33,7 @@ public class FireBaseManager : MonoBehaviour
 
 	string myProjectURL = "https://appointmentproject-a7233.firebaseio.com/";
 	DatabaseReference reference;
+	public Delegates.GetUserMessages userMessages;
 
 	public static FireBaseManager GetFireBaseInstance ()
 	{
@@ -40,7 +42,6 @@ public class FireBaseManager : MonoBehaviour
 
 	void Awake ()
 	{
-		
 		FirebaseApp.DefaultInstance.SetEditorDatabaseUrl (myProjectURL);
 		reference = FirebaseDatabase.DefaultInstance.RootReference;
 		
@@ -84,8 +85,28 @@ public class FireBaseManager : MonoBehaviour
 				});
 			}
 		});
-			
-		
+	}
+
+	public void CreateNewMessage (MessageModel message, string responsibleID, string userID, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		string messageID = reference.Child (DBTable.User.ToString ()).Push ().Key;
+		message.id = messageID;
+
+		string json = JsonUtility.ToJson (message);
+
+		reference.Child (DBTable.User.ToString ()).Child (userID).Child (Parameters.messages + "/" + messageID).SetRawJsonValueAsync (json).ContinueWith (task => {
+			if (task.IsFaulted) {
+				fail (task.Exception.ToString ());
+			} else if (task.IsCompleted) {
+				reference.Child (DBTable.Responsible.ToString ()).Child (responsibleID).Child (Parameters.messages + "/" + messageID).SetRawJsonValueAsync (json).ContinueWith (task2 => {
+					if (task.IsFaulted) {
+						fail (task.Exception.ToString ());
+					} else if (task.IsCompleted) {
+						success ();
+					}
+				});
+			}
+		});
 	}
 
 	public CompanyModel CreateNewCompany (string name, string phone, string city, string address, string cep)
@@ -299,6 +320,51 @@ public class FireBaseManager : MonoBehaviour
 
 	}
 
+	public void GetUserMessages (string userID, Delegates.GetUserMessages success, Delegates.GeneralListenerFail fail)
+	{
+
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.User.ToString ()).Child (userID).Child (Parameters.messages.ToString ())
+			.GetValueAsync ().ContinueWith (task => {
+			if (task.IsFaulted) {
+				fail (task.Exception.ToString ());
+			} else if (task.IsCompleted) {
+				DataSnapshot snapshot = task.Result;
+				List<MessageModel> messages = new List<MessageModel> ();
+				foreach (var message in snapshot.Children) {
+					string json = message.GetRawJsonValue ();
+					MessageModel mMessage = JsonUtility.FromJson<MessageModel> (json);
+					messages.Add (mMessage);
+				}
+				success (messages);
+			}
+		});
+
+	}
+
+	public void DeleteMessage (UserModel user, string messageID, Delegates.GeneralListenerSuccess success)
+	{
+		if (user is ResponsibleModel) {
+			FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsible.ToString ()).Child (user.userID).Child (Parameters.messages.ToString ()).Child (messageID).RemoveValueAsync ()
+				.ContinueWith (task => {
+				if (task.IsFaulted) {
+						
+				} else {
+					success ();
+				}
+			});
+		} else {
+			FirebaseDatabase.DefaultInstance.GetReference (DBTable.User.ToString ()).Child (user.userID).Child (Parameters.messages.ToString ()).Child (messageID).RemoveValueAsync ()
+				.ContinueWith (task => {
+				if (task.IsFaulted) {
+
+				} else {
+					success ();
+				}
+			});
+			;
+		}
+	}
+
 	public void DeleteAppointment (AppointmentModel appointment, Delegates.GeneralListenerSuccess success)
 	{
 		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Appointment.ToString ()).Child (appointment.appointmentID).RemoveValueAsync ().ContinueWith (task => {
@@ -320,6 +386,13 @@ public class FireBaseManager : MonoBehaviour
 				});
 			}
 		});
+	}
+
+	public void ActiveUserMessagesListener (string userID, Delegates.GetUserMessages success)
+	{
+		userMessages += success;
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.User.ToString ()).Child (userID).Child (Parameters.messages.ToString ())
+			.ValueChanged += MessagesListChanged;
 	}
 
 	void ActiveMyAppointmentsListener (string userID)
@@ -344,5 +417,20 @@ public class FireBaseManager : MonoBehaviour
 			return;
 		}
 		//		Debug.Log ("!!!!" + args.Snapshot.);
+	}
+
+	void MessagesListChanged (object sender, ValueChangedEventArgs args)
+	{
+		if (args.DatabaseError != null) {
+			Debug.LogError (args.DatabaseError.Message);
+			return;
+		}
+		List<MessageModel> messages = new List<MessageModel> ();
+		foreach (var message in args.Snapshot.Children) {
+			string json = message.GetRawJsonValue ();
+			MessageModel mMessage = JsonUtility.FromJson<MessageModel> (json);
+			messages.Add (mMessage);
+		}
+		userMessages (messages);
 	}
 }

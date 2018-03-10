@@ -13,6 +13,7 @@ public class UserModel
 	public string userType;
 
 	public Dictionary<string, object> appoitments;
+	public Dictionary<string, object> messages;
 
 	public UserModel (string userID, string name, string phone, Constants.UserType userType = Constants.UserType.Client)
 	{
@@ -21,6 +22,7 @@ public class UserModel
 		this.phone = phone;
 		this.userType = userType.ToString ();
 		appoitments = new Dictionary<string, object> ();
+		messages = new Dictionary<string, object> ();
 	}
 
 }
