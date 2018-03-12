@@ -4,10 +4,6 @@ using System.Collections.Generic;
 
 public class PlayerPreferences : MonoBehaviour
 {
-	//Monday
-	public static int initialDayOfWeek = 1;
-	//Friday
-	public static int endDayOfWeek = 5;
 	public static bool oneInOneHour = false;
 
 	public static string TranslateDay (int day)

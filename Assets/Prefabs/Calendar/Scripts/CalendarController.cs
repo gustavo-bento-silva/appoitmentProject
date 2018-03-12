@@ -98,6 +98,9 @@ public class CalendarController : MonoBehaviour
 				if (i == 0 && j < dayOfWeek || day > daysInMonth) {
 					linesText [i] [j].transform.parent.GetComponent<Button> ().enabled = false;
 				} else {
+					if (DateTime.Compare (today, new DateTime (year, month, day)) > 0) {
+						linesText [i] [j].transform.parent.GetComponent<Button> ().enabled = false;
+					}
 					linesText [i] [j].text = day.ToString ();
 					linesText [i] [j].name = day.ToString ();
 					date = new DateTime (year, month, day);

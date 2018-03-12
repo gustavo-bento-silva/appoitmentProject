@@ -11,9 +11,7 @@ public class LoginPageController : PageController
 
 	void Start ()
 	{
-
-//		StartCoroutine (GetLocations ());
-
+		Loading = false;
 	}
 
 	void Update ()
