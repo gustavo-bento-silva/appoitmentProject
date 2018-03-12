@@ -8,7 +8,7 @@ public class DataManager : MonoBehaviour
 {
 	public static UserModel currentUser;
 	public static List<MessageModel> userMessages = new List<MessageModel> ();
-	public static List<AppointmentModel> appointmentList = new List<AppointmentModel> ();
+	public static List<AppointmentModel> responsibleAppointmentList = new List<AppointmentModel> ();
 	public static CompanyModel companyData;
 	public static ResponsibleModel currentResponsible;
 	public static ServicesProvidedModel currentservice;
@@ -54,11 +54,12 @@ public class DataManager : MonoBehaviour
 	void ActiveListeners ()
 	{
 		ActiveUserMessagesListener ();
-		GetCurrentUserMessages (delegate() {
-			
-		}, delegate(string error) {
-			
-		});
+		ActiveUserAppointmentsListener ();
+//		GetCurrentUserMessages (delegate() {
+//			
+//		}, delegate(string error) {
+//			
+//		});
 	}
 
 	CompanyModel CreateCompanyData ()
@@ -110,7 +111,6 @@ public class DataManager : MonoBehaviour
 	{
 		var appointment = new AppointmentModel (dateNewAppointment, currentUser.userID, currentResponsible.userID, currentResponsible.name, currentservice.name);
 		FireBaseManager.GetFireBaseInstance ().CreateNewAppoitment (currentUser, currentResponsible, appointment, delegate(AppointmentModel mappointment) {
-			currentUser.appoitments.Add (mappointment.appointmentID, appointment);
 			success ();
 			string minute = (dateNewAppointment.Minute == 0 ? "00" : "0");
 			var message = string.Format ("{0} realizou novo agendamento de {1} para dia {2}/{3} às {4}:{5}h", currentUser.name, currentservice.name, dateNewAppointment.Day, dateNewAppointment.Month, dateNewAppointment.Hour, minute);
@@ -158,8 +158,8 @@ public class DataManager : MonoBehaviour
 	public static void GetResponsibleAppointments (Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
 	{
 		FireBaseManager.GetFireBaseInstance ().GetResponsibleAppointments (currentResponsible.userID, delegate(List<AppointmentModel> appointments) {
-			appointmentList.Clear ();
-			appointments.ForEach (x => appointmentList.Add (x));
+			responsibleAppointmentList.Clear ();
+			appointments.ForEach (x => responsibleAppointmentList.Add (x));
 			success ();
 		}, delegate(string error) {
 			fail (error);
@@ -193,10 +193,17 @@ public class DataManager : MonoBehaviour
 	public static void ActiveUserMessagesListener ()
 	{
 		FireBaseManager.GetFireBaseInstance ().ActiveUserMessagesListener (currentUser.userID, delegate(List<MessageModel> messages) {
-			userMessages.Clear ();
-			currentUser.messages.Clear ();
-			currentUser.messages = messages.ToDictionary (x => x.id, y => (object)y);
+			SetCurrentUserMessages (messages);
 			userMessages = messages;
+			DefineMessagesBadges ();
+		});
+	}
+
+	public static void ActiveUserAppointmentsListener ()
+	{
+		FireBaseManager.GetFireBaseInstance ().ActiveMyAppointmentsListener (currentUser.userID, delegate(List<AppointmentModel> appointments) {
+			SetCurrentUserAppointments (appointments);
+			DefineAppointmentsBadges ();
 		});
 	}
 
@@ -209,6 +216,90 @@ public class DataManager : MonoBehaviour
 		}, delegate(string error) {
 			fail (error);
 		});
+	}
+
+	private static void DefineAppointmentsBadges ()
+	{
+		List<AppointmentModel> appointments = new List<AppointmentModel> ();
+		foreach (var appointmentKey in currentUser.appoitments.Keys) {
+			appointments.Add ((AppointmentModel)currentUser.appoitments [appointmentKey]);
+		}
+		if (appointments != null) {
+			var i = 0;
+			appointments.ForEach (x => {
+				if (x.isNew)
+					i++;
+			});
+			if (i > 0) {
+				MainPageController.GetMainPageINstance ().ActiveMyAppointmentsBadge (i);
+			} else {
+				MainPageController.GetMainPageINstance ().HideMyAppointmentsBadge ();
+			}
+		}
+	}
+
+	private static void DefineMessagesBadges ()
+	{
+		if (userMessages != null) {
+			var i = 0;
+			userMessages.ForEach (x => {
+				if (x.isNew)
+					i++;
+			});
+			if (i > 0) {
+				MainPageController.GetMainPageINstance ().ActiveMessagesBadge (i);
+			} else {
+				MainPageController.GetMainPageINstance ().HideMessagesBadge ();
+			}
+		}
+	}
+
+	public static void SetMyAppointmentsAsRead ()
+	{
+		if (currentUser.appoitments != null) {
+			foreach (var appointmentKey in currentUser.appoitments.Keys) {
+				AppointmentModel appointment;
+				appointment = (AppointmentModel)currentUser.appoitments [appointmentKey];
+				if (appointment.isNew) {
+					appointment.isNew = false;
+					FireBaseManager.GetFireBaseInstance ().UpdateMyAppointment (currentUser, appointmentKey);
+				}
+			}
+		}
+		DefineAppointmentsBadges ();
+	}
+
+	public static void SetMessagesToRead ()
+	{
+		userMessages.ForEach (x => {
+			if (x.isNew) {
+				x.isNew = false;
+				FireBaseManager.GetFireBaseInstance ().UpdateMessage (currentUser, x);
+			}
+		});
+		SetCurrentUserMessages (userMessages);
+		DefineMessagesBadges ();
+
+	}
+
+	private static void SetCurrentUserMessages (List<MessageModel> messages)
+	{
+		if (currentUser.messages != null) {
+			currentUser.messages.Clear ();	
+		} else {
+			currentUser.messages = new Dictionary<string, object> ();
+		}
+		currentUser.messages = messages.ToDictionary (x => x.id, y => (object)y);
+	}
+
+	private static void SetCurrentUserAppointments (List<AppointmentModel> appointments)
+	{
+		if (currentUser.appoitments != null) {
+			currentUser.appoitments.Clear ();	
+		} else {
+			currentUser.appoitments = new Dictionary<string, object> ();
+		}
+		currentUser.appoitments = appointments.ToDictionary (x => x.appointmentID, x => (object)x);
 	}
 
 	//	void CreateAppointments()

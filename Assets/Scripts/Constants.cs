@@ -9,7 +9,7 @@ public static class Constants
 	public enum UserType
 	{
 		Client,
-		Responsable,
+		Responsible,
 		Company,
 		Admin,
 		None

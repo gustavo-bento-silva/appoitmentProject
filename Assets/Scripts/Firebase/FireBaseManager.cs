@@ -10,11 +10,10 @@ using UnityEngine.UI;
 
 public enum DBTable
 {
-	Appoitments,
+	Appointments,
 	User,
 	Responsible,
 	Company,
-	Appointment,
 	Data
 }
 
@@ -24,7 +23,8 @@ public enum Parameters
 	messages,
 	date,
 	responsibles,
-	servicesProvided
+	servicesProvided,
+	isNew
 }
 
 public class FireBaseManager : MonoBehaviour
@@ -34,6 +34,7 @@ public class FireBaseManager : MonoBehaviour
 	string myProjectURL = "https://appointmentproject-a7233.firebaseio.com/";
 	DatabaseReference reference;
 	public Delegates.GetUserMessages userMessages;
+	public Delegates.GetUserAppointments userAppointments;
 
 	public static FireBaseManager GetFireBaseInstance ()
 	{
@@ -62,7 +63,7 @@ public class FireBaseManager : MonoBehaviour
 
 	public void CreateNewAppoitment (UserModel user, ResponsibleModel responsable, AppointmentModel appointment, Delegates.CreateNewAppointment success, Delegates.GeneralListenerFail fail)
 	{
-		string appoitmentID = reference.Child (DBTable.Appoitments.ToString ()).Push ().Key;
+		string appoitmentID = reference.Child (DBTable.Appointments.ToString ()).Push ().Key;
 		appointment.appointmentID = appoitmentID;
 
 //		TODO Get appointments dinamicaly
@@ -71,7 +72,7 @@ public class FireBaseManager : MonoBehaviour
 
 		string json = JsonUtility.ToJson (appointment);
 
-		CreateTable (DBTable.Appoitments, appoitmentID, json);
+		CreateTable (DBTable.Appointments, appoitmentID, json);
 		reference.Child (DBTable.User.ToString ()).Child (user.userID).Child (Parameters.appointments + "/" + appoitmentID).SetRawJsonValueAsync (json).ContinueWith (task2 => {
 			if (task2.IsFaulted) {
 				fail (task2.Exception.ToString ());
@@ -117,6 +118,25 @@ public class FireBaseManager : MonoBehaviour
 		string json = JsonUtility.ToJson (company);
 		CreateTable (DBTable.Company, companyID, json);
 		return company;
+	}
+
+	public void UpdateMyAppointment (UserModel user, string appointmentID)
+	{
+		if (user.userType == Constants.UserType.Responsible.ToString ()) {
+			reference.Child (DBTable.Responsible.ToString ()).Child (user.userID).Child (Parameters.appointments.ToString ()).Child (appointmentID).Child (Parameters.isNew.ToString ()).SetValueAsync (false);
+		} else {
+			reference.Child (DBTable.User.ToString ()).Child (user.userID).Child (Parameters.appointments.ToString ()).Child (appointmentID).Child (Parameters.isNew.ToString ()).SetValueAsync (false);
+		}
+		reference.Child (DBTable.Appointments.ToString ()).Child (appointmentID).Child (Parameters.isNew.ToString ()).SetValueAsync (false);
+	}
+
+	public void UpdateMessage (UserModel user, MessageModel message)
+	{
+		if (user.userType == Constants.UserType.Responsible.ToString ()) {
+			reference.Child (DBTable.Responsible.ToString ()).Child (user.userID).Child (Parameters.messages.ToString ()).Child (message.id).Child (Parameters.isNew.ToString ()).SetValueAsync (false);
+		} else {
+			reference.Child (DBTable.User.ToString ()).Child (user.userID).Child (Parameters.messages.ToString ()).Child (message.id).Child (Parameters.isNew.ToString ()).SetValueAsync (false);
+		}
 	}
 
 	public void AddServicesToResponsible (string companyID, ResponsibleModel responsible, List<ServicesProvidedModel> services)
@@ -189,7 +209,7 @@ public class FireBaseManager : MonoBehaviour
 
 	void GetDaySchedule (string date)
 	{
-		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Appoitments.ToString ()).Child ("data").EqualTo (date)
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Appointments.ToString ()).Child ("data").EqualTo (date)
 			.ValueChanged += HandleValueChanged;
 
 	}
@@ -204,12 +224,17 @@ public class FireBaseManager : MonoBehaviour
 				DataSnapshot snapshot = task.Result;
 				var userJson = snapshot.GetRawJsonValue ();
 				var user = JsonUtility.FromJson<UserModel> (userJson);
-				GetUserAppointments (user.userID, delegate(List<AppointmentModel> appointments) {
-					user.appoitments = appointments.ToDictionary (x => x.userID, y => (object)y);
-					getUserById (user);
-				}, delegate(string error) {
-					Debug.Log ("Falha no get user by id");
-				});
+//				GetUserAppointments (user.userID, delegate(List<AppointmentModel> appointments) {
+//					user.appoitments = new Dictionary<string, object> ();
+//					foreach (var appointment in appointments) {
+//						user.appoitments.Add (appointment.appointmentID, (object)appointment);
+//					}
+//					getUserById (user);
+//				}, delegate(string error) {
+//					Debug.Log ("Falha no get user by id");
+//				});
+
+				getUserById (user);
 			}
 		});
 	}
@@ -367,7 +392,7 @@ public class FireBaseManager : MonoBehaviour
 
 	public void DeleteAppointment (AppointmentModel appointment, Delegates.GeneralListenerSuccess success)
 	{
-		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Appointment.ToString ()).Child (appointment.appointmentID).RemoveValueAsync ().ContinueWith (task => {
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Appointments.ToString ()).Child (appointment.appointmentID).RemoveValueAsync ().ContinueWith (task => {
 			if (task.IsFaulted) {
 				
 			} else {
@@ -395,8 +420,9 @@ public class FireBaseManager : MonoBehaviour
 			.ValueChanged += MessagesListChanged;
 	}
 
-	void ActiveMyAppointmentsListener (string userID)
+	public void ActiveMyAppointmentsListener (string userID, Delegates.GetUserAppointments appointmentsSuccess)
 	{
+		userAppointments += appointmentsSuccess;
 		FirebaseDatabase.DefaultInstance.GetReference (DBTable.User.ToString ()).Child (userID).Child (Parameters.appointments.ToString ())
 			.ValueChanged += AppointmentListChanged;
 	}
@@ -416,7 +442,14 @@ public class FireBaseManager : MonoBehaviour
 			Debug.LogError (args.DatabaseError.Message);
 			return;
 		}
-		//		Debug.Log ("!!!!" + args.Snapshot.);
+		DataSnapshot snapshot = args.Snapshot;
+		List<AppointmentModel> appointments = new List<AppointmentModel> ();
+		foreach (var appointment in snapshot.Children) {
+			string json = appointment.GetRawJsonValue ();
+			AppointmentModel mAppointment = JsonUtility.FromJson<AppointmentModel> (json);
+			appointments.Add (mAppointment);
+		}
+		userAppointments (appointments);
 	}
 
 	void MessagesListChanged (object sender, ValueChangedEventArgs args)

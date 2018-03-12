@@ -14,6 +14,21 @@ public class AppointmentModel
 	public string responsibleName;
 	public string description;
 	public int durationInMinutes;
+	public bool isNew;
+
+	public AppointmentModel (string data, string hour, string minute, string userID, string responsableID, string responsibleName, string description = "", int durationInMinutes = 30)
+	{
+		this.data = data;
+		this.hour = hour;
+		this.minute = minute;
+		this.userID = userID;
+		this.responsableID = responsableID;
+		this.responsibleName = responsibleName;
+		this.description = description;
+		this.durationInMinutes = durationInMinutes;
+		this.isNew = true;
+	}
+
 
 	public AppointmentModel (DateTime data, string userID, string responsableID, string responsibleName, string description = "", int durationInMinutes = 30)
 	{
@@ -25,6 +40,7 @@ public class AppointmentModel
 		this.responsibleName = responsibleName;
 		this.description = description;
 		this.durationInMinutes = durationInMinutes;
+		this.isNew = true;
 	}
 
 }

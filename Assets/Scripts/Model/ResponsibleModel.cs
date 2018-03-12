@@ -14,7 +14,7 @@ public class ResponsibleModel : UserModel
 	[SerializeField]
 	public List<bool> daysOfWork;
 
-	public ResponsibleModel (UserModel user) : base (user.userID, user.name, user.phone, Constants.UserType.Responsable)
+	public ResponsibleModel (UserModel user) : base (user.userID, user.name, user.phone, Constants.UserType.Responsible)
 	{
 		servicesProvided = new Dictionary<string, object> ();
 		this.daysOfWork = new List<bool> (new bool[] { false, true, true, true, true, true, true });

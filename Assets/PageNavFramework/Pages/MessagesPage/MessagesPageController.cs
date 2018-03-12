@@ -42,6 +42,7 @@ public class MessagesPageController : PageController
 	void FillList ()
 	{
 		DataManager.userMessages.ForEach (x => messageCell.Add (MessageCellControler.Instantiate (cellPrefab, x.message, x)));
+		StartCoroutine (OnFillList ());
 	}
 
 	IEnumerator OnFillList ()
@@ -49,6 +50,7 @@ public class MessagesPageController : PageController
 		yield return new WaitForSeconds (1f);
 		messageCell.ForEach (x => x.transform.SetParent (scrollContentList, false));
 		ReadjustScrollSize (messageCell.Count);
+		DataManager.SetMessagesToRead ();
 		Loading = false;
 	}
 

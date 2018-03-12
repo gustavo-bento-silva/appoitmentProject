@@ -11,8 +11,10 @@ public class MessageCellControler : MonoBehaviour
 
 	public void OnRemoveClick ()
 	{
+		PageNavFrameWork.PageNav.GetPageNavInstance ().SetLoadingVisibility (true);
 		DataManager.RemoveMessage (messageModel, delegate {
 			GameObject.Destroy (gameObject);
+			PageNavFrameWork.PageNav.GetPageNavInstance ().SetLoadingVisibility (false);
 		});
 	}
 

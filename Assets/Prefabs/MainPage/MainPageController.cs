@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MainPageController : MonoBehaviour
 {
@@ -11,22 +12,30 @@ public class MainPageController : MonoBehaviour
 		Closed
 	}
 
+	public static MainPageController _instance;
+
 	public Canvas canvas;
 	public GameObject menu;
 	public GameObject background;
 	public float time = 0f;
+	public GameObject homeBadge;
+	public GameObject messagesBadge;
+	public GameObject newAppointmentBadge;
+	public GameObject myAppointmentsBadge;
 	MenuState menuState = MenuState.Closed;
 	float xPosition;
 
-	// Use this for initialization
-	void Start ()
+
+	public static MainPageController GetMainPageINstance ()
 	{
-        
+		return _instance;
 	}
 
-	// Update is called once per frame
-	void Update ()
+	void Awake ()
 	{
+		if (_instance == null) {
+			_instance = this;
+		}
 	}
 
 	public void OnHomeClick ()
@@ -77,5 +86,53 @@ public class MainPageController : MonoBehaviour
 	void HideSideMenu ()
 	{
 		iTween.MoveTo (menu, iTween.Hash ("x", -xPosition, "time", time, "easeType", iTween.EaseType.linear.ToString ()));
+	}
+
+	public void ActiveHomeBadge (int quantity)
+	{
+		var homeBadgeText = homeBadge.GetComponentInChildren<Text> ();
+		homeBadgeText.text = quantity.ToString ();
+		homeBadge.SetActive (true);
+	}
+
+	public void ActiveNewAppointmentBadge (int quantity)
+	{
+		var newAppointmentBadgeText = newAppointmentBadge.GetComponentInChildren<Text> ();
+		newAppointmentBadgeText.text = quantity.ToString ();
+		newAppointmentBadge.SetActive (true);
+	}
+
+	public void ActiveMessagesBadge (int quantity)
+	{
+		var messagesBadgeText = messagesBadge.GetComponentInChildren<Text> ();
+		messagesBadgeText.text = quantity.ToString ();
+		messagesBadge.SetActive (true);
+	}
+
+	public void ActiveMyAppointmentsBadge (int quantity)
+	{
+		var myAppointmentsBadgeText = myAppointmentsBadge.GetComponentInChildren<Text> ();
+		myAppointmentsBadgeText.text = quantity.ToString ();
+		myAppointmentsBadge.SetActive (true);
+	}
+
+	public void HideHomeBadge ()
+	{
+		homeBadge.SetActive (false);
+	}
+
+	public void HideNewAppointmentBadge ()
+	{
+		newAppointmentBadge.SetActive (false);
+	}
+
+	public void HideMessagesBadge ()
+	{
+		messagesBadge.SetActive (false);
+	}
+
+	public void HideMyAppointmentsBadge ()
+	{
+		myAppointmentsBadge.SetActive (false);
 	}
 }

@@ -54,6 +54,7 @@ public class MyAppointmentsPageController : PageController
 		yield return new WaitForSeconds (1f);
 		appointmentsCell.ForEach (x => x.transform.SetParent (scrollContentList, false));
 		ReadjustScrollSize (appointmentsCell.Count);
+		DataManager.SetMyAppointmentsAsRead ();
 		Loading = false;
 	}
 

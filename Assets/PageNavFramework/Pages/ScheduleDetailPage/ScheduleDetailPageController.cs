@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using PageNavFrameWork;
 using UnityEngine.Networking.NetworkSystem;
 using UnityEngine.UI;
+using System.Globalization;
 
 public class ScheduleDetailPageController : PageController
 {
@@ -99,9 +100,17 @@ public class ScheduleDetailPageController : PageController
 	{
 		limit = DataManager.currentResponsible.timeToFinishWork [(int)DataManager.dateNewAppointment.DayOfWeek];
 		begin = DataManager.currentResponsible.timeToBeginWork [(int)DataManager.dateNewAppointment.DayOfWeek];
-		var appointmentList = DataManager.appointmentList;
+		List<AppointmentModel> appointmentList = new List<AppointmentModel> ();
 		var isOneInOneHour = PlayerPreferences.oneInOneHour;
 		int index = 0;
+		var newAppointmentDate = new DateTime (appointmentYear, appointmentMonth, appointmentDay);
+		CultureInfo provider = new CultureInfo ("pt-BR");
+
+		DataManager.responsibleAppointmentList.ForEach (x => {
+			if (DateTime.ParseExact (x.data, Constants.dateformat, provider) == newAppointmentDate) {
+				appointmentList.Add (x);
+			}
+		});
 
 		if (appointmentList != null)
 			appointmentList.Sort ((first, second) => ((first.data).CompareTo (second.data)));
