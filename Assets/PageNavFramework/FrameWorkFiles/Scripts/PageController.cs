@@ -75,7 +75,7 @@ namespace PageNavFrameWork
 		public void OpenSuccessPopup ()
 		{
 			_success = true;
-			PageNav.GetPageNavInstance ().SetErrorVisibility (true);
+			PageNav.GetPageNavInstance ().SetSuccessVisibility (true);
 		}
 
 		public void CloseErrorPopup ()
@@ -87,7 +87,7 @@ namespace PageNavFrameWork
 		public void CloseSuccessPopup ()
 		{
 			_success = false;
-			PageNav.GetPageNavInstance ().SetErrorVisibility (false);
+			PageNav.GetPageNavInstance ().SetSuccessVisibility (false);
 		}
 
 		/// <summary>

@@ -41,9 +41,6 @@ public class FirebaseAuth : MonoBehaviour
 
 			user = task.Result;
 			PlayerData.auth = auth.CurrentUser;
-			FireBaseManager.GetFireBaseInstance ().GetUserByID (user.UserId, delegate(UserModel user) {
-				PlayerData.user = user;
-			});
 			successListener ();
 			Debug.LogFormat ("User signed in successfully: {0} ({1})",
 				user.DisplayName, user.UserId);

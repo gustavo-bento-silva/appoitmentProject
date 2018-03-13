@@ -27,7 +27,7 @@ public class DataManager : MonoBehaviour
 //		CreateCompanyData ();
 		//		CreateCompanyDataTest2 ();
 //		CreateUserJustForTest ();
-		LogUser ("-L7FT39g_S2jGWgx4WOc");
+//		LogUser ("-L7FT39g_S2jGWgx4WOc");
 	}
 
 	//	List<AppointmentModel> CreateApoointmentList ()
@@ -43,7 +43,7 @@ public class DataManager : MonoBehaviour
 		FireBaseManager.GetFireBaseInstance ().CreateNewUser ("Gustavinho", "35442543");
 	}
 
-	void LogUser (string ID)
+	void LoadUserInfo (string ID)
 	{
 		FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel user) {
 			currentUser = user;
