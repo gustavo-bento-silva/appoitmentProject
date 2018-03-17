@@ -3,21 +3,31 @@ using System.Collections;
 using PageNavFrameWork;
 using System.Collections.Generic;
 using System;
+using UnityEngine.SceneManagement;
 
 public class LoginPageController : PageController
 {
-
+	public string homeScene;
 	public string url = "http://servicodados.ibge.gov.br/api/v1/localidades/estados/33/municipios";
 
 	void Start ()
 	{
 		Loading = false;
+		if (PlayerPreferences.userIsLogged) {
+			ChangeScene ();
+		}
 	}
 
 	void Update ()
 	{
 
 	}
+
+	void ChangeScene ()
+	{
+		SceneManager.LoadSceneAsync (homeScene);
+	}
+
 
 	IEnumerator GetLocations ()
 	{

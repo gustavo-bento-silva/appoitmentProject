@@ -8,11 +8,13 @@ public class ServicesProvidedModel
 {
 	public string serviceID;
 	public string name;
+	public string price;
 	public float duration;
 
-	public ServicesProvidedModel(string name, float duration)
+	public ServicesProvidedModel (string name, float duration, string price)
 	{
 		this.name = name;
 		this.duration = duration;
+		this.price = price;
 	}
 }

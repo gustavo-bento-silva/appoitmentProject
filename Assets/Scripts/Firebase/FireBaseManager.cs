@@ -24,7 +24,10 @@ public enum Parameters
 	date,
 	responsibles,
 	servicesProvided,
-	isNew
+	isNew,
+	daysOfWork,
+	timeToBeginWork,
+	timeToFinishWork
 }
 
 public class FireBaseManager : MonoBehaviour
@@ -110,13 +113,13 @@ public class FireBaseManager : MonoBehaviour
 		});
 	}
 
-	public CompanyModel CreateNewCompany (string name, string phone, string city, string address, string cep)
+	public CompanyModel CreateNewCompany (string companyID, string name, string phone, string city, string address, string cep)
 	{
-		string companyID = reference.Child (DBTable.Company.ToString ()).Push ().Key;
 		CompanyModel company = new CompanyModel (new UserModel (companyID, name, phone), city, address, cep);
 
 		string json = JsonUtility.ToJson (company);
 		CreateTable (DBTable.Company, companyID, json);
+		CreateTable (DBTable.User, companyID, json);
 		return company;
 	}
 
@@ -161,9 +164,9 @@ public class FireBaseManager : MonoBehaviour
 		});
 	}
 
-	public UserModel CreateNewUser (/*string userID,*/ string name, string phone)
+	public UserModel CreateNewUser (string userID, string name, string phone)
 	{
-		string userID = reference.Child (DBTable.User.ToString ()).Push ().Key;
+//		string userID = reference.Child (DBTable.User.ToString ()).Push ().Key;
 		UserModel user = new UserModel (userID, name, phone);
 		string json = JsonUtility.ToJson (user);
 
@@ -203,6 +206,76 @@ public class FireBaseManager : MonoBehaviour
 				}
 
 				getAllResponsiblesListener (responsibles);
+			}
+		});
+	}
+
+	public void GetAllServicesProvidedFromCompany (String companyID, Delegates.GetAllServicesProvidedFromCompany servicesCallback)
+	{
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.servicesProvided.ToString ())
+			.GetValueAsync ().ContinueWith (task => {
+			if (task.IsFaulted) {
+				// Handle the error...
+			} else if (task.IsCompleted) {
+				DataSnapshot snapshot = task.Result;
+				List<ServicesProvidedModel> services = new List<ServicesProvidedModel> ();
+				foreach (var service in snapshot.Children) {
+					string json = service.GetRawJsonValue ();
+					services.Add (JsonUtility.FromJson<ServicesProvidedModel> (json));
+				}
+
+				servicesCallback (services);
+			}
+		});
+	}
+
+	public void GetAllDaysWorkedFromCompany (String companyID, Delegates.GetDaysWorked daysWorkedCallback)
+	{
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.daysOfWork.ToString ())
+			.GetValueAsync ().ContinueWith (task => {
+			if (task.IsFaulted) {
+				// Handle the error...
+			} else if (task.IsCompleted) {
+				DataSnapshot snapshot = task.Result;
+				List<bool> daysWorkedList = new List<bool> ();
+				foreach (var dayWorked in snapshot.Children) {
+					daysWorkedList.Add ((bool)dayWorked.Value);
+				}
+				daysWorkedCallback (daysWorkedList);
+			}
+		});
+	}
+
+	public void GetAllInitDaysWorkedFromCompany (String companyID, Delegates.GetDaysTimeWorked daysTimeWorkedCallBack)
+	{
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.timeToBeginWork.ToString ())
+			.GetValueAsync ().ContinueWith (task => {
+			if (task.IsFaulted) {
+				// Handle the error...
+			} else if (task.IsCompleted) {
+				DataSnapshot snapshot = task.Result;
+				List<int> daysTime = new List<int> ();
+				foreach (var daytime in snapshot.Children) {
+					daysTime.Add ((int)daytime.Value);
+				}
+				daysTimeWorkedCallBack (daysTime);
+			}
+		});
+	}
+
+	public void GetAllFinishDaysWorkedFromCompany (String companyID, Delegates.GetDaysTimeWorked daysTimeWorkedCallBack)
+	{
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.timeToFinishWork.ToString ())
+			.GetValueAsync ().ContinueWith (task => {
+			if (task.IsFaulted) {
+				// Handle the error...
+			} else if (task.IsCompleted) {
+				DataSnapshot snapshot = task.Result;
+				List<int> daysTime = new List<int> ();
+				foreach (var daytime in snapshot.Children) {
+					daysTime.Add ((int)daytime.Value);
+				}
+				daysTimeWorkedCallBack (daysTime);
 			}
 		});
 	}

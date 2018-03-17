@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class PlayerPreferences : MonoBehaviour
 {
 	public static bool oneInOneHour = false;
+	public static bool userIsLogged = false;
 
 	public static string TranslateDay (int day)
 	{

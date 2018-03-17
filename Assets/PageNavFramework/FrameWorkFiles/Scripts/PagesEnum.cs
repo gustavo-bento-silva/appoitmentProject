@@ -17,6 +17,10 @@ namespace PageNavFrameWork{
 		HomePage=11,
 		ConfirmAppointmentPopup=12,
 		MyAppointmentsPage=13,
-		MessagesPage=14
+		MessagesPage=14,
+		ManageResponsiblePage=15,
+		CreateNewCompanyPage=16,
+		ConfirmDeleteUserPopUp=17,
+		CreateNewResponsibleToCompany=18
 	}
 }

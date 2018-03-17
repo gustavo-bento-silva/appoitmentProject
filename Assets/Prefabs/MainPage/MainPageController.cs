@@ -14,6 +14,7 @@ public class MainPageController : MonoBehaviour
 
 	public static MainPageController _instance;
 
+	public Text userName;
 	public Canvas canvas;
 	public GameObject menu;
 	public GameObject background;
@@ -35,6 +36,9 @@ public class MainPageController : MonoBehaviour
 	{
 		if (_instance == null) {
 			_instance = this;
+		}
+		if (DataManager.currentUser != null) {
+			userName.text = DataManager.currentUser.name;
 		}
 	}
 

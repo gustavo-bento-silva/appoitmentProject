@@ -2,10 +2,11 @@ using UnityEngine;
 using System.Collections;
 using PageNavFrameWork;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class CreateNewUserPopupController : PageController
 {
-
+	public string homeScene;
 	public GameObject name;
 	public GameObject nameError;
 	public GameObject email;
@@ -21,47 +22,49 @@ public class CreateNewUserPopupController : PageController
 		var phoneText = phone.GetComponent<InputField> ().text;
 		var emailText = email.GetComponent<InputField> ().text;
 		var passwordText = password.GetComponent<InputField> ().text;
-		bool everyThingIsRight = true;
+		int everyThingIsRight = 0;
 
 		if (string.IsNullOrEmpty (nameText)) {
 			nameError.SetActive (true);
-			everyThingIsRight = false;
 		} else {
 			nameError.SetActive (false);
-			everyThingIsRight = true;
+			everyThingIsRight++;
 		}
-		if (passwordText.Length < 8) {
+		if (phoneText.Length < 8) {
 			phoneError.SetActive (true);
-			everyThingIsRight = false;
 		} else {
 			phoneError.SetActive (false);
-			everyThingIsRight = true;
+			everyThingIsRight++;
 		}
 		if (string.IsNullOrEmpty (emailText) || !emailText.Contains ("@")) {
 			emailError.SetActive (true);
-			everyThingIsRight = false;
 		} else {
 			emailError.SetActive (false);
-			everyThingIsRight = true;
+			everyThingIsRight++;
 		}
 		if (passwordText.Length < 6) {
 			passwordError.SetActive (true);
-			everyThingIsRight = false;
 		} else {
 			passwordError.SetActive (false);
-			everyThingIsRight = true;
+			everyThingIsRight++;
 		}
-		if (everyThingIsRight) {
+		if (everyThingIsRight >= 4) {
 			Loading = true;
-			FirebaseAuth.GetFireBaseAuthInstance ().CreateNewUserWithEmailAndPassword (nameText, phoneText, emailText, passwordText, Constants.UserType.Client, delegate {
+			FirebaseAuth.GetFireBaseAuthInstance ().CreateNewUserWithEmailAndPassword (nameText, phoneText, emailText, passwordText, Constants.UserType.Client, delegate(string userID) {
 				Loading = false;
 				Success = true;
 				CloseModal ();
+				LoadHomeSceneAsync ();	
 			}, delegate(string error) {
 				Loading = false;
 				Error = true;
 			});
 		}
+	}
+
+	void LoadHomeSceneAsync ()
+	{
+		SceneManager.LoadSceneAsync (homeScene);
 	}
 
 }

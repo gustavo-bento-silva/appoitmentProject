@@ -12,9 +12,17 @@ public static class Delegates
 
 	public delegate void GetAllServicesProvided (List<ResponsibleModel> responsablesWithServices);
 
+	public delegate void GetAllServicesProvidedFromCompany (List<ServicesProvidedModel> services);
+
 	public delegate void GetAllResponsibles (List<ResponsibleModel> responsables);
 
+	public delegate void GetDaysWorked (List<bool> daysWorked);
+
+	public delegate void GetDaysTimeWorked (List<int> daysTime);
+
 	public delegate void CreateNewAppointment (AppointmentModel appointment);
+
+	public delegate void CreateNewUser (string userID);
 
 	public delegate void GetUserByID (UserModel user);
 
@@ -29,6 +37,8 @@ public static class Delegates
 	public delegate void GeneralListenerFail (string error);
 
 	public delegate void GetAllCompanies (List<CompanyModel> companies);
+
+	public delegate void OnSelectServiceClick (ServicesProvidedModel serviceprovided, bool status);
 
 
 	

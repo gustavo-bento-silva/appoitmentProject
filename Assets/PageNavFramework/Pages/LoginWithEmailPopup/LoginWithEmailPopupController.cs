@@ -2,9 +2,11 @@ using UnityEngine;
 using System.Collections;
 using PageNavFrameWork;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class LoginWithEmailPopupController : PageController
 {
+	public string homeScene;
 	public GameObject email;
 	public GameObject password;
 	public GameObject emailError;
@@ -14,33 +16,37 @@ public class LoginWithEmailPopupController : PageController
 	{
 		var emailText = email.GetComponent<InputField> ().text;
 		var passwordText = password.GetComponent<InputField> ().text;
-		bool everyThingIsRight = true;
+		int everyThingIsRight = 0;
 
 		if (string.IsNullOrEmpty (emailText) || !emailText.Contains ("@")) {
 			emailError.SetActive (true);
-			everyThingIsRight = false;
 		} else {
 			emailError.SetActive (false);
-			everyThingIsRight = true;
+			everyThingIsRight++;
 		}
 		if (passwordText.Length < 6) {
 			passwordError.SetActive (true);
-			everyThingIsRight = false;
 		} else {
 			passwordError.SetActive (false);
-			everyThingIsRight = true;
+			everyThingIsRight++;
 		}
 
-		if (everyThingIsRight) {
+		if (everyThingIsRight >= 2) {
 			Loading = true;
-			FirebaseAuth.GetFireBaseAuthInstance ().UserLogin (email.GetComponent<InputField> ().text, email.GetComponent<InputField> ().text, delegate {
+			FirebaseAuth.GetFireBaseAuthInstance ().UserLogin (email.GetComponent<InputField> ().text, password.GetComponent<InputField> ().text, delegate {
 				CloseModal ();
 				Loading = false;
 				Success = true;
+				LoadHomeSceneAsync ();
 			}, delegate(string error) {
 				Loading = false;
 				Error = true;
 			});
 		}		
+	}
+
+	void LoadHomeSceneAsync ()
+	{
+		SceneManager.LoadSceneAsync (homeScene);
 	}
 }

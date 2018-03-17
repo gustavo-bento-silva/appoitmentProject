@@ -25,11 +25,10 @@ public class DataManager : MonoBehaviour
 	{
 //		GetUserByID();
 //		CreateCompanyData ();
-		//		CreateCompanyDataTest2 ();
+//		CreateCompanyDataTest2 ();
 //		CreateUserJustForTest ();
-//		LogUser ("-L7FT39g_S2jGWgx4WOc");
+//		LoadUserInfo ("z0iJvJUBK2aK2BP2OAuACDrNMSn1");
 	}
-
 	//	List<AppointmentModel> CreateApoointmentList ()
 	//	{
 	//		var appointmentList = new List<AppointmentModel> ();
@@ -40,18 +39,45 @@ public class DataManager : MonoBehaviour
 
 	void CreateUserJustForTest ()
 	{
-		FireBaseManager.GetFireBaseInstance ().CreateNewUser ("Gustavinho", "35442543");
+		FireBaseManager.GetFireBaseInstance ().CreateNewUser ("123456", "Gustavinho", "35442543");
 	}
 
-	void LoadUserInfo (string ID)
+	public static void LoadUserInfoAux (Delegates.GeneralListenerSuccess success)
 	{
+		string ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
 		FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel user) {
-			currentUser = user;
+			if (user.userType == Constants.UserType.Company.ToString ()) {
+				currentUser = new CompanyModel (user);
+				GetAllResponsablesFromCompanyAsUser ();
+				GetAllDaysWorkedFromCompanyAsUser ();
+				GetAllInitWorkFromCompanyAsUser ();
+				GetAllEndWorkFromCompanyAsUser ();
+			} else {
+				currentUser = user;
+			}
+			success ();
 			ActiveListeners ();
 		});
 	}
 
-	void ActiveListeners ()
+	public static void LoadUserInfo (string ID)
+	{
+		FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel user) {
+			if (user.userType == Constants.UserType.Company.ToString ()) {
+				currentUser = new CompanyModel (user);
+				GetAllResponsablesFromCompanyAsUser ();
+				GetAllServicesProvidedFromCompanyAsUser ();
+				GetAllDaysWorkedFromCompanyAsUser ();
+				GetAllInitWorkFromCompanyAsUser ();
+				GetAllEndWorkFromCompanyAsUser ();
+			} else {
+				currentUser = user;
+			}
+			ActiveListeners ();
+		});
+	}
+
+	static void ActiveListeners ()
 	{
 		ActiveUserMessagesListener ();
 		ActiveUserAppointmentsListener ();
@@ -62,38 +88,37 @@ public class DataManager : MonoBehaviour
 //		});
 	}
 
-	CompanyModel CreateCompanyData ()
+	public static void CreateCompanyDataWithMockData (string companyID)
 	{
-		companyData = FireBaseManager.GetFireBaseInstance ().CreateNewCompany ("Minha Empresa", "32456789", "Campinas", "Rua Joãozinho", "13082660");
+		companyData = FireBaseManager.GetFireBaseInstance ().CreateNewCompany (companyID, "Minha Empresa", "32456789", "Campinas", "Rua Joãozinho", "13082660");
 		
-		var servicesList = new List<ServicesProvidedModel> ();
-		servicesList.Add (new ServicesProvidedModel ("Cabeleireiro", 1));
-		servicesList.Add (new ServicesProvidedModel ("Manicure", 0.5f));
-		servicesList.Add (new ServicesProvidedModel ("Pedicure", 1.5f));
+//		var servicesList = new List<ServicesProvidedModel> ();
+//		servicesList.Add (new ServicesProvidedModel ("Cabeleireiro", 1));
+//		servicesList.Add (new ServicesProvidedModel ("Manicure", 0.5f));
+//		servicesList.Add (new ServicesProvidedModel ("Pedicure", 1.5f));
 		
-		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Funcionario 1", new List<ServicesProvidedModel> { servicesList [0] }));
-		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Funcionario 2", new List<ServicesProvidedModel> { servicesList [1] }));
-		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Funcionario 3", new List<ServicesProvidedModel> { servicesList [2] }));
-		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Funcionario 4", servicesList));
+//		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Funcionario 1", new List<ServicesProvidedModel> { servicesList [0] }));
+//		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Funcionario 2", new List<ServicesProvidedModel> { servicesList [1] }));
+//		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Funcionario 3", new List<ServicesProvidedModel> { servicesList [2] }));
+//		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Funcionario 4", servicesList));
 
 		companyData.employees = responsibles.ToDictionary (x => x.userID, x => (object)x);
-		
-		return companyData;
+
 	}
 
-	CompanyModel CreateCompanyDataTest2 ()
+	CompanyModel CreateCompanyDataTest2 (string companyID)
 	{
-		companyData = FireBaseManager.GetFireBaseInstance ().CreateNewCompany ("Minha Empresa 2", "34565432", "Paulínia", "Rua Juarez Antonio Carlos", "13456765");
+		companyData = FireBaseManager.GetFireBaseInstance ().CreateNewCompany (companyID, "Minha Empresa 2", "34565432", "Paulínia", "Rua Juarez Antonio Carlos", "13456765");
 
-		var servicesList = new List<ServicesProvidedModel> ();
-		servicesList.Add (new ServicesProvidedModel ("Cabeleireiro", 1));
-		servicesList.Add (new ServicesProvidedModel ("Pintura", 0.5f));
-		servicesList.Add (new ServicesProvidedModel ("Tinta", 1.5f));
+//		var servicesList = new List<ServicesProvidedModel> ();
+//		servicesList.Add (new ServicesProvidedModel ("Cabeleireiro", 1));
+//		servicesList.Add (new ServicesProvidedModel ("Pintura", 0.5f));
+//		servicesList.Add (new ServicesProvidedModel ("Tinta", 1.5f));
 
-		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Meu Func 1", new List<ServicesProvidedModel> { servicesList [0] }));
-		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Meu Func 2", new List<ServicesProvidedModel> { servicesList [1] }));
-		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Meu Func 3", new List<ServicesProvidedModel> { servicesList [2] }));
-		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Meu Func 4", servicesList));
+//		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Meu Func 1", new List<ServicesProvidedModel> { servicesList [0] }));
+//		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Meu Func 2", new List<ServicesProvidedModel> { servicesList [1] }));
+//		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Meu Func 3", new List<ServicesProvidedModel> { servicesList [2] }));
+//		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Meu Func 4", servicesList));
 
 		companyData.employees = responsibles.ToDictionary (x => x.userID, x => (object)x);
 
@@ -141,6 +166,51 @@ public class DataManager : MonoBehaviour
 		});
 	}
 
+	static void GetAllResponsablesFromCompanyAsUser ()
+	{
+		Delegates.GetAllResponsibles getAllResponsiblesListener = (mresponsibles) => {
+			responsibles = mresponsibles;
+			(currentUser as CompanyModel).employees = mresponsibles.ToDictionary (x => x.userID, x => (object)x);
+		};
+		FireBaseManager.GetFireBaseInstance ().GetAllResponsiblesFromCompany (currentUser.userID, getAllResponsiblesListener);
+	}
+
+	static void GetAllServicesProvidedFromCompanyAsUser ()
+	{
+		Delegates.GetAllServicesProvidedFromCompany getAllServicesProvided = (services) => {
+			(currentUser as CompanyModel).servicesProvided = services.ToDictionary (x => x.serviceID, x => (object)x);
+		};
+		FireBaseManager.GetFireBaseInstance ().GetAllServicesProvidedFromCompany (currentUser.userID, getAllServicesProvided);
+	}
+
+
+	static void GetAllDaysWorkedFromCompanyAsUser ()
+	{
+		Delegates.GetDaysWorked getDaysWorkedCallBack = delegate(List<bool> daysWorked) {
+			(currentUser as CompanyModel).daysOfWork = daysWorked;
+		};
+
+		FireBaseManager.GetFireBaseInstance ().GetAllDaysWorkedFromCompany (currentUser.userID, getDaysWorkedCallBack);
+	}
+
+	static void GetAllInitWorkFromCompanyAsUser ()
+	{
+		Delegates.GetDaysTimeWorked getInitDaysWorkedCallBack = delegate(List<int> initTimeDays) {
+			(currentUser as CompanyModel).timeToBeginWork = initTimeDays;
+		};
+
+		FireBaseManager.GetFireBaseInstance ().GetAllInitDaysWorkedFromCompany (currentUser.userID, getInitDaysWorkedCallBack);
+	}
+
+	static void GetAllEndWorkFromCompanyAsUser ()
+	{
+		Delegates.GetDaysTimeWorked getFinishDaysWorkedCallBack = delegate(List<int> finishTimeDays) {
+			(currentUser as CompanyModel).timeToFinishWork = finishTimeDays;
+		};
+
+		FireBaseManager.GetFireBaseInstance ().GetAllFinishDaysWorkedFromCompany (currentUser.userID, getFinishDaysWorkedCallBack);
+	}
+
 	public static void GetAllResponsablesFromCompany (Delegates.GetAllResponsibles getAllResponsiblesListener)
 	{
 		getAllResponsiblesListener += (mresponsibles) => responsibles = mresponsibles;
@@ -164,6 +234,15 @@ public class DataManager : MonoBehaviour
 		}, delegate(string error) {
 			fail (error);
 		});
+	}
+
+	public static void RemoveUser (string userID, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		
+		FirebaseAPIHelper.GetFireBaseAPIHelperInstance ().RemoveUser (userID, delegate() {
+			GetAllResponsablesFromCompanyAsUser ();
+			success ();
+		}, fail);
 	}
 
 	public static void RemoveAppointmentFromUser (AppointmentModel appointment, Delegates.GeneralListenerSuccess success)

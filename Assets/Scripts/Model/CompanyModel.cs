@@ -15,6 +15,17 @@ public class CompanyModel : UserModel
 	public List<int> timeToFinishWork;
 	[SerializeField]
 	public List<bool> daysOfWork;
+	public Dictionary<string, object> servicesProvided;
+
+	public CompanyModel (UserModel user) : base (user.userID, user.name, user.phone, Constants.UserType.Company)
+	{
+		
+		this.daysOfWork = new List<bool> ();
+		timeToBeginWork = new List<int> ();
+		timeToFinishWork = new List<int> ();
+		employees = new Dictionary<string, object> ();
+		servicesProvided = new Dictionary<string, object> ();
+	}
 
 	public CompanyModel (UserModel user, string city, string address, string cep) : base (user.userID, user.name, user.phone, Constants.UserType.Company)
 	{
