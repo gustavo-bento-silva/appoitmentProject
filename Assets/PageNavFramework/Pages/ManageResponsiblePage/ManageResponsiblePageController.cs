@@ -14,10 +14,16 @@ public class ManageResponsiblePageController : PageController
 	void Start ()
 	{
 		Loading = true;
-		if (DataManager.responsibles != null && DataManager.responsibles.Count != 0) {
-			FillList ();
+		if (DataManager.responsibles != null) {
+			if (DataManager.responsibles.Count != 0) {
+				FillList ();
+			} else {
+//				nullListMessage.SetActive (true);
+				Loading = false;
+			}
 		} else {
 			nullListMessage.SetActive (true);
+			Loading = false;
 		}
 	}
 

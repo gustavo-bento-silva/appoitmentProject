@@ -10,6 +10,12 @@ public class CreateNewResponsibleToCompanyController : PageController
 	public Text password;
 	public Text name;
 
+	public GameObject nameError;
+	public GameObject emailError;
+	public GameObject passwordError;
+	public GameObject serviceError;
+	public GameObject daysError;
+
 	public GameObject container;
 
 	public Transform cellPrefab;
@@ -18,7 +24,7 @@ public class CreateNewResponsibleToCompanyController : PageController
 
 	public List<Toggle> daysWorked;
 	public List<Text> initTimeToWork;
-	public List<Text> endTimeToWor;
+	public List<Text> endTimeToWork;
 
 	private int actualPositionIndex = 0;
 	private int positionXOffset = 1315;
@@ -31,6 +37,11 @@ public class CreateNewResponsibleToCompanyController : PageController
 
 	void Start ()
 	{
+		OnDaysWorkedInit ();
+		OnInitTimeToWorkScreen ();
+		OnFinishTimeToWorkScreen ();
+		OnInitServicesWindow ();
+
 	}
 
 	void OnInitServicesWindow ()
@@ -54,14 +65,28 @@ public class CreateNewResponsibleToCompanyController : PageController
 		servicesProvidedByResponsible [servicesProvidedList.IndexOf (serviceprovided)] = status;
 	}
 
-	void OnInitTimeToWorkScreen ()
+	void OnDaysWorkedInit ()
 	{
-//		initTimeToWork = (DataManager.currentUser as CompanyModel).timeToBeginWork;
+		var index = 0;
+		(DataManager.currentUser as CompanyModel).daysOfWork.ForEach (x => {
+			daysWorked [index++].isOn = x;
+		});
 	}
 
-	void OnDeleteUserClicked ()
+	void OnInitTimeToWorkScreen ()
 	{
-		//		PageNav.GetPageNavInstance().PushPageToStackWithArgs(PagesEnum.ConfirmDeleteUserPopUp)
+		int index = 0;
+		(DataManager.currentUser as CompanyModel).timeToBeginWork.ForEach (x => {
+			initTimeToWork [index++].text = x.ToString ();
+		});
+	}
+
+	void OnFinishTimeToWorkScreen ()
+	{
+		int index = 0;
+		(DataManager.currentUser as CompanyModel).timeToFinishWork.ForEach (x => {
+			endTimeToWork [index++].text = x.ToString ();
+		});
 	}
 
 	void FillServicesList ()
@@ -81,6 +106,23 @@ public class CreateNewResponsibleToCompanyController : PageController
 		Loading = false;
 	}
 
+	void CreateUserLogin ()
+	{
+		Loading = true;
+		FirebaseAPIHelper.GetFireBaseAPIHelperInstance ().AddUser (email.text, password.text, delegate() {
+			CreateNewResponsibleToCompany ();
+		}, delegate(string error) {
+			Error = true;
+		});
+	}
+
+	void CreateNewResponsibleToCompany ()
+	{
+		
+		DataManager.CreateNewResponsibleToCompanyAsUser (name.text, GetServices (), GetDaysWorked (), GetInitTime (), GetEndTime ());
+		Loading = false;
+	}
+
 	void ReadjustScrollSize (int size)
 	{
 		scrollContentList.anchorMax = new Vector2 (1, 1);
@@ -94,9 +136,23 @@ public class CreateNewResponsibleToCompanyController : PageController
 
 	public void OnNextButtonClick ()
 	{
-		actualPositionIndex++;
-		var position = container.transform.localPosition.x - positionXOffset;
-		iTween.MoveTo (container, iTween.Hash ("x", position, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInBack));
+		bool everythingOk = true;
+		if (actualPositionIndex == 0) {
+			everythingOk = FirstStepVerify ();
+		} else if (actualPositionIndex == 1) {
+			everythingOk = SecondStepVerify ();
+		} else if (actualPositionIndex == 2) {
+			everythingOk = ThirdStepVerify ();
+		}
+
+		if (everythingOk) {
+			if (actualPositionIndex == 2) {
+				CreateUserLogin ();
+			}
+			actualPositionIndex++;
+			var position = container.transform.localPosition.x - positionXOffset;
+			iTween.MoveTo (container, iTween.Hash ("x", position, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInBack));
+		}
 	}
 
 	public void OnBackButtonClick ()
@@ -105,5 +161,106 @@ public class CreateNewResponsibleToCompanyController : PageController
 		var position = container.transform.localPosition.x + positionXOffset;
 		iTween.MoveTo (container, iTween.Hash ("x", position, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInBack));
 
+	}
+
+	public bool FirstStepVerify ()
+	{
+		if (string.IsNullOrEmpty (name.text)) {
+			nameError.SetActive (true);
+			return false;
+		} else {
+			nameError.SetActive (false);
+		}
+		if (string.IsNullOrEmpty (email.text) || !email.text.Contains ("@")) {
+			emailError.SetActive (true);
+			return false;
+		} else {
+			emailError.SetActive (false);
+		}
+		if (password.text.Length < 6) {
+			passwordError.SetActive (true);
+			return false;
+		} else {
+			passwordError.SetActive (false);
+		}
+		return true;
+	}
+
+	public bool SecondStepVerify ()
+	{
+		int isOn = 0;
+		if (servicesProvidedByResponsible == null || servicesProvidedByResponsible.Count == 0) {
+			serviceError.SetActive (true);
+			return false;
+		}
+		servicesProvidedByResponsible.ForEach (x => {
+			if (x)
+				isOn++;
+		});
+		if (isOn > 0) {
+			serviceError.SetActive (false);
+			return true;
+		} 
+		serviceError.SetActive (true);
+		return false;
+	}
+
+	public bool ThirdStepVerify ()
+	{
+		int isOn = 0;
+		if (daysWorked == null || daysWorked.Count == 0) {
+			daysError.SetActive (true);
+			return false;
+		}
+		daysWorked.ForEach (x => {
+			if (x.isOn)
+				isOn++;
+		});
+		if (isOn > 0) {
+			daysError.SetActive (false);
+			return true;
+		} 
+		daysError.SetActive (true);
+		return false;
+	}
+
+	public List<ServicesProvidedModel> GetServices ()
+	{
+		int index = 0;
+		List<ServicesProvidedModel> services = new List<ServicesProvidedModel> ();
+		servicesProvidedByResponsible.ForEach (x => {
+			if (x) {
+				services.Add (servicesProvidedList [index]);
+				index++;
+			}
+		});
+		return services;
+	}
+
+	public List<bool> GetDaysWorked ()
+	{
+		List<bool> mDaysWorked = new List<bool> ();
+		daysWorked.ForEach (x => {
+			if (x.isOn) {
+				mDaysWorked.Add (true);
+			} else {
+				mDaysWorked.Add (false);
+			}
+		});
+		return mDaysWorked;
+	}
+
+	public List<int> GetInitTime ()
+	{
+		List<int> initTimeToWorkList = new List<int> ();
+		initTimeToWork.ForEach (x => initTimeToWorkList.Add (int.Parse (x.text)));
+		return initTimeToWorkList;
+	}
+
+	public List<int> GetEndTime ()
+	{
+		List<int> endTimeToWorkList = new List<int> ();
+		endTimeToWork.ForEach (x => endTimeToWorkList.Add (int.Parse (x.text)));
+		return endTimeToWorkList;
 	}
 }

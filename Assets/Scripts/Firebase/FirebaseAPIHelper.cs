@@ -29,6 +29,11 @@ public class FirebaseAPIHelper : MonoBehaviour
 		StartCoroutine (RemoveUserAux (userID, success, fail));
 	}
 
+	public void AddUser (string email, string password, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		StartCoroutine (AddUserAux (email, password, success, fail));
+	}
+
 	IEnumerator CallServer ()
 	{
 		using (WWW www = new WWW (url)) {

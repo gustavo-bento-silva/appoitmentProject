@@ -174,10 +174,10 @@ public class FireBaseManager : MonoBehaviour
 		return user;
 	}
 
-	public ResponsibleModel CreateNewResponsibleToCompany (string companyID, string name, List<ServicesProvidedModel> servicesProvided, string phone = "")
+	public ResponsibleModel CreateNewResponsibleToCompany (string companyID, string name, List<ServicesProvidedModel> servicesProvided, List<bool> daysWorked, List<int> initTime, List<int> finishTime, string phone)
 	{
 		string responsibleID = reference.Child (DBTable.Responsible.ToString ()).Push ().Key;
-		ResponsibleModel responsable = new ResponsibleModel (new UserModel (responsibleID, name, phone));
+		ResponsibleModel responsable = new ResponsibleModel (new UserModel (responsibleID, name, phone), servicesProvided, daysWorked, initTime, finishTime);
 		string json = JsonUtility.ToJson (responsable);
 
 		CreateTable (DBTable.Responsible, responsibleID, json);
@@ -434,6 +434,23 @@ public class FireBaseManager : MonoBehaviour
 					messages.Add (mMessage);
 				}
 				success (messages);
+			}
+		});
+
+	}
+
+	public void RemoveUser (string userID, string userType, Delegates.GeneralListenerSuccess success)
+	{
+		if (userType == Constants.UserType.Responsible.ToString ()) {
+			FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsible.ToString ()).Child (userID).RemoveValueAsync ();
+		}
+
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.User.ToString ()).Child (userID).RemoveValueAsync ()
+			.ContinueWith (task => {
+			if (task.IsFaulted) {
+
+			} else {
+				success ();
 			}
 		});
 

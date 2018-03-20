@@ -15,7 +15,7 @@ public class ConfirmDeleteUserPopUpController : PageController
 	public void OnYesClick ()
 	{
 		Loading = true;
-		DataManager.RemoveUser (user.userID, delegate() {
+		DataManager.RemoveUser (user, delegate() {
 			Success = true;
 			Loading = false;
 			CloseModal ();

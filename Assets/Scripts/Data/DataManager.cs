@@ -88,6 +88,15 @@ public class DataManager : MonoBehaviour
 //		});
 	}
 
+	public static void CreateNewResponsibleToCompanyAsUser (string name, List<ServicesProvidedModel> services, List<bool> daysWorked, List<int> initTime, List<int> finishTime, string phone = "")
+	{
+		var mPhone = phone;
+		if (string.IsNullOrEmpty (phone)) {
+			mPhone = companyData.phone;
+		}
+		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, name, services, daysWorked, initTime, finishTime, mPhone));
+	}
+
 	public static void CreateCompanyDataWithMockData (string companyID)
 	{
 		companyData = FireBaseManager.GetFireBaseInstance ().CreateNewCompany (companyID, "Minha Empresa", "32456789", "Campinas", "Rua Joãozinho", "13082660");
@@ -236,12 +245,13 @@ public class DataManager : MonoBehaviour
 		});
 	}
 
-	public static void RemoveUser (string userID, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	public static void RemoveUser (UserModel user, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
 	{
-		
-		FirebaseAPIHelper.GetFireBaseAPIHelperInstance ().RemoveUser (userID, delegate() {
-			GetAllResponsablesFromCompanyAsUser ();
-			success ();
+		FirebaseAPIHelper.GetFireBaseAPIHelperInstance ().RemoveUser (user.userID, delegate() {
+			FireBaseManager.GetFireBaseInstance ().RemoveUser (user.userID, user.userType, delegate() {
+				GetAllResponsablesFromCompanyAsUser ();
+				success ();
+			});
 		}, fail);
 	}
 
