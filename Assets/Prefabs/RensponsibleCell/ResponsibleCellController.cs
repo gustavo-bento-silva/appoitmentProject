@@ -4,9 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using PageNavFrameWork;
 
-public class ResponsibleCellControler : MonoBehaviour
+public class ResponsibleCellController : MonoBehaviour
 {
 	public Text userName;
+	public Text functions;
 	public UserModel userModel;
 
 
@@ -23,11 +24,20 @@ public class ResponsibleCellControler : MonoBehaviour
 //		});
 	}
 
-	public static GameObject Instantiate (Transform CellPrefabTransform, UserModel user)
+	public static GameObject Instantiate (Transform CellPrefabTransform, ResponsibleModel user)
 	{
 		GameObject go = GameObject.Instantiate (CellPrefabTransform).gameObject;
-		var myResponsibleCellController = go.GetComponent<ResponsibleCellControler> ();
+		var myResponsibleCellController = go.GetComponent<ResponsibleCellController> ();
 		myResponsibleCellController.userName.text = user.name;
+		if (user.servicesProvided != null) {
+			foreach (var key in user.servicesProvided.Keys) {
+				if (string.IsNullOrEmpty (myResponsibleCellController.functions.text)) {
+					myResponsibleCellController.functions.text = (user.servicesProvided [key] as ServicesProvidedModel).name;
+				} else {
+					myResponsibleCellController.functions.text = myResponsibleCellController.functions.text + " / " + (user.servicesProvided [key] as ServicesProvidedModel).name;
+				}
+			}
+		}
 		myResponsibleCellController.userModel = user;
 		return go;
 	}

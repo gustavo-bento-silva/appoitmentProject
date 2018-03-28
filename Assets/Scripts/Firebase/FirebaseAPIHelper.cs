@@ -29,7 +29,7 @@ public class FirebaseAPIHelper : MonoBehaviour
 		StartCoroutine (RemoveUserAux (userID, success, fail));
 	}
 
-	public void AddUser (string email, string password, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	public void AddUser (string email, string password, Delegates.CreateNewUser success, Delegates.GeneralListenerFail fail)
 	{
 		StartCoroutine (AddUserAux (email, password, success, fail));
 	}
@@ -42,7 +42,7 @@ public class FirebaseAPIHelper : MonoBehaviour
 		}
 	}
 
-	IEnumerator AddUserAux (string email, string password, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	IEnumerator AddUserAux (string email, string password, Delegates.CreateNewUser success, Delegates.GeneralListenerFail fail)
 	{
 		WWWForm form = new WWWForm ();
 		form.AddField ("email", email);
@@ -54,8 +54,12 @@ public class FirebaseAPIHelper : MonoBehaviour
 				Debug.Log (w.error);
 				fail (w.error.ToString ());
 			} else {
-				Debug.Log ("User created!");
-				success ();
+				Debug.Log ("User created! id: " + w.downloadHandler.text);
+				var id = w.downloadHandler.text.Split (':');
+				var idFormatted = id [1].Replace ("{", "");
+				idFormatted = idFormatted.Replace ("}", "");
+				idFormatted = idFormatted.Replace ("\"", "");
+				success (idFormatted);
 			}
 		}
 	}

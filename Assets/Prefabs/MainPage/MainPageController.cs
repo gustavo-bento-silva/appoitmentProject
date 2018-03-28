@@ -67,6 +67,12 @@ public class MainPageController : MonoBehaviour
 		OnMenuClick ();
 	}
 
+	public void OnServicesManagerClick ()
+	{
+		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.ManageServicesProvided);
+		OnMenuClick ();
+	}
+
 	public void OnMenuClick ()
 	{
 		if (menuState == MenuState.Closed) {

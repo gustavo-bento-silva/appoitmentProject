@@ -15,7 +15,7 @@ public class UserModel
 	public Dictionary<string, object> appoitments;
 	public Dictionary<string, object> messages;
 
-	public UserModel (string userID, string name, string phone, Constants.UserType userType = Constants.UserType.Client)
+	public UserModel (string userID, string name, string phone, Constants.UserType userType = Constants.UserType.User)
 	{
 		this.userID = userID;
 		this.name = name;

@@ -16,7 +16,7 @@ public class HomePageController : PageController
 		DataManager.LoadUserInfoAux (delegate {
 			var currentUserType = DataManager.currentUser.userType;
 
-			if (currentUserType == Constants.UserType.Client.ToString ()) {
+			if (currentUserType == Constants.UserType.User.ToString ()) {
 				LoadClientHome ();
 			} else if (currentUserType == Constants.UserType.Admin.ToString ()) {
 				LoadAdminHome ();

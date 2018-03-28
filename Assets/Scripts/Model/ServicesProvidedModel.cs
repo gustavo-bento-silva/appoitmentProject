@@ -11,7 +11,7 @@ public class ServicesProvidedModel
 	public string price;
 	public float duration;
 
-	public ServicesProvidedModel (string name, float duration, string price)
+	public ServicesProvidedModel (string name, float duration, string price = "")
 	{
 		this.name = name;
 		this.duration = duration;

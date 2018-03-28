@@ -3,22 +3,27 @@ using System.Collections;
 using PageNavFrameWork;
 using System.Collections.Generic;
 
-public class ManageResponsiblePageController : PageController
+public class ClientsManagerPageController : PageController
 {
+
 	public Transform cellPrefab;
 	public RectTransform scrollContentList;
 	public GameObject nullListMessage;
 
 	List <GameObject> userCell = new List<GameObject> ();
+	List<UserModel> clientsList = new List<UserModel> ();
 
 	void Start ()
 	{
 		Loading = true;
 		if (DataManager.responsibles != null) {
 			if (DataManager.responsibles.Count != 0) {
+				foreach (var clientKey in (DataManager.currentUser as CompanyModel).clients.Keys) {
+					clientsList.Add ((UserModel)(DataManager.currentUser as CompanyModel).clients [clientKey]);
+				}
 				FillList ();
 			} else {
-//				nullListMessage.SetActive (true);
+				nullListMessage.SetActive (true);
 				Loading = false;
 			}
 		} else {
@@ -27,14 +32,9 @@ public class ManageResponsiblePageController : PageController
 		}
 	}
 
-	void OnDeleteUserClicked ()
-	{
-//		PageNav.GetPageNavInstance().PushPageToStackWithArgs(PagesEnum.ConfirmDeleteUserPopUp)
-	}
-
 	void FillList ()
 	{
-		DataManager.responsibles.ForEach (x => userCell.Add (ResponsibleCellController.Instantiate (cellPrefab, x)));
+		clientsList.ForEach (x => userCell.Add (ClientCellController.Instantiate (cellPrefab, x)));
 		StartCoroutine (OnFillList ());
 	}
 
@@ -56,5 +56,4 @@ public class ManageResponsiblePageController : PageController
 
 		scrollContentList.offsetMin = new Vector2 (0, -number);
 	}
-
 }

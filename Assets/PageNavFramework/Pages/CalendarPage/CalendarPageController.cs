@@ -86,6 +86,7 @@ public class CalendarPageController : PageController
 		}
 
 		DataManager.currentservice = servicesList [newPosition];
+		Loading = false;
 	}
 
 	void GetEmployeeSelected (int newPosition)

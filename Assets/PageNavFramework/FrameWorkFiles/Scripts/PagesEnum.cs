@@ -21,6 +21,11 @@ namespace PageNavFrameWork{
 		ManageResponsiblePage=15,
 		CreateNewCompanyPage=16,
 		ConfirmDeleteUserPopUp=17,
-		CreateNewResponsibleToCompany=18
+		CreateNewResponsibleToCompany=18,
+		ManageServicesProvided=19,
+		CreateServicePopup=20,
+		ClientsManagerPage=21,
+		CreateNewClientPage=22,
+		SelectClientPopup=23
 	}
 }

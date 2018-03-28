@@ -15,14 +15,16 @@ public class ConfirmDeleteUserPopUpController : PageController
 	public void OnYesClick ()
 	{
 		Loading = true;
-		DataManager.RemoveUser (user, delegate() {
+		DataManager.RemoveResponsibleFromCompany (user, delegate() {
 			Success = true;
 			Loading = false;
 			CloseModal ();
+			Constants.LoadHomePage ();
 		}, delegate(string error) {
 			Loading = false;
 			Error = true;
 			CloseModal ();
+			Constants.LoadHomePage ();
 		});
 	}
 

@@ -49,9 +49,16 @@ public class DataManager : MonoBehaviour
 			if (user.userType == Constants.UserType.Company.ToString ()) {
 				currentUser = new CompanyModel (user);
 				GetAllResponsablesFromCompanyAsUser ();
+				GetAllClientsFromCompanyAsUser ();
+				GetAllServicesProvidedFromCompanyAsUser ();
 				GetAllDaysWorkedFromCompanyAsUser ();
 				GetAllInitWorkFromCompanyAsUser ();
 				GetAllEndWorkFromCompanyAsUser ();
+			} else if (user.userType == Constants.UserType.Responsible.ToString ()) {
+				currentUser = user;
+				FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel muser) {
+					companyData = muser as CompanyModel;
+				});
 			} else {
 				currentUser = user;
 			}
@@ -66,14 +73,28 @@ public class DataManager : MonoBehaviour
 			if (user.userType == Constants.UserType.Company.ToString ()) {
 				currentUser = new CompanyModel (user);
 				GetAllResponsablesFromCompanyAsUser ();
+				GetAllClientsFromCompanyAsUser ();
 				GetAllServicesProvidedFromCompanyAsUser ();
 				GetAllDaysWorkedFromCompanyAsUser ();
 				GetAllInitWorkFromCompanyAsUser ();
 				GetAllEndWorkFromCompanyAsUser ();
+				companyData = user as CompanyModel;
+			} else if (user.userType == Constants.UserType.Responsible.ToString ()) {
+				currentUser = user;
+				FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel muser) {
+					companyData = muser as CompanyModel;
+				});
 			} else {
 				currentUser = user;
 			}
 			ActiveListeners ();
+		});
+	}
+
+	public static void GetUserById (string userID, Delegates.GetUserByID getUserSucess)
+	{
+		FireBaseManager.GetFireBaseInstance ().GetUserByID (userID, delegate(UserModel user) {
+			getUserSucess (user);
 		});
 	}
 
@@ -88,13 +109,30 @@ public class DataManager : MonoBehaviour
 //		});
 	}
 
-	public static void CreateNewResponsibleToCompanyAsUser (string name, List<ServicesProvidedModel> services, List<bool> daysWorked, List<int> initTime, List<int> finishTime, string phone = "")
+	public static void CreateNewResponsibleToCompanyAsUser (string reponsibleID, string name, List<ServicesProvidedModel> services, List<bool> daysWorked, List<int> initTime, List<int> finishTime, string phone = "")
 	{
 		var mPhone = phone;
 		if (string.IsNullOrEmpty (phone)) {
-			mPhone = companyData.phone;
+			mPhone = (currentUser as CompanyModel).phone;
 		}
-		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, name, services, daysWorked, initTime, finishTime, mPhone));
+		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (reponsibleID, (currentUser as CompanyModel).userID, name, services, daysWorked, initTime, finishTime, mPhone));
+	}
+
+	public static void CreateNewClientToCompany (string name, string phone, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		var user = FireBaseManager.GetFireBaseInstance ().CreateNewClient (name, phone);
+		FireBaseManager.GetFireBaseInstance ().AddClientToCompany (companyData.userID, user, delegate() {
+			success ();
+		}, delegate(string error) {
+			fail (error);
+		});
+	}
+
+	public static void AddServiceToCompanyAsUser (ServicesProvidedModel service)
+	{
+		FireBaseManager.GetFireBaseInstance ().AddServicesToCompany (currentUser.userID, new List<ServicesProvidedModel> () { service }, delegate(List<ServicesProvidedModel> services) {
+			services.ForEach (x => (currentUser as CompanyModel).servicesProvided.Add (x.serviceID, (object)x));
+		});
 	}
 
 	public static void CreateCompanyDataWithMockData (string companyID)
@@ -184,6 +222,24 @@ public class DataManager : MonoBehaviour
 		FireBaseManager.GetFireBaseInstance ().GetAllResponsiblesFromCompany (currentUser.userID, getAllResponsiblesListener);
 	}
 
+	static void GetAllClientsFromCompanyAsUser ()
+	{
+		Delegates.GetAllClients getAllClients = (clients) => {
+			(currentUser as CompanyModel).clients = clients.ToDictionary (x => x.userID, x => (object)x);
+		};
+		FireBaseManager.GetFireBaseInstance ().GetAllClientsFromCompany (currentUser.userID, getAllClients, delegate(string error) {
+			
+		});
+	}
+
+	public static void GetAllClientsFromCompany (string companyID, Delegates.GetAllClients getClientsSuccess)
+	{
+		FireBaseManager.GetFireBaseInstance ().GetAllClientsFromCompany (companyID, getClientsSuccess, delegate(string error) {
+
+		});
+	}
+
+
 	static void GetAllServicesProvidedFromCompanyAsUser ()
 	{
 		Delegates.GetAllServicesProvidedFromCompany getAllServicesProvided = (services) => {
@@ -253,6 +309,21 @@ public class DataManager : MonoBehaviour
 				success ();
 			});
 		}, fail);
+	}
+
+	public static void RemoveResponsibleFromCompany (UserModel user, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		FirebaseAPIHelper.GetFireBaseAPIHelperInstance ().RemoveUser (user.userID, delegate() {
+			FireBaseManager.GetFireBaseInstance ().RemoveResponsibleFromCompany (currentUser.userID, user.userID, user.userType, delegate() {
+				GetAllResponsablesFromCompanyAsUser ();
+				success ();
+			});
+		}, fail);
+	}
+
+	public static void RemoveServiceFromCompanyAsUser (String serviceID)
+	{
+		FireBaseManager.GetFireBaseInstance ().DeleteService (currentUser.userID, serviceID);
 	}
 
 	public static void RemoveAppointmentFromUser (AppointmentModel appointment, Delegates.GeneralListenerSuccess success)

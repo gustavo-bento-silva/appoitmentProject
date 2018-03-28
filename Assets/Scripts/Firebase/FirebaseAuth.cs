@@ -48,6 +48,27 @@ public class FirebaseAuth : MonoBehaviour
 		auth = null;
 	}
 
+	public void ForgotPassword (string email, Delegates.GeneralListenerSuccess successListener, Delegates.GeneralListenerFail failListener)
+	{
+		if (user != null) {
+			auth.SendPasswordResetEmailAsync (email).ContinueWith (task => {
+				if (task.IsCanceled) {
+					Debug.LogError ("SendPasswordResetEmailAsync was canceled.");
+					failListener ("SendPasswordResetEmailAsync was canceled.");
+					return;
+				}
+				if (task.IsFaulted) {
+					Debug.LogError ("SendPasswordResetEmailAsync encountered an error: " + task.Exception);
+					failListener (task.Exception.ToString ());
+					return;
+				}
+
+				Debug.Log ("Password reset email sent successfully.");
+				successListener ();
+			});
+		}
+	}
+
 	public void UserLogin (string email, string password, Delegates.UserLoginSuccess successListener, Delegates.UserLoginFail failListener)
 	{
 		auth.SignInWithEmailAndPasswordAsync (email, password).ContinueWith (task => {
@@ -116,7 +137,7 @@ public class FirebaseAuth : MonoBehaviour
 
 			// Firebase user has been created.
 			user = task.Result;
-			if (userType == Constants.UserType.Client) {
+			if (userType == Constants.UserType.User) {
 				DataManager.currentUser = FireBaseManager.GetFireBaseInstance ().CreateNewUser (auth.CurrentUser.UserId, name, phone);
 			}
 		

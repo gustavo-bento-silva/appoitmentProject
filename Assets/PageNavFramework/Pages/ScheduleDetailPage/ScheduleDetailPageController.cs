@@ -98,8 +98,9 @@ public class ScheduleDetailPageController : PageController
 
 	void InitializeScheduleTime ()
 	{
-		limit = DataManager.currentResponsible.timeToFinishWork [(int)DataManager.dateNewAppointment.DayOfWeek];
-		begin = DataManager.currentResponsible.timeToBeginWork [(int)DataManager.dateNewAppointment.DayOfWeek];
+		var dayOfWeek = (int)DataManager.dateNewAppointment.DayOfWeek;
+		limit = DataManager.currentResponsible.timeToFinishWork [dayOfWeek];
+		begin = DataManager.currentResponsible.timeToBeginWork [dayOfWeek];
 		List<AppointmentModel> appointmentList = new List<AppointmentModel> ();
 		var isOneInOneHour = PlayerPreferences.oneInOneHour;
 		int index = 0;

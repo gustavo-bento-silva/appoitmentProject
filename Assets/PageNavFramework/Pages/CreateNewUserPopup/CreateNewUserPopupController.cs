@@ -50,7 +50,7 @@ public class CreateNewUserPopupController : PageController
 		}
 		if (everyThingIsRight >= 4) {
 			Loading = true;
-			FirebaseAuth.GetFireBaseAuthInstance ().CreateNewUserWithEmailAndPassword (nameText, phoneText, emailText, passwordText, Constants.UserType.Client, delegate(string userID) {
+			FirebaseAuth.GetFireBaseAuthInstance ().CreateNewUserWithEmailAndPassword (nameText, phoneText, emailText, passwordText, Constants.UserType.User, delegate(string userID) {
 				Loading = false;
 				Success = true;
 				CloseModal ();

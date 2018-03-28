@@ -8,6 +8,8 @@ public class CompanyModel : UserModel
 	public string address;
 	public string cep;
 	[SerializeField]
+	public Dictionary<string, object> clients;
+	[SerializeField]
 	public Dictionary<string, object> employees;
 	[SerializeField]
 	public List<int> timeToBeginWork;
@@ -23,6 +25,7 @@ public class CompanyModel : UserModel
 		this.daysOfWork = new List<bool> ();
 		timeToBeginWork = new List<int> ();
 		timeToFinishWork = new List<int> ();
+		clients = new Dictionary<string, object> ();
 		employees = new Dictionary<string, object> ();
 		servicesProvided = new Dictionary<string, object> ();
 	}
@@ -35,6 +38,7 @@ public class CompanyModel : UserModel
 		this.daysOfWork = new List<bool> (new bool[] { false, true, true, true, true, true, true });
 		timeToBeginWork = new List<int> (new int[] { 8, 8, 8, 8, 8, 8, 8 });
 		timeToFinishWork = new List<int> (new int[] { 17, 17, 17, 17, 17, 17, 17 });
+		clients = new Dictionary<string, object> ();
 		employees = new Dictionary<string, object> ();
 	}
 

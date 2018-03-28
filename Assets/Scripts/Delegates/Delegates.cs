@@ -16,6 +16,8 @@ public static class Delegates
 
 	public delegate void GetAllResponsibles (List<ResponsibleModel> responsables);
 
+	public delegate void GetAllClients (List<UserModel> users);
+
 	public delegate void GetDaysWorked (List<bool> daysWorked);
 
 	public delegate void GetDaysTimeWorked (List<int> daysTime);

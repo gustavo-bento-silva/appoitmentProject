@@ -47,7 +47,6 @@ public class CreateNewResponsibleToCompanyController : PageController
 	void OnInitServicesWindow ()
 	{
 		selectServiceDelegate += HandleOnSelectServiceClick;
-		Loading = true;
 		if ((DataManager.currentUser as CompanyModel).servicesProvided != null) {
 			foreach (var key in (DataManager.currentUser as CompanyModel).servicesProvided.Keys) {
 				servicesProvidedList.Add ((ServicesProvidedModel)(DataManager.currentUser as CompanyModel).servicesProvided [key]);
@@ -103,24 +102,23 @@ public class CreateNewResponsibleToCompanyController : PageController
 		yield return new WaitForSeconds (1f);
 		servicesProvidedCell.ForEach (x => x.transform.SetParent (scrollContentList, false));
 		ReadjustScrollSize (servicesProvidedCell.Count);
-		Loading = false;
 	}
 
 	void CreateUserLogin ()
 	{
 		Loading = true;
-		FirebaseAPIHelper.GetFireBaseAPIHelperInstance ().AddUser (email.text, password.text, delegate() {
-			CreateNewResponsibleToCompany ();
+		FirebaseAPIHelper.GetFireBaseAPIHelperInstance ().AddUser (email.text, password.text, delegate(string userID) {
+			CreateNewResponsibleToCompany (userID);
 		}, delegate(string error) {
 			Error = true;
 		});
 	}
 
-	void CreateNewResponsibleToCompany ()
+	void CreateNewResponsibleToCompany (string userID)
 	{
-		
-		DataManager.CreateNewResponsibleToCompanyAsUser (name.text, GetServices (), GetDaysWorked (), GetInitTime (), GetEndTime ());
+		DataManager.CreateNewResponsibleToCompanyAsUser (userID, name.text, GetServices (), GetDaysWorked (), GetInitTime (), GetEndTime ());
 		Loading = false;
+		Constants.LoadHomePage ();
 	}
 
 	void ReadjustScrollSize (int size)
@@ -148,10 +146,11 @@ public class CreateNewResponsibleToCompanyController : PageController
 		if (everythingOk) {
 			if (actualPositionIndex == 2) {
 				CreateUserLogin ();
+			} else {
+				actualPositionIndex++;
+				var position = container.transform.localPosition.x - positionXOffset;
+				iTween.MoveTo (container, iTween.Hash ("x", position, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInBack));	
 			}
-			actualPositionIndex++;
-			var position = container.transform.localPosition.x - positionXOffset;
-			iTween.MoveTo (container, iTween.Hash ("x", position, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInBack));
 		}
 	}
 

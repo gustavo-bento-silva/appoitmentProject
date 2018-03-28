@@ -7,6 +7,12 @@ using UnityEngine.SceneManagement;
 public class LoginWithEmailPopupController : PageController
 {
 	public string homeScene;
+	public string loginScene;
+	public GameObject container;
+	public GameObject forgotPassword;
+	public GameObject success;
+	public Text forgotEmail;
+	public GameObject forgotEmailError;
 	public GameObject email;
 	public GameObject password;
 	public GameObject emailError;
@@ -43,6 +49,35 @@ public class LoginWithEmailPopupController : PageController
 				Error = true;
 			});
 		}		
+	}
+
+	public void ForgotPasswordClick ()
+	{
+		forgotPassword.SetActive (true);
+		container.SetActive (false);
+	}
+
+	public void OnConfirmForgotPasswordClick ()
+	{
+		if (string.IsNullOrEmpty (forgotEmail.text) || !forgotEmail.text.Contains ("@")) {
+			forgotEmailError.SetActive (true);
+		} else {
+			Loading = true;
+			forgotEmailError.SetActive (false);
+			FirebaseAuth.GetFireBaseAuthInstance ().ForgotPassword (forgotEmail.text, delegate() {
+				success.SetActive (true);
+				forgotPassword.SetActive (false);
+				Loading = false;
+			}, delegate(string error) {
+				Error = true;
+				Loading = false;
+			});
+		}
+	}
+
+	public void LoadLoginSceneAsync ()
+	{
+		SceneManager.LoadSceneAsync (loginScene);
 	}
 
 	void LoadHomeSceneAsync ()

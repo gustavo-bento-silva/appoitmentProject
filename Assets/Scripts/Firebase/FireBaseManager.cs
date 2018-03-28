@@ -23,6 +23,7 @@ public enum Parameters
 	messages,
 	date,
 	responsibles,
+	clients,
 	servicesProvided,
 	isNew,
 	daysOfWork,
@@ -142,6 +143,25 @@ public class FireBaseManager : MonoBehaviour
 		}
 	}
 
+	public void AddServicesToCompany (string companyID, List<ServicesProvidedModel> services, Delegates.GetAllServicesProvidedFromCompany success)
+	{
+		var servicesList = new List<ServicesProvidedModel> ();
+		int index = 0;
+		foreach (var service in services) {
+			service.serviceID = reference.Child (DBTable.Company.ToString ()).Push ().Key;
+			string json = JsonUtility.ToJson (service);
+			reference.Child (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.servicesProvided.ToString ()).Child (service.serviceID).SetRawJsonValueAsync (json).ContinueWith (task => {
+				if (task.IsCompleted) {
+					index++;
+					servicesList.Add (service);
+					if (index >= services.Count) {
+						success (servicesList);
+					}
+				}
+			});
+		}
+	}
+
 	public void AddServicesToResponsible (string companyID, ResponsibleModel responsible, List<ServicesProvidedModel> services)
 	{
 		foreach (var service in services) {
@@ -164,6 +184,28 @@ public class FireBaseManager : MonoBehaviour
 		});
 	}
 
+	public void AddClientToCompany (string companyID, UserModel userModel, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		string json = JsonUtility.ToJson (userModel);
+		reference.Child (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.clients.ToString ()).Child (userModel.userID).SetRawJsonValueAsync (json).ContinueWith (task => {
+			if (task.IsFaulted) {
+				fail (task.Exception.ToString ());
+			} else if (task.IsCompleted) {
+				success ();
+			}
+		});
+	}
+
+	public UserModel CreateNewClient (string name, string phone)
+	{
+		string userID = reference.Child (DBTable.User.ToString ()).Push ().Key;
+		UserModel user = new UserModel (userID, name, phone, Constants.UserType.Client);
+		string json = JsonUtility.ToJson (user);
+
+		CreateTable (DBTable.User, userID, json);
+		return user;
+	}
+
 	public UserModel CreateNewUser (string userID, string name, string phone)
 	{
 //		string userID = reference.Child (DBTable.User.ToString ()).Push ().Key;
@@ -174,10 +216,9 @@ public class FireBaseManager : MonoBehaviour
 		return user;
 	}
 
-	public ResponsibleModel CreateNewResponsibleToCompany (string companyID, string name, List<ServicesProvidedModel> servicesProvided, List<bool> daysWorked, List<int> initTime, List<int> finishTime, string phone)
+	public ResponsibleModel CreateNewResponsibleToCompany (string responsibleID, string companyID, string name, List<ServicesProvidedModel> servicesProvided, List<bool> daysWorked, List<int> initTime, List<int> finishTime, string phone)
 	{
-		string responsibleID = reference.Child (DBTable.Responsible.ToString ()).Push ().Key;
-		ResponsibleModel responsable = new ResponsibleModel (new UserModel (responsibleID, name, phone), servicesProvided, daysWorked, initTime, finishTime);
+		ResponsibleModel responsable = new ResponsibleModel (new UserModel (responsibleID, name, phone), companyID, servicesProvided, daysWorked, initTime, finishTime);
 		string json = JsonUtility.ToJson (responsable);
 
 		CreateTable (DBTable.Responsible, responsibleID, json);
@@ -206,6 +247,25 @@ public class FireBaseManager : MonoBehaviour
 				}
 
 				getAllResponsiblesListener (responsibles);
+			}
+		});
+	}
+
+	public void GetAllClientsFromCompany (String companyID, Delegates.GetAllClients getAllClientsListener, Delegates.GeneralListenerFail fail)
+	{
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.clients.ToString ())
+			.GetValueAsync ().ContinueWith (task => {
+			if (task.IsFaulted) {
+				fail (task.Exception.ToString ());
+			} else if (task.IsCompleted) {
+				DataSnapshot snapshot = task.Result;
+				List<UserModel> clients = new List<UserModel> ();
+				foreach (var client in snapshot.Children) {
+					string json = client.GetRawJsonValue ();
+					clients.Add (JsonUtility.FromJson<UserModel> (json));
+				}
+
+				getAllClientsListener (clients);
 			}
 		});
 	}
@@ -456,6 +516,25 @@ public class FireBaseManager : MonoBehaviour
 
 	}
 
+	public void RemoveResponsibleFromCompany (string companyID, string userID, string userType, Delegates.GeneralListenerSuccess success)
+	{
+		if (userType == Constants.UserType.Responsible.ToString ()) {
+			FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsible.ToString ()).Child (userID).RemoveValueAsync ();
+		}
+
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.responsibles.ToString ()).Child (userID).RemoveValueAsync ();
+
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.User.ToString ()).Child (userID).RemoveValueAsync ()
+			.ContinueWith (task => {
+			if (task.IsFaulted) {
+
+			} else {
+				success ();
+			}
+		});
+
+	}
+
 	public void DeleteMessage (UserModel user, string messageID, Delegates.GeneralListenerSuccess success)
 	{
 		if (user is ResponsibleModel) {
@@ -478,6 +557,11 @@ public class FireBaseManager : MonoBehaviour
 			});
 			;
 		}
+	}
+
+	public void DeleteService (String companyID, String serviceID)
+	{
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.servicesProvided.ToString ()).Child (serviceID).RemoveValueAsync ();
 	}
 
 	public void DeleteAppointment (AppointmentModel appointment, Delegates.GeneralListenerSuccess success)

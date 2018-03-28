@@ -39,14 +39,20 @@ public class ConfirmAppointmentPopupController : PageController
 	public void OnYesClick ()
 	{
 		Loading = true;
-		DataManager.CreateNewAppointmentToCurrentUser (delegate {
-			Loading = false;
-			DropAllPagesFromStack ();
-			StartCoroutine (MyCloseModal ());
-		}, delegate (string error) {
-			Loading = false;
-			CloseModal ();
-		});
+		if (DataManager.currentUser.userType == Constants.UserType.User.ToString ()) {
+			DataManager.CreateNewAppointmentToCurrentUser (delegate {
+				Loading = false;
+				DropAllPagesFromStack ();
+				StartCoroutine (MyCloseModal ());
+			}, delegate (string error) {
+				Loading = false;
+				CloseModal ();
+			});
+		} else {
+			var pageNav = PageNav.GetPageNavInstance ();
+			var page = pageNav.GetPagePrefabByEnum (PagesEnum.SelectClientPopup);
+			pageNav.OpenModal (page);
+		}
 	}
 
 	IEnumerator MyCloseModal ()

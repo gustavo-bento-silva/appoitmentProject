@@ -1,14 +1,25 @@
 using UnityEngine;
 using System.Collections;
 using PageNavFrameWork;
+using UnityEngine.SceneManagement;
 
-public class SuccessPopupController : PageController{
+public class SuccessPopupController : PageController
+{
 
-	void Start () {
+	public string sceneName;
+
+	void Start ()
+	{
 
 	}
-	
-	void Update () {
 
+	void Update ()
+	{
+
+	}
+
+	public void LoadHomeScene ()
+	{
+		SceneManager.LoadSceneAsync (sceneName);
 	}
 }
