@@ -40,6 +40,7 @@ public class ConfirmAppointmentPopupController : PageController
 	{
 		Loading = true;
 		if (DataManager.currentUser.userType == Constants.UserType.User.ToString ()) {
+			
 			DataManager.CreateNewAppointmentToCurrentUser (delegate {
 				Loading = false;
 				DropAllPagesFromStack ();
@@ -52,6 +53,7 @@ public class ConfirmAppointmentPopupController : PageController
 			var pageNav = PageNav.GetPageNavInstance ();
 			var page = pageNav.GetPagePrefabByEnum (PagesEnum.SelectClientPopup);
 			pageNav.OpenModal (page);
+			GameObject.Destroy (this.gameObject);
 		}
 	}
 

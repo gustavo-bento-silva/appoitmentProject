@@ -26,6 +26,7 @@ namespace PageNavFrameWork{
 		CreateServicePopup=20,
 		ClientsManagerPage=21,
 		CreateNewClientPage=22,
-		SelectClientPopup=23
+		SelectClientPopup=23,
+		ConfirmDeleteAppointmentPopup=24
 	}
 }

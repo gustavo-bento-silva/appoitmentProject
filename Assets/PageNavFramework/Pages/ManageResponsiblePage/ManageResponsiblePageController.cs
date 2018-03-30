@@ -10,13 +10,17 @@ public class ManageResponsiblePageController : PageController
 	public GameObject nullListMessage;
 
 	List <GameObject> userCell = new List<GameObject> ();
+	List<ResponsibleModel> responsibles = new List<ResponsibleModel> ();
 
 	void Start ()
 	{
 		Loading = true;
 		if (DataManager.responsibles != null) {
 			if (DataManager.responsibles.Count != 0) {
-				FillList ();
+				DataManager.GetServicesFromAllResponsibles (delegate(List<ResponsibleModel> responsablesWithServices) {
+					responsibles = responsablesWithServices;
+					FillList ();
+				});
 			} else {
 //				nullListMessage.SetActive (true);
 				Loading = false;

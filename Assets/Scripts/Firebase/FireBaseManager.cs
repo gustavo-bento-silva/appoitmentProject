@@ -27,6 +27,7 @@ public enum Parameters
 	servicesProvided,
 	isNew,
 	daysOfWork,
+	companyID,
 	timeToBeginWork,
 	timeToFinishWork
 }
@@ -104,9 +105,9 @@ public class FireBaseManager : MonoBehaviour
 				fail (task.Exception.ToString ());
 			} else if (task.IsCompleted) {
 				reference.Child (DBTable.Responsible.ToString ()).Child (responsibleID).Child (Parameters.messages + "/" + messageID).SetRawJsonValueAsync (json).ContinueWith (task2 => {
-					if (task.IsFaulted) {
-						fail (task.Exception.ToString ());
-					} else if (task.IsCompleted) {
+					if (task2.IsFaulted) {
+						fail (task2.Exception.ToString ());
+					} else if (task2.IsCompleted) {
 						success ();
 					}
 				});
@@ -340,6 +341,19 @@ public class FireBaseManager : MonoBehaviour
 		});
 	}
 
+	public void GetCompanyIDFromResponsible (String responsibleID, Delegates.GetCompanyID companyIDCallBack)
+	{
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsible.ToString ()).Child (responsibleID).Child (Parameters.companyID.ToString ())
+			.GetValueAsync ().ContinueWith (task => {
+			if (task.IsFaulted) {
+				// Handle the error...
+			} else if (task.IsCompleted) {
+				DataSnapshot snapshot = task.Result;
+				companyIDCallBack ((string)snapshot.Value);
+			}
+		});
+	}
+
 	void GetDaySchedule (string date)
 	{
 		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Appointments.ToString ()).Child ("data").EqualTo (date)
@@ -564,19 +578,19 @@ public class FireBaseManager : MonoBehaviour
 		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.servicesProvided.ToString ()).Child (serviceID).RemoveValueAsync ();
 	}
 
-	public void DeleteAppointment (AppointmentModel appointment, Delegates.GeneralListenerSuccess success)
+	public void DeleteAppointment (AppointmentModel appointment, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
 	{
 		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Appointments.ToString ()).Child (appointment.appointmentID).RemoveValueAsync ().ContinueWith (task => {
 			if (task.IsFaulted) {
-				
+				fail (task.Exception.ToString ());
 			} else {
 				FirebaseDatabase.DefaultInstance.GetReference (DBTable.User.ToString ()).Child (appointment.userID).Child (Parameters.appointments.ToString ()).RemoveValueAsync ().ContinueWith (task2 => {
 					if (task2.IsFaulted) {
-						
+						fail (task2.Exception.ToString ());
 					} else {
 						FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsible.ToString ()).Child (appointment.responsableID).Child (Parameters.appointments.ToString ()).RemoveValueAsync ().ContinueWith (task3 => {
 							if (task3.IsFaulted) {
-								
+								fail (task3.Exception.ToString ());
 							} else {
 								success ();
 							}
@@ -587,18 +601,31 @@ public class FireBaseManager : MonoBehaviour
 		});
 	}
 
-	public void ActiveUserMessagesListener (string userID, Delegates.GetUserMessages success)
+	public void ActiveUserMessagesListener (string userID, string userType, Delegates.GetUserMessages success)
 	{
 		userMessages += success;
-		FirebaseDatabase.DefaultInstance.GetReference (DBTable.User.ToString ()).Child (userID).Child (Parameters.messages.ToString ())
-			.ValueChanged += MessagesListChanged;
+		if (userType == Constants.UserType.Responsible.ToString ()) {
+			FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsible.ToString ()).Child (userID).Child (Parameters.messages.ToString ())
+				.ValueChanged += MessagesListChanged;
+		} else if (userType == Constants.UserType.Company.ToString ()) {
+			FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child (userID).Child (Parameters.messages.ToString ())
+				.ValueChanged += MessagesListChanged;
+		} else {
+			FirebaseDatabase.DefaultInstance.GetReference (DBTable.User.ToString ()).Child (userID).Child (Parameters.messages.ToString ())
+				.ValueChanged += MessagesListChanged;
+		}
 	}
 
-	public void ActiveMyAppointmentsListener (string userID, Delegates.GetUserAppointments appointmentsSuccess)
+	public void ActiveMyAppointmentsListener (string userID, string userType, Delegates.GetUserAppointments appointmentsSuccess)
 	{
 		userAppointments += appointmentsSuccess;
-		FirebaseDatabase.DefaultInstance.GetReference (DBTable.User.ToString ()).Child (userID).Child (Parameters.appointments.ToString ())
-			.ValueChanged += AppointmentListChanged;
+		if (userType == Constants.UserType.Responsible.ToString ()) {
+			FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsible.ToString ()).Child (userID).Child (Parameters.appointments.ToString ())
+				.ValueChanged += AppointmentListChanged;
+		} else {
+			FirebaseDatabase.DefaultInstance.GetReference (DBTable.User.ToString ()).Child (userID).Child (Parameters.appointments.ToString ())
+				.ValueChanged += AppointmentListChanged;
+		}
 	}
 
 	void HandleValueChanged (object sender, ValueChangedEventArgs args)

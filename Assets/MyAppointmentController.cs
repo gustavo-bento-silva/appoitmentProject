@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using PageNavFrameWork;
 
 public class MyAppointmentController : MonoBehaviour
 {
@@ -13,9 +14,10 @@ public class MyAppointmentController : MonoBehaviour
 
 	public void OnRemoveClick ()
 	{
-		DataManager.RemoveAppointmentFromUser (appointment, delegate {
-			GameObject.Destroy (gameObject);
-		});
+		var dict = new Dictionary<string, object> ();
+		dict.Add (appointment.appointmentID, appointment);
+		PageNav.GetPageNavInstance ().PushPageToStackWithArgs (PagesEnum.ConfirmDeleteAppointmentPopup, dict);
+
 	}
 
 	public static GameObject Instantiate (Transform CellPrefabTransform, string time, string service, string responsible, AppointmentModel appointment)

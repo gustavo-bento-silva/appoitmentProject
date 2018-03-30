@@ -32,7 +32,8 @@ public class SelectClientPopupController : PageController
 				Loading = false;
 			}
 		} else {
-			DataManager.GetAllClientsFromCompany ((DataManager.currentUser as ResponsibleModel).companyID, delegate(List<UserModel> users) {
+			var user = (DataManager.currentUser as ResponsibleModel);
+			DataManager.GetAllClientsFromCompany (user.companyID, delegate(List<UserModel> users) {
 				clientsList = users;
 				if (clientsList.Count > 0) {
 					FillList ();
@@ -54,7 +55,10 @@ public class SelectClientPopupController : PageController
 	IEnumerator OnFillList ()
 	{
 		yield return new WaitForSeconds (1f);
-		userCell.ForEach (x => x.transform.SetParent (scrollContentList, false));
+		userCell.ForEach (x => {
+			x.transform.SetParent (scrollContentList, false);
+			x.GetComponent<Button> ().onClick.AddListener (() => OnClientSelectedClick (x));
+		});
 		ReadjustScrollSize (userCell.Count);
 		Loading = false;
 	}
@@ -91,6 +95,6 @@ public class SelectClientPopupController : PageController
 	IEnumerator MyCloseModal ()
 	{
 		yield return new WaitForSeconds (0.3f);
-		CloseModal ();
+		GameObject.Destroy (this.gameObject);
 	}
 }

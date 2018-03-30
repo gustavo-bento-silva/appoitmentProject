@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections;
 using PageNavFrameWork;
 using System.Collections.Generic;
+using System.Globalization;
+using System;
 
 public class MyAppointmentsPageController : PageController
 {
@@ -45,7 +47,16 @@ public class MyAppointmentsPageController : PageController
 		foreach (var appointmentKey in DataManager.currentUser.appoitments.Keys) {
 			appointmentsList.Add ((AppointmentModel)DataManager.currentUser.appoitments [appointmentKey]);
 		}
-		appointmentsList.ForEach (x => appointmentsCell.Add (MyAppointmentController.Instantiate (cellPrefab, string.Format ("{0} \n {1}:{2}h", x.data, x.hour, x.minute), x.description, x.responsibleName, x)));
+
+		CultureInfo provider = new CultureInfo ("pt-BR");
+		appointmentsList.Sort ((first, second) => ((DateTime.ParseExact (first.data, Constants.dateformat, provider).Add (new TimeSpan (first.hour, first.minute, 0))).CompareTo ((DateTime.ParseExact (second.data, Constants.dateformat, provider).Add (new TimeSpan (second.hour, second.minute, 0))))));
+
+//		appointmentsList.Sort ((first, second) => (first.data.CompareTo (second.data)));
+		if (DataManager.currentUser.userType == Constants.UserType.Responsible.ToString ()) {
+			appointmentsList.ForEach (x => appointmentsCell.Add (MyAppointmentController.Instantiate (cellPrefab, string.Format ("{0} \n {1}:{2}h", x.data, x.hour, x.minute.ToString ("00")), x.description, x.userName, x)));
+		} else {
+			appointmentsList.ForEach (x => appointmentsCell.Add (MyAppointmentController.Instantiate (cellPrefab, string.Format ("{0} \n {1}:{2}h", x.data, x.hour, x.minute.ToString ("00")), x.description, x.responsibleName, x)));
+		}
 		StartCoroutine (OnFillList ());
 	}
 
