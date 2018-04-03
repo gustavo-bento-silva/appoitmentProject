@@ -8,13 +8,15 @@ public class MessageModel
 {
 	public string id;
 	public string from;
+	public string to;
 	public string message;
 	public string messageDate;
 	public bool isNew;
 
-	public MessageModel (string from, string message, string messageDate)
+	public MessageModel (string from, string to, string message, string messageDate)
 	{
 		this.from = from;
+		this.to = to;
 		this.message = message;
 		this.messageDate = messageDate;
 		this.isNew = true;

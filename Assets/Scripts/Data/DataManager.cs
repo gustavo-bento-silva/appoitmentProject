@@ -44,8 +44,12 @@ public class DataManager : MonoBehaviour
 
 	public static void LoadUserInfoAux (Delegates.GeneralListenerSuccess success)
 	{
+//		Empresa:
 //		string ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
-		string ID = "uWkT3ATlOPdxIjfUYEH4ybb2hf33";
+//		Thamyris:
+//		string ID = "uWkT3ATlOPdxIjfUYEH4ybb2hf33";
+//		Gustavo:
+		string ID = "DUN4RgbN6EZNvFPxAPwFrJoIggq1";
 		FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel user) {
 			if (user.userType == Constants.UserType.Company.ToString ()) {
 				currentUser = new CompanyModel (user);
@@ -207,7 +211,7 @@ public class DataManager : MonoBehaviour
 
 	public static void CreateNewMessageFromUserToResponsilbe (UserModel from, string toID, string message, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
 	{
-		var mMessage = new MessageModel (from.name, message, DateTime.Now.ToString (Constants.dateformat));
+		var mMessage = new MessageModel (from.name, toID, message, DateTime.Now.ToString (Constants.dateformat));
 		if (from.userType == Constants.UserType.Responsible.ToString ()) {
 			FireBaseManager.GetFireBaseInstance ().CreateNewMessage (mMessage, from.userID, toID, delegate() {
 				success ();
