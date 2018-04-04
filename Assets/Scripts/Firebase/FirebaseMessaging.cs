@@ -14,7 +14,11 @@ public class FirebaseMessaging : MonoBehaviour
 	{
 		Firebase.Messaging.FirebaseMessaging.MessageReceived += OnMessageReceived;
 		Firebase.Messaging.FirebaseMessaging.TokenReceived += OnTokenReceived;
-		Firebase.Messaging.FirebaseMessaging.Subscribe ("/topics/pushNotifications_" + DataManager.currentUser.userID);
+	}
+
+	public static void SubscribeToTopic ()
+	{
+		Firebase.Messaging.FirebaseMessaging.Subscribe ("pushNotifications_" + DataManager.currentUser.userID);
 		Debug.Log ("Firebase Messaging Initialized. Topic: " + "pushNotifications_" + DataManager.currentUser.userID);
 	}
 

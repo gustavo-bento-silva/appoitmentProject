@@ -69,6 +69,7 @@ public class DataManager : MonoBehaviour
 			} else {
 				currentUser = user;
 			}
+			FirebaseMessaging.SubscribeToTopic ();
 			success ();
 			ActiveListeners ();
 		});
