@@ -42,6 +42,8 @@ public static class Delegates
 
 	public delegate void GetAllCompanies (List<CompanyModel> companies);
 
+	public delegate void OnSelectCompanyClick (CompanyModel company, int index);
+
 	public delegate void OnSelectServiceClick (ServicesProvidedModel serviceprovided, bool status);
 
 
