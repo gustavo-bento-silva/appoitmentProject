@@ -33,6 +33,9 @@ namespace PageNavFrameWork
 		}
 
 		private const int positionOffSet = 300;
+		private const int loadingCountDownTime = 10;
+		private float timeLeft = 0;
+		private bool loadingCountDownEnabled;
 		private Vector3 sideMenuInitialPosition;
 		private RectTransform _loadingPage = null;
 		private RectTransform _successPopup = null;
@@ -140,6 +143,14 @@ namespace PageNavFrameWork
 					}
 				}
 			}
+			if (loadingCountDownEnabled) {
+				timeLeft -= Time.deltaTime;
+
+				if (timeLeft <= 0) {
+					EndTimer ();
+					loadingCountDownEnabled = false;
+				}
+			}
 		}
 
 		void PresentFirstPage (PagesEnum page)
@@ -227,6 +238,21 @@ namespace PageNavFrameWork
 				Helper.FindComponentInChildWithTag <Text> (_successPopup.gameObject, "SuccessMessage").text = msg;
 			}
 			_loadingPage.gameObject.SetActive (state);
+			if (state) {
+				StartTimer ();
+			}
+		}
+
+		void StartTimer ()
+		{
+			timeLeft = loadingCountDownTime;
+			loadingCountDownEnabled = true;
+		}
+
+		void EndTimer ()
+		{
+			SetLoadingVisibility (false);
+			SetErrorVisibility (true);
 		}
 
 		public PageController GetCurrentPage ()
