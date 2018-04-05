@@ -30,11 +30,9 @@ public class MessagesPageController : PageController
 				nullListMessage.SetActive (false);
 				FillList ();
 			} else {
-				nullListMessage.SetActive (true);
 				Loading = false;
 			}
 		} else {
-			nullListMessage.SetActive (true);
 			Loading = false;
 		}
 	}

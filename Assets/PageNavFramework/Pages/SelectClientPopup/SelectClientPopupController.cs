@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class SelectClientPopupController : PageController
 {
 
-
+	public InputField search;
 	public Transform cellPrefab;
 	public RectTransform scrollContentList;
 	public GameObject nullListMessage;
@@ -46,6 +46,27 @@ public class SelectClientPopupController : PageController
 	
 	}
 
+	public void Search ()
+	{
+		if (!string.IsNullOrEmpty (search.text)) {
+			if (userCell != null && userCell.Count > 0) {
+				userCell.ForEach (x => {
+					if (!x.GetComponent<ClientCellController> ().userName.text.ToLower ().Contains (search.text.ToLower ())) {
+						x.SetActive (false);
+					} else {
+						x.SetActive (true);
+					}
+				});
+			}
+		} else {
+			if (userCell != null && userCell.Count > 0) {
+				userCell.ForEach (x => {
+					x.SetActive (true);
+				});
+			}
+		}
+	}
+
 	void FillList ()
 	{
 		clientsList.ForEach (x => userCell.Add (ClientCellController.Instantiate (cellPrefab, x)));
@@ -82,6 +103,7 @@ public class SelectClientPopupController : PageController
 
 	public void OnNextButtonClicked ()
 	{
+		Loading = true;
 		DataManager.CreateNewAppointment (userSelected, delegate {
 			Loading = false;
 			DropAllPagesFromStack ();

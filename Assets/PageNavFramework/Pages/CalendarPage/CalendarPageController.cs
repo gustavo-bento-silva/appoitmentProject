@@ -68,7 +68,8 @@ public class CalendarPageController : PageController
 		List<String> namesList = new List<string> ();
 		servicesDropdown.ClearOptions ();
 		foreach (ServicesProvidedModel service in DataManager.currentResponsible.servicesProvided.Values) {
-			namesList.Add (service.name);
+			var servicePrice = float.Parse (service.price) % 1;
+			namesList.Add (string.Format ("{0} - R${1},{2}", service.name, Mathf.Floor (float.Parse (service.price)), servicePrice.ToString ("00")));
 		}
 
 		servicesDropdown.AddOptions (namesList);

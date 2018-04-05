@@ -93,7 +93,7 @@ public class FireBaseManager : MonoBehaviour
 		});
 	}
 
-	public void CreateNewMessage (MessageModel message, string responsibleID, string userID, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	public void CreateNewMessage (MessageModel message, string responsibleID, string userID, string companyID, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
 	{
 		string messageID = reference.Child (DBTable.User.ToString ()).Push ().Key;
 		message.id = messageID;
@@ -101,6 +101,34 @@ public class FireBaseManager : MonoBehaviour
 		string json = JsonUtility.ToJson (message);
 
 		reference.Child (DBTable.User.ToString ()).Child (userID).Child (Parameters.messages + "/" + messageID).SetRawJsonValueAsync (json).ContinueWith (task => {
+			if (task.IsFaulted) {
+				fail (task.Exception.ToString ());
+			} else if (task.IsCompleted) {
+				reference.Child (DBTable.Responsible.ToString ()).Child (responsibleID).Child (Parameters.messages + "/" + messageID).SetRawJsonValueAsync (json).ContinueWith (task2 => {
+					if (task2.IsFaulted) {
+						fail (task2.Exception.ToString ());
+					} else if (task2.IsCompleted) {
+						reference.Child (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.messages + "/" + messageID).SetRawJsonValueAsync (json).ContinueWith (task3 => {
+							if (task3.IsFaulted) {
+								fail (task3.Exception.ToString ());
+							} else if (task3.IsCompleted) {
+								success ();
+							}
+						});
+					}
+				});
+			}
+		});
+	}
+
+	public void CreateNewMessageScheduleByCompany (MessageModel message, string responsibleID, string userID, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		string messageID = reference.Child (DBTable.User.ToString ()).Push ().Key;
+		message.id = messageID;
+
+		string json = JsonUtility.ToJson (message);
+
+		reference.Child (DBTable.Company.ToString ()).Child (userID).Child (Parameters.messages + "/" + messageID).SetRawJsonValueAsync (json).ContinueWith (task => {
 			if (task.IsFaulted) {
 				fail (task.Exception.ToString ());
 			} else if (task.IsCompleted) {

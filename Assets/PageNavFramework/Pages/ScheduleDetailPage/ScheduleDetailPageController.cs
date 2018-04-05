@@ -141,6 +141,7 @@ public class ScheduleDetailPageController : PageController
 						dt = dt.AddMinutes (isOneInOneHour ? 60 : 30);
 					} else {
 						into = false;
+						limit++;
 						index++;
 					}
 				} else {

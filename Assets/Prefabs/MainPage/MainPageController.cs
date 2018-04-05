@@ -89,7 +89,6 @@ public class MainPageController : MonoBehaviour
 	void ShowSideMenu ()
 	{
 		xPosition = (((RectTransform)menu.transform).sizeDelta.x * canvas.scaleFactor) / 2;
-		Debug.Log (xPosition);
 		iTween.MoveTo (menu, iTween.Hash ("x", xPosition, "time", time, "easeType", iTween.EaseType.linear.ToString ()));
 	}
 

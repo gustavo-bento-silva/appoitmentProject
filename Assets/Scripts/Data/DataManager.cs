@@ -45,11 +45,11 @@ public class DataManager : MonoBehaviour
 	public static void LoadUserInfoAux (Delegates.GeneralListenerSuccess success)
 	{
 //		Empresa:
-//		string ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
+		string ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
 //		Thamyris:
 //		string ID = "uWkT3ATlOPdxIjfUYEH4ybb2hf33";
 //		Gustavo:
-		string ID = "DUN4RgbN6EZNvFPxAPwFrJoIggq1";
+//		string ID = "DUN4RgbN6EZNvFPxAPwFrJoIggq1";
 		FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel user) {
 			if (user.userType == Constants.UserType.Company.ToString ()) {
 				currentUser = new CompanyModel (user);
@@ -202,29 +202,57 @@ public class DataManager : MonoBehaviour
 			success ();
 			string minute = (dateNewAppointment.Minute == 0 ? "00" : "0");
 			var message = string.Format ("{0} realizou novo agendamento de {1} para dia {2}/{3} às {4}:{5}h", user.name, currentservice.name, dateNewAppointment.Day, dateNewAppointment.Month, dateNewAppointment.Hour, minute);
-			CreateNewMessageFromUserToResponsilbe (user, currentResponsible.userID, message, delegate() {
+			if (user.userType == Constants.UserType.User.ToString ()) {
+				CreateNewMessageFromUserToResponsilbe (user, currentResponsible, message, delegate() {
 
-			}, delegate(string error) {
+				}, delegate(string error) {
 
-			});
+				});
+			} else {
+				CreateNewMessageFromClientOrCompanyToResponsilbe (user, currentResponsible.userID, message, delegate() {
+
+				}, delegate(string error) {
+
+				});	
+			}
 		}, fail);
 	}
 
-	public static void CreateNewMessageFromUserToResponsilbe (UserModel from, string toID, string message, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	public static void CreateNewMessageFromUserToResponsilbe (UserModel from, ResponsibleModel responsible, string message, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
 	{
-		var mMessage = new MessageModel (from.name, toID, message, DateTime.Now.ToString (Constants.dateformat));
-		if (from.userType == Constants.UserType.Responsible.ToString ()) {
-			FireBaseManager.GetFireBaseInstance ().CreateNewMessage (mMessage, from.userID, toID, delegate() {
+		string companyID = "";
+		var mMessage = new MessageModel (from.name, responsible.userID, message, DateTime.Now.ToString (Constants.dateformat));
+		if (from.userType == Constants.UserType.User.ToString ()) {
+			FireBaseManager.GetFireBaseInstance ().CreateNewMessage (mMessage, from.userID, responsible.userID, responsible.companyID, delegate() {
 				success ();
 			}, delegate(string error) {
 				fail (error);
 			});
 		} else {
-			FireBaseManager.GetFireBaseInstance ().CreateNewMessage (mMessage, toID, from.userID, delegate() {
+			fail ("Usuário não é um profissional!");
+		}
+
+	}
+
+	public static void CreateNewMessageFromClientOrCompanyToResponsilbe (UserModel from, string toID, string message, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		string companyID = "";
+		var mMessage = new MessageModel (from.name, toID, message, DateTime.Now.ToString (Constants.dateformat));
+		if (from.userType == Constants.UserType.Responsible.ToString ()) {
+			companyID = (from as ResponsibleModel).companyID;
+			FireBaseManager.GetFireBaseInstance ().CreateNewMessage (mMessage, from.userID, toID, companyID, delegate() {
 				success ();
 			}, delegate(string error) {
 				fail (error);
 			});
+		} else if (from.userType == Constants.UserType.Client.ToString ()) {
+			FireBaseManager.GetFireBaseInstance ().CreateNewMessageScheduleByCompany (mMessage, toID, currentUser.userID, delegate() {
+				success ();
+			}, delegate(string error) {
+				fail (error);
+			});
+		} else {
+			fail ("Usuário não é um profissional!");
 		}
 
 	}
@@ -364,7 +392,7 @@ public class DataManager : MonoBehaviour
 			} else {
 				toID = appointment.responsableID;
 			}
-			CreateNewMessageFromUserToResponsilbe (currentUser, toID, message, delegate() {
+			CreateNewMessageFromClientOrCompanyToResponsilbe (currentUser, toID, message, delegate() {
 
 			}, delegate(string error) {
 
@@ -382,7 +410,7 @@ public class DataManager : MonoBehaviour
 
 			string minute = (appointment.minute.ToString () == "0" ? "00" : "0");
 			var message = string.Format ("{0} desmarcou o agendamento de {1} marcado para dia {2} às {3}:{4}h", currentUser.name, appointment.description, appointment.data, appointment.hour, minute);
-			CreateNewMessageFromUserToResponsilbe (currentUser, currentResponsible.userID, message, delegate() {
+			CreateNewMessageFromUserToResponsilbe (currentUser, currentResponsible, message, delegate() {
 				
 			}, delegate(string error) {
 			});
