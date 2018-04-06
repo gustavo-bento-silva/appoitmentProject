@@ -34,7 +34,7 @@ public enum Parameters
 
 public class FireBaseManager : MonoBehaviour
 {
-	public static FireBaseManager _instance;
+	static FireBaseManager _instance;
 
 	string myProjectURL = "https://appointmentproject-a7233.firebaseio.com/";
 	DatabaseReference reference;
@@ -50,6 +50,7 @@ public class FireBaseManager : MonoBehaviour
 	{
 		FirebaseApp.DefaultInstance.SetEditorDatabaseUrl (myProjectURL);
 		reference = FirebaseDatabase.DefaultInstance.RootReference;
+		reference.KeepSynced (true);
 		
 		if (_instance == null) {
 			_instance = this;
@@ -153,6 +154,31 @@ public class FireBaseManager : MonoBehaviour
 		return company;
 	}
 
+	public void UpdateSeviceCompany (string companyID, ServicesProvidedModel service, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		string json = JsonUtility.ToJson (service);
+
+		reference.Child (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.servicesProvided.ToString ()).Child (service.serviceID).SetRawJsonValueAsync (json).ContinueWith (task => {
+			if (task.IsFaulted) {
+				fail (task.Exception.ToString ());
+			} else if (task.IsCompleted) {
+				success ();
+			}
+		});
+	}
+
+	public void UpdateSeviceResponsible (string responsibleID, ServicesProvidedModel service, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		string json = JsonUtility.ToJson (service);
+		reference.Child (DBTable.Responsible.ToString ()).Child (responsibleID).Child (Parameters.servicesProvided.ToString ()).Child (service.serviceID).SetRawJsonValueAsync (json).ContinueWith (task => {
+			if (task.IsFaulted) {
+				fail (task.Exception.ToString ());
+			} else if (task.IsCompleted) {
+				success ();
+			}
+		});
+	}
+
 	public void UpdateMyAppointment (UserModel user, string appointmentID)
 	{
 		if (user.userType == Constants.UserType.Responsible.ToString ()) {
@@ -198,6 +224,29 @@ public class FireBaseManager : MonoBehaviour
 			string json = JsonUtility.ToJson (service);
 			reference.Child (DBTable.Responsible.ToString ()).Child (responsible.userID).Child (Parameters.servicesProvided.ToString ()).Child (service.serviceID).SetRawJsonValueAsync (json);
 			reference.Child (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.responsibles.ToString ()).Child (responsible.userID).Child (Parameters.servicesProvided.ToString ()).Child (service.serviceID).SetRawJsonValueAsync (json);
+		}
+
+	}
+
+	public void RemoveAllServcesFromResponsible (string companyID, ResponsibleModel responsible, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		reference.Child (DBTable.Company.ToString ()).Child (Parameters.responsibles.ToString ()).Child (responsible.userID).Child (Parameters.servicesProvided.ToString ()).RemoveValueAsync ();
+		reference.Child (DBTable.Responsible.ToString ()).Child (responsible.userID).Child (Parameters.servicesProvided.ToString ()).RemoveValueAsync ().ContinueWith (task => {
+			if (task.IsFaulted) {
+				fail (task.Exception.ToString ());
+			} else if (task.IsCompleted) {
+				responsible.servicesProvided.Clear ();
+				success ();
+			}
+		});
+	}
+
+	public void RemoveServicesToResponsible (string companyID, ResponsibleModel responsible, List<ServicesProvidedModel> services)
+	{
+		foreach (var service in services) {
+			responsible.servicesProvided.Add (service.serviceID, (object)service);
+			reference.Child (DBTable.Responsible.ToString ()).Child (responsible.userID).Child (Parameters.servicesProvided.ToString ()).Child (service.serviceID).RemoveValueAsync ();
+			reference.Child (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.responsibles.ToString ()).Child (responsible.userID).Child (Parameters.servicesProvided.ToString ()).Child (service.serviceID).RemoveValueAsync ();
 		}
 
 	}
@@ -603,6 +652,11 @@ public class FireBaseManager : MonoBehaviour
 	public void DeleteService (String companyID, String serviceID)
 	{
 		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.servicesProvided.ToString ()).Child (serviceID).RemoveValueAsync ();
+		GetAllResponsiblesFromCompany (companyID, delegate(List<ResponsibleModel> responsables) {
+			responsables.ForEach (x => {
+				FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsible.ToString ()).Child (x.userID).Child (Parameters.servicesProvided.ToString ()).Child (serviceID).RemoveValueAsync ();
+			});
+		});
 	}
 
 	public void DeleteAppointment (AppointmentModel appointment, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)

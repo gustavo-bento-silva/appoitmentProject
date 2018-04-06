@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using PageNavFrameWork;
 
 public class ServiceManagerCell : MonoBehaviour
 {
@@ -12,6 +13,13 @@ public class ServiceManagerCell : MonoBehaviour
 	public void OnRemoveClick ()
 	{
 		DataManager.RemoveServiceFromCompanyAsUser (mServiceModel.serviceID);
+	}
+
+	public void OnEditClick ()
+	{
+		var dict = new Dictionary<string, object> ();
+		dict.Add (mServiceModel.serviceID, mServiceModel);
+		PageNav.GetPageNavInstance ().PushPageToStackWithArgs (PagesEnum.EditServicePopup, dict);
 	}
 
 	public static GameObject Instantiate (Transform CellPrefabTransform, ServicesProvidedModel serviceModel)

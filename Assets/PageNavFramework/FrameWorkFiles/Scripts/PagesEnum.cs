@@ -28,6 +28,7 @@ namespace PageNavFrameWork{
 		CreateNewClientPage=22,
 		SelectClientPopup=23,
 		ConfirmDeleteAppointmentPopup=24,
-		EditServicePopup=25
+		EditServicePopup=25,
+		EditResponsiblePopup=26
 	}
 }

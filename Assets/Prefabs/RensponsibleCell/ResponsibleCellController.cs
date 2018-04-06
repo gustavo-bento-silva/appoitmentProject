@@ -10,6 +10,12 @@ public class ResponsibleCellController : MonoBehaviour
 	public Text functions;
 	public UserModel userModel;
 
+	public void OnEditResponsible ()
+	{
+		var dict = new Dictionary<string, object> ();
+		dict.Add (userModel.userID, userModel);
+		PageNav.GetPageNavInstance ().PushPageToStackWithArgs (PagesEnum.EditResponsiblePopup, dict);
+	}
 
 	public void OnRemoveClick ()
 	{

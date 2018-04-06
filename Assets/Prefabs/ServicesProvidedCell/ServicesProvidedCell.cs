@@ -16,13 +16,18 @@ public class ServicesProvidedCell : MonoBehaviour
 		serviceCallback (serviceModel, toogle.isOn);
 	}
 
-	public static GameObject Instantiate (Transform CellPrefabTransform, ServicesProvidedModel user, Delegates.OnSelectServiceClick serviceClickCallback)
+	public static GameObject Instantiate (Transform CellPrefabTransform, ServicesProvidedModel service, Delegates.OnSelectServiceClick serviceClickCallback, bool isOn = false)
 	{
 		GameObject go = GameObject.Instantiate (CellPrefabTransform).gameObject;
 		var myServiceProvidedCellController = go.GetComponent<ServicesProvidedCell> ();
-		myServiceProvidedCellController.serviceName.text = user.name;
-		myServiceProvidedCellController.serviceModel = user;
+		var servicePrice = float.Parse (service.price) % 1;
+		string text = string.Format ("{0} - R${1},{2}", service.name, Mathf.Floor (float.Parse (service.price)), servicePrice.ToString ("00"));
+		myServiceProvidedCellController.serviceName.text = text;
+		myServiceProvidedCellController.serviceModel = service;
 		myServiceProvidedCellController.serviceCallback = serviceClickCallback;
+		if (isOn) {
+			go.GetComponentInChildren<Toggle> ().isOn = true;
+		}
 		return go;
 	}
 }

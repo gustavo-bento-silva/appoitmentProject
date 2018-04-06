@@ -59,12 +59,12 @@ public class DataManager : MonoBehaviour
 				GetAllDaysWorkedFromCompanyAsUser ();
 				GetAllInitWorkFromCompanyAsUser ();
 				GetAllEndWorkFromCompanyAsUser ();
-				companyData = user as CompanyModel;
+				companyData = new CompanyModel (user);
 			} else if (user.userType == Constants.UserType.Responsible.ToString ()) {
 				currentUser = new ResponsibleModel (user);
 				GetCompanyIDFromResponsibleAsUser ();
 				FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel muser) {
-					companyData = muser as CompanyModel;
+					companyData = new CompanyModel (muser);
 				});
 			} else {
 				currentUser = user;
@@ -257,6 +257,63 @@ public class DataManager : MonoBehaviour
 
 	}
 
+	public static void UpdateService (ServicesProvidedModel service, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		bool mError = false;
+		UpdateServiceCompany (service, delegate() {
+			GetAllResponsablesFromCompany (companyData.userID, delegate(List<ResponsibleModel> responsables) {
+				responsables.ForEach (x => {
+					UpdateServiceResponsible (service, x.userID, delegate() {
+						
+					}, delegate(string error) {
+						mError = true;
+					});
+				});
+				if (mError) {
+					fail ("");
+				} else {
+					success ();
+				}
+			});
+		}, delegate(string error) {
+			fail (error);
+		});
+
+	}
+
+	public static void UpdateResponsibleServices (ResponsibleModel responsible, List<ServicesProvidedModel> services, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		FireBaseManager.GetFireBaseInstance ().RemoveAllServcesFromResponsible (responsible.companyID, responsible, delegate() {
+			FireBaseManager.GetFireBaseInstance ().AddServicesToResponsible (responsible.companyID, responsible, services);
+			success ();
+		}, delegate(string error) {
+			fail (error);
+		});
+	}
+
+	static void UpdateServiceCompany (ServicesProvidedModel service, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		FireBaseManager.GetFireBaseInstance ().UpdateSeviceCompany (companyData.userID, service, delegate() {
+			success ();
+		}, delegate(string error) {
+			fail (error);
+		});
+	}
+
+	static void UpdateServiceResponsible (ServicesProvidedModel service, string responsibleID, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		FireBaseManager.GetFireBaseInstance ().UpdateSeviceResponsible (responsibleID, service, delegate() {
+			success ();
+		}, delegate(string error) {
+			fail (error);
+		});
+	}
+
+	static void GetAllResponsablesFromCompany (string companyID, Delegates.GetAllResponsibles getResponsibles)
+	{
+		FireBaseManager.GetFireBaseInstance ().GetAllResponsiblesFromCompany (companyID, getResponsibles);
+	}
+
 	static void GetAllResponsablesFromCompanyAsUser ()
 	{
 		Delegates.GetAllResponsibles getAllResponsiblesListener = (mresponsibles) => {
@@ -372,6 +429,11 @@ public class DataManager : MonoBehaviour
 				success ();
 			});
 		}, fail);
+	}
+
+	public static void RemoveServiceFromCompany (String companyID, String serviceID)
+	{
+		FireBaseManager.GetFireBaseInstance ().DeleteService (companyID, serviceID);
 	}
 
 	public static void RemoveServiceFromCompanyAsUser (String serviceID)

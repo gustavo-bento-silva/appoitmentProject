@@ -240,6 +240,8 @@ namespace PageNavFrameWork
 			_loadingPage.gameObject.SetActive (state);
 			if (state) {
 				StartTimer ();
+			} else {
+				loadingCountDownEnabled = false;
 			}
 		}
 
