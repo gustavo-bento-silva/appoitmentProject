@@ -17,6 +17,12 @@ public static class Constants
 		None
 	}
 
+	public enum MessageType
+	{
+		ScheduleAppointment,
+		RemoveAppointment
+	}
+
 	public static void LoadHomePage ()
 	{
 		SceneManager.LoadSceneAsync ("MainScene");
