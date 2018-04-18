@@ -8,6 +8,7 @@ public class CompanyCell : MonoBehaviour
 	
 	public Text companyName;
 	public Text companyAddress;
+	public Image companyImage;
 	public CompanyModel companyModel;
 	public int index;
 	public Delegates.OnSelectCompanyClick onSelectedCompanyclick;

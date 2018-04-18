@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class SelectCompanyController : PageController
 {
-
+	public InputField search;
 	public Transform cellPrefab;
 	public RectTransform scrollContentList;
 	public GameObject nullListMessage;
@@ -14,7 +14,7 @@ public class SelectCompanyController : PageController
 	public Dropdown dropDown;
 	public Text description;
 
-	Color selectedColor = new Color (27f / 255.0f, 184f / 255.0f, 157f / 255.0f);
+	Color selectedColor = new Color (213f / 255.0f, 204f / 255.0f, 84f / 255.0f);
 
 	List <GameObject> companyCell = new List<GameObject> ();
 
@@ -77,7 +77,7 @@ public class SelectCompanyController : PageController
 	{
 		DataManager.companyData = company;
 		ChangeSelectCompanyColor (index);
-		UpdateCompanyDescription (company);
+		PageNav.GetPageNavInstance ().PushPageToStack (PagesEnum.CalendarPage);
 	}
 
 	void ReadjustScrollSize (int size)
@@ -91,33 +91,30 @@ public class SelectCompanyController : PageController
 		scrollContentList.offsetMin = new Vector2 (0, -number);
 	}
 
-	void GetAllCompanies ()
-	{
-		FireBaseManager.GetFireBaseInstance ().GetAllCompanies (delegate(List<CompanyModel> companies) {
-			DataManager.companiesList = companies;
-			List<string> companiesName = new List<string> ();
-			companies.ForEach ((x) => companiesName.Add (x.name));
-			dropDown.ClearOptions ();
-			dropDown.AddOptions (companiesName);
-			OnCompanySelected ();
-			Loading = false;
-		}, delegate (string error) {
-			Loading = false;
-			Error = true;
-		});
-	}
-
 	void UpdateCompanyDescription (CompanyModel company)
 	{
 		description.text = string.Format ("{0}\nTelefone: {1}\n{2} - {3}", company.name, company.phone, company.address, company.city);
 		description.gameObject.SetActive (true);
 	}
 
-	public void OnCompanySelected ()
+	public void Search ()
 	{
-		Debug.Log (dropDown.value);
-		UpdateCompanyDescription (DataManager.companiesList [dropDown.value]);
-		DataManager.companyData = DataManager.companiesList [dropDown.value];
-		
+		if (!string.IsNullOrEmpty (search.text)) {
+			if (companyCell != null && companyCell.Count > 0) {
+				companyCell.ForEach (x => {
+					if (!x.GetComponent<CompanyCell> ().companyName.text.ToLower ().Contains (search.text.ToLower ())) {
+						x.SetActive (false);
+					} else {
+						x.SetActive (true);
+					}
+				});
+			}
+		} else {
+			if (companyCell != null && companyCell.Count > 0) {
+				companyCell.ForEach (x => {
+					x.SetActive (true);
+				});
+			}
+		}
 	}
 }
