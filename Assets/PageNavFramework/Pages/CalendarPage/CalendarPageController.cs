@@ -7,13 +7,26 @@ using UnityEngine.UI;
 
 public class CalendarPageController : PageController
 {
-
+	public GameObject container;
 	public Dropdown responsibleDropdown;
 	public Dropdown servicesDropdown;
 	public GameObject calendars;
 	public CalendarController[] calendarsController;
 
+	public Transform ResponsibleCellPrefab;
+	public RectTransform ResponsibleScrollContentList;
+
+	public Transform ServiceCellPrefab;
+	public RectTransform ServiceScrollContentList;
+
+	List<ResponsibleModel> responsibles = new List<ResponsibleModel> ();
+	List <GameObject> responsibleCell = new List<GameObject> ();
+
+	List<ServicesProvidedModel> services = new List<ServicesProvidedModel> ();
+	List <GameObject> servicesCell = new List<GameObject> ();
+
 	private int actualPositionIndex = 0;
+	private int actualPagePosition = 0;
 	private int positionXOffset = 1127;
 
 	void Start ()
@@ -23,25 +36,10 @@ public class CalendarPageController : PageController
 		DataManager.GetAllResponsablesFromCompany (getAllResponsibles);
 	}
 
-	void Update ()
-	{
-
-	}
-
 	void GetEmployerList (List<ResponsibleModel> responsiblesList)
 	{
 		DataManager.responsibles = responsiblesList;
-		List<String> namesList = new List<string> ();
-		responsibleDropdown.ClearOptions ();
-		foreach (var employee in responsiblesList) {
-			namesList.Add (employee.name);
-		}
-		
-		responsibleDropdown.AddOptions (namesList);
-		DataManager.currentResponsible = DataManager.responsibles [0];
 		GetAllServices ();
-		responsibleDropdown.onValueChanged.AddListener (GetEmployeeSelected);
-		FillCalendars ();
 	}
 
 	void FillCalendars ()
@@ -57,11 +55,53 @@ public class CalendarPageController : PageController
 		DataManager.GetServicesFromAllResponsibles (getAllResponsiblesWithServices);
 	}
 
-	void CallbackGetAllServices (List<ResponsibleModel> responsibles)
+	void CallbackGetAllServices (List<ResponsibleModel> mResponsibles)
 	{
-		FillDropDownServices ();
-		servicesDropdown.onValueChanged.AddListener (GetServiceSelected);
+		responsibles = mResponsibles;
+		FillEmployerList ();
 	}
+
+	void FillEmployerList ()
+	{
+		var index = 0;
+		responsibles.ForEach (x => {
+			responsibleCell.Add (SelectResponsibleCellController.Instantiate (ResponsibleCellPrefab, x, index, delegate(ResponsibleModel responsible, int mindex) {
+				OnResponsibleSelected (responsible, mindex);
+			}));
+			index++;
+		});
+		StartCoroutine (OnFillEmployerList ());
+	}
+
+	IEnumerator OnFillEmployerList ()
+	{
+		yield return new WaitForSeconds (1f);
+		responsibleCell.ForEach (x => x.transform.SetParent (ResponsibleScrollContentList, false));
+		ReadjustScrollSize (responsibleCell.Count);
+		Loading = false;
+	}
+
+	void FillServiceList ()
+	{
+		Loading = true;
+		var index = 0;
+		services.ForEach (x => {
+			servicesCell.Add (SelectServiceCellController.Instantiate (ServiceCellPrefab, x, index, delegate(ServicesProvidedModel serviceprovided, int mIndex) {
+				OnServiceSelected (serviceprovided, mIndex);
+			}));
+			index++;
+		});
+		StartCoroutine (OnFillServiceList ());
+	}
+
+	IEnumerator OnFillServiceList ()
+	{
+		yield return new WaitForSeconds (1f);
+		servicesCell.ForEach (x => x.transform.SetParent (ServiceScrollContentList, false));
+		ReadjustScrollSize (servicesCell.Count);
+		Loading = false;
+	}
+
 
 	void FillDropDownServices ()
 	{
@@ -90,12 +130,51 @@ public class CalendarPageController : PageController
 		Loading = false;
 	}
 
-	void GetEmployeeSelected (int newPosition)
+	public void OnServiceSelected (ServicesProvidedModel service, int index)
 	{
-		Loading = true;
-		DataManager.currentResponsible = DataManager.responsibles [newPosition];
-		FillDropDownServices ();
+		DataManager.currentservice = service;
+		GoToNextPage ();
+	}
+
+	public void OnResponsibleSelected (ResponsibleModel responsible, int index)
+	{
+		DataManager.currentResponsible = responsible;
+		services.Clear ();
+		foreach (var key in responsible.servicesProvided.Keys) {
+			services.Add ((ServicesProvidedModel)responsible.servicesProvided [key]);
+		}
 		FillCalendars ();
+		FillServiceList ();
+		GoToNextPage ();
+	}
+
+	public void GoToNextPage ()
+	{
+		actualPagePosition++;
+		var position = container.transform.localPosition.x - 1451.8f;
+		iTween.MoveTo (container, iTween.Hash ("x", position, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInOutBack));
+	}
+
+	public void GoToPrevioslyPage ()
+	{
+		if (actualPagePosition == 2) {
+			GoCalendarsToOriginalPosition ();
+		}
+		actualPagePosition--;
+		var position = container.transform.localPosition.x + 1451.8f;
+		iTween.MoveTo (container, iTween.Hash ("x", position, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInOutBack));
+	}
+
+	public void GoCalendarsToOriginalPosition ()
+	{
+		var myOffset = 0;
+		if (actualPositionIndex == 2) {
+			myOffset = 2 * positionXOffset;
+		} else if (actualPositionIndex == 1) {
+			myOffset = positionXOffset;
+		} 
+		var position = calendars.transform.localPosition.x + myOffset;
+		iTween.MoveTo (calendars, iTween.Hash ("x", position, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInOutBack));
 	}
 
 	public void OnNextButtonClick ()
@@ -111,6 +190,17 @@ public class CalendarPageController : PageController
 		var position = calendars.transform.localPosition.x + positionXOffset;
 		iTween.MoveTo (calendars, iTween.Hash ("x", position, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInOutBack));
 		
+	}
+
+	void ReadjustScrollSize (int size)
+	{
+		ResponsibleScrollContentList.anchorMax = new Vector2 (1, 1);
+		ResponsibleScrollContentList.anchorMin = new Vector2 (0, 1);
+
+		ResponsibleScrollContentList.offsetMax = new Vector2 (0, 0);
+		var number = (((RectTransform)ResponsibleCellPrefab).rect.height * (size + 1));
+
+		ResponsibleScrollContentList.offsetMin = new Vector2 (0, -number);
 	}
 		
 }

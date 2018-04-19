@@ -44,6 +44,10 @@ public static class Delegates
 
 	public delegate void OnSelectCompanyClick (CompanyModel company, int index);
 
+	public delegate void OnSelectResponsibleClick (ResponsibleModel company, int index);
+
+	public delegate void OnSelectServiceFromResponsibleClick (ServicesProvidedModel serviceprovided, int index);
+
 	public delegate void OnSelectServiceClick (ServicesProvidedModel serviceprovided, bool status);
 
 
