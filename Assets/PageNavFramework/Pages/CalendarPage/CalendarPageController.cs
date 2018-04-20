@@ -168,11 +168,7 @@ public class CalendarPageController : PageController
 	public void GoCalendarsToOriginalPosition ()
 	{
 		var myOffset = 0;
-		if (actualPositionIndex == 2) {
-			myOffset = 2 * positionXOffset;
-		} else if (actualPositionIndex == 1) {
-			myOffset = positionXOffset;
-		} 
+		myOffset = actualPositionIndex * positionXOffset;
 		var position = calendars.transform.localPosition.x + myOffset;
 		iTween.MoveTo (calendars, iTween.Hash ("x", position, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInOutBack));
 	}

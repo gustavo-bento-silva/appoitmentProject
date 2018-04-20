@@ -8,6 +8,8 @@ public class MyAppointmentController : MonoBehaviour
 {
 
 	public Text time;
+	public Text day;
+	public Text month;
 	public Text description;
 	public AppointmentModel appointment;
 
@@ -20,13 +22,17 @@ public class MyAppointmentController : MonoBehaviour
 
 	}
 
-	public static GameObject Instantiate (Transform CellPrefabTransform, string time, string service, string responsible, AppointmentModel appointment)
+	public static GameObject Instantiate (Transform CellPrefabTransform, string day, string month, string time, string service, string responsible, AppointmentModel appointment)
 	{
 		GameObject go = GameObject.Instantiate (CellPrefabTransform).gameObject;
 		var myAppointmentController = go.GetComponent<MyAppointmentController> ();
-		myAppointmentController.description.text = string.Format ("{0} \n {1}", responsible, service);
+		myAppointmentController.description.text = string.Format ("{0}\n{1}", responsible, service);
+		myAppointmentController.day.text = day;
+		myAppointmentController.month.text = month;
 		myAppointmentController.time.text = time;
 		myAppointmentController.appointment = appointment;
 		return go;
 	}
+
+
 }

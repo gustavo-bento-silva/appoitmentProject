@@ -40,6 +40,7 @@ public class MessagesPageController : PageController
 	void FillList ()
 	{
 		DataManager.userMessages.ForEach (x => messageCell.Add (MessageCellControler.Instantiate (cellPrefab, x.message, x)));
+		messageCell.Reverse ();
 		StartCoroutine (OnFillList ());
 	}
 

@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using PageNavFrameWork;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class CreateNewClientPageController : PageController
 {
@@ -9,6 +10,8 @@ public class CreateNewClientPageController : PageController
 	public GameObject userNameError;
 	public Text phone;
 	public GameObject phoneError;
+
+	bool isFromClientsPage = false;
 
 	bool VerifyErrors ()
 	{
@@ -33,11 +36,21 @@ public class CreateNewClientPageController : PageController
 			Loading = true;
 			DataManager.CreateNewClientToCompany (userName.text, phone.text, delegate {
 				Loading = false;
+				if (isFromClientsPage) {
+					Constants.LoadHomePage ();
+				}
 				CloseModal ();
 			}, delegate(string error) {
 				Loading = false;
 				CloseModal ();
 			});
+		}
+	}
+
+	public override void InstantiatedWithArgs (Dictionary<string,object> args)
+	{
+		foreach (var key in args.Keys) {
+			isFromClientsPage = (bool)args [key];
 		}
 	}
 }

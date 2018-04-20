@@ -33,6 +33,7 @@ public class HomePageController : PageController
 
 	void LoadClientHome ()
 	{
+		MainPageController.GetMainPageINstance ().SetClientMenu ();
 		newAppointmentButton.SetActive (true);
 		myAppointments.SetActive (true);
 		myMessages.SetActive (true);
@@ -41,6 +42,7 @@ public class HomePageController : PageController
 
 	void LoadCompanyHome ()
 	{
+		MainPageController.GetMainPageINstance ().SetCompanyMenu ();
 		newAppointmentButton.SetActive (true);
 		myAppointments.SetActive (true);
 		myMessages.SetActive (true);
@@ -58,6 +60,7 @@ public class HomePageController : PageController
 
 	void LoadResponsibleHome ()
 	{
+		MainPageController.GetMainPageINstance ().SetResponsibleMenu ();
 		newAppointmentButton.SetActive (true);
 		myAppointments.SetActive (true);
 		myMessages.SetActive (true);

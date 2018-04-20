@@ -46,6 +46,7 @@ public class EditResponsiblePopupController : PageController
 		Loading = true;
 		selectServiceDelegate = HandleOnSelectServiceClick;
 		if ((DataManager.currentUser as CompanyModel).servicesProvided != null) {
+			servicesProvidedList.Clear ();
 			foreach (var key in (DataManager.currentUser as CompanyModel).servicesProvided.Keys) {
 				servicesProvidedList.Add ((ServicesProvidedModel)(DataManager.currentUser as CompanyModel).servicesProvided [key]);
 			}
@@ -61,6 +62,7 @@ public class EditResponsiblePopupController : PageController
 	{
 		int index = 0;
 		List<ServicesProvidedModel> services = new List<ServicesProvidedModel> ();
+		services.Clear ();
 		servicesProvidedByResponsible.ForEach (x => {
 			if (x) {
 				services.Add (servicesProvidedList [index]);
@@ -80,6 +82,9 @@ public class EditResponsiblePopupController : PageController
 
 	void FillServicesList ()
 	{
+		servicesProvidedCell.Clear ();
+		servicesProvidedByResponsible.Clear ();
+
 		servicesProvidedList.ForEach (x => {
 			if (responsible.servicesProvided.ContainsKey (x.serviceID)) {
 				var cell = ServicesProvidedCell.Instantiate (cellPrefab, x, selectServiceDelegate, true);

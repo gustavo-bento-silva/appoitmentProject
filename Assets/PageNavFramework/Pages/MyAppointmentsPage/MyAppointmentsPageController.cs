@@ -4,16 +4,33 @@ using PageNavFrameWork;
 using System.Collections.Generic;
 using System.Globalization;
 using System;
+using UnityEngine.UI;
 
 public class MyAppointmentsPageController : PageController
 {
 
+	const string todayNullMessage = "Você não possui nenhum agendamento para hoje!";
+	const string weekNullMessage = "Você não possui nenhum agendamento para essa semana!";
+	const string allNullMessage = "Você não possui nenhum agendamento.";
+
 	public Transform cellPrefab;
 	public RectTransform scrollContentList;
 	public GameObject nullListMessage;
+	public GameObject imageBar;
+	public Text[] tabsText;
 
 	List <GameObject> appointmentsCell = new List<GameObject> ();
 	List<AppointmentModel> appointmentsList = new List<AppointmentModel> ();
+
+	float xPositionOffset = 394f;
+	int actualPositionIndex = 0;
+
+	public enum AppointmentDate
+	{
+		Today,
+		Week,
+		All
+	}
 
 	void Start ()
 	{
@@ -53,9 +70,17 @@ public class MyAppointmentsPageController : PageController
 
 //		appointmentsList.Sort ((first, second) => (first.data.CompareTo (second.data)));
 		if (DataManager.currentUser.userType == Constants.UserType.Responsible.ToString ()) {
-			appointmentsList.ForEach (x => appointmentsCell.Add (MyAppointmentController.Instantiate (cellPrefab, string.Format ("{0} \n {1}:{2}h", x.data, x.hour, x.minute.ToString ("00")), x.description, x.userName, x)));
+			appointmentsList.ForEach (x => {
+				var data = x.data.Split ('-');
+				var month = GetMonth (int.Parse (data [1]));
+				appointmentsCell.Add (MyAppointmentController.Instantiate (cellPrefab, data [0], month, string.Format ("{0}:{1}h", x.hour, x.minute.ToString ("00")), x.description, x.userName, x));
+			});
 		} else {
-			appointmentsList.ForEach (x => appointmentsCell.Add (MyAppointmentController.Instantiate (cellPrefab, string.Format ("{0} \n {1}:{2}h", x.data, x.hour, x.minute.ToString ("00")), x.description, x.responsibleName, x)));
+			appointmentsList.ForEach (x => {
+				var data = x.data.Split ('-');
+				var month = GetMonth (int.Parse (data [1]));
+				appointmentsCell.Add (MyAppointmentController.Instantiate (cellPrefab, data [0], month, string.Format ("{0}:{1}h", x.hour, x.minute.ToString ("00")), x.description, x.responsibleName, x));
+			});
 		}
 		StartCoroutine (OnFillList ());
 	}
@@ -66,7 +91,144 @@ public class MyAppointmentsPageController : PageController
 		appointmentsCell.ForEach (x => x.transform.SetParent (scrollContentList, false));
 		ReadjustScrollSize (appointmentsCell.Count);
 		DataManager.SetMyAppointmentsAsRead ();
+		OnTodayClick ();
 		Loading = false;
+	}
+
+	public void changeTabsColor (int mIndex)
+	{
+		var index = 0;
+
+		foreach (var text in tabsText) {
+			var color = text.color;
+			if (index != mIndex) {
+				color.a = 0.5f;
+			} else {
+				color.a = 1;
+			}
+			text.color = color;
+			index++;
+		}
+	}
+
+	public void OnTodayClick ()
+	{
+		var mIndex = 0;
+		MoveBar (mIndex);
+		changeTabsColor (mIndex);
+		Filter (AppointmentDate.Today);
+	}
+
+	public void OnWeekClick ()
+	{
+		var mIndex = 1;
+		MoveBar (mIndex);
+		changeTabsColor (mIndex);
+		Filter (AppointmentDate.Week);
+	}
+
+	public void OnAllClick ()
+	{
+		var mIndex = 2;
+		MoveBar (mIndex);
+		changeTabsColor (mIndex);
+		Filter (AppointmentDate.All);
+	}
+
+	public void MoveBar (int position)
+	{
+		var diference = (position - actualPositionIndex);
+		if (diference < 0) {
+			actualPositionIndex--;
+		} else if (diference > 0) {
+			actualPositionIndex++;
+		}
+
+		var mPosition = imageBar.transform.localPosition.x + (diference * xPositionOffset);
+		iTween.MoveTo (imageBar, iTween.Hash ("x", mPosition, "islocal", true, "time", 0.4, "easetype", iTween.EaseType.easeOutBack));
+	}
+
+	public void Filter (AppointmentDate appointmentDate)
+	{
+		bool hasOneAtLeast = false;
+		CultureInfo provider = new CultureInfo ("pt-BR");
+
+		if (appointmentsCell != null && appointmentsCell.Count > 0) {
+			switch (appointmentDate) {
+			case AppointmentDate.Today:
+				nullListMessage.GetComponent<Text> ().text = todayNullMessage;
+				appointmentsCell.ForEach (x => {
+					DateTime data = DateTime.ParseExact (x.GetComponent<MyAppointmentController> ().appointment.data, Constants.dateformat, provider);
+					DateTime now = DateTime.Now;
+					if (data.Day == now.Day && data.Month == now.Month && data.Year == now.Year) {
+						hasOneAtLeast = true;
+						x.SetActive (true);
+					} else {
+						x.SetActive (false);
+					}
+				});
+				break;
+
+			case AppointmentDate.Week:
+				nullListMessage.GetComponent<Text> ().text = weekNullMessage;
+				appointmentsCell.ForEach (x => {
+					DateTime data = DateTime.ParseExact (x.GetComponent<MyAppointmentController> ().appointment.data, Constants.dateformat, provider);
+					if ((data - DateTime.Now).TotalDays <= 7) {
+						hasOneAtLeast = true;
+						x.SetActive (true);
+					} else {
+						x.SetActive (false);
+					}
+				});
+				break;
+
+			case AppointmentDate.All:
+				nullListMessage.GetComponent<Text> ().text = allNullMessage;
+				appointmentsCell.ForEach (x => {
+					hasOneAtLeast = true;
+					x.SetActive (true);
+				});
+				break;
+			}
+		}
+
+		if (!hasOneAtLeast) {
+			nullListMessage.SetActive (true);
+		} else {
+			nullListMessage.SetActive (false);
+		}
+	}
+
+	String GetMonth (int month)
+	{
+		switch (month) {
+		case 1:
+			return "Jan";
+		case 2:
+			return "Fev";
+		case 3:
+			return "Mar";
+		case 4:
+			return "Abr";
+		case 5:
+			return "Mai";
+		case 6:
+			return "Jun";
+		case 7:
+			return "Jul";
+		case 8:
+			return "Ago";
+		case 9:
+			return "Set";
+		case 10:
+			return "Out";
+		case 11:
+			return "Nov";
+		case 12:
+			return "Dez";
+
+		}
+		return "";
 	}
 
 	void ReadjustScrollSize (int size)

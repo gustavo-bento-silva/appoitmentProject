@@ -15,7 +15,6 @@ public class SelectClientPopupController : PageController
 
 	List <GameObject> userCell = new List<GameObject> ();
 	List<UserModel> clientsList = new List<UserModel> ();
-	UserModel userSelected;
 
 	void Start ()
 	{
@@ -69,7 +68,9 @@ public class SelectClientPopupController : PageController
 
 	void FillList ()
 	{
-		clientsList.ForEach (x => userCell.Add (ClientCellController.Instantiate (cellPrefab, x)));
+		clientsList.ForEach (x => userCell.Add (ClientCellController.Instantiate (cellPrefab, x, delegate(UserModel user) {
+			OnNextButtonClicked (user);
+		})));
 		StartCoroutine (OnFillList ());
 	}
 
@@ -78,7 +79,6 @@ public class SelectClientPopupController : PageController
 		yield return new WaitForSeconds (1f);
 		userCell.ForEach (x => {
 			x.transform.SetParent (scrollContentList, false);
-			x.GetComponent<Button> ().onClick.AddListener (() => OnClientSelectedClick (x));
 		});
 		ReadjustScrollSize (userCell.Count);
 		Loading = false;
@@ -95,16 +95,10 @@ public class SelectClientPopupController : PageController
 		scrollContentList.offsetMin = new Vector2 (0, -number);
 	}
 
-	public void OnClientSelectedClick (GameObject client)
-	{
-		userSelected = client.GetComponent<ClientCellController> ().userModel;
-		nextButton.interactable = true;
-	}
-
-	public void OnNextButtonClicked ()
+	public void OnNextButtonClicked (UserModel client)
 	{
 		Loading = true;
-		DataManager.CreateNewAppointment (userSelected, delegate {
+		DataManager.CreateNewAppointment (client, delegate {
 			Loading = false;
 			DropAllPagesFromStack ();
 			StartCoroutine (MyCloseModal ());

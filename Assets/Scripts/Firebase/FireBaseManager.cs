@@ -273,6 +273,18 @@ public class FireBaseManager : MonoBehaviour
 		});
 	}
 
+	public void DeleteClientToCompany (string companyID, UserModel userModel, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		reference.Child (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.clients.ToString ()).Child (userModel.userID).RemoveValueAsync ().ContinueWith (task => {
+			if (task.IsFaulted) {
+				fail (task.Exception.ToString ());
+			} else if (task.IsCompleted) {
+				success ();
+			}
+		});
+		
+	}
+
 	public UserModel CreateNewClient (string name, string phone)
 	{
 		string userID = reference.Child (DBTable.User.ToString ()).Push ().Key;
@@ -665,11 +677,11 @@ public class FireBaseManager : MonoBehaviour
 			if (task.IsFaulted) {
 				fail (task.Exception.ToString ());
 			} else {
-				FirebaseDatabase.DefaultInstance.GetReference (DBTable.User.ToString ()).Child (appointment.userID).Child (Parameters.appointments.ToString ()).RemoveValueAsync ().ContinueWith (task2 => {
+				FirebaseDatabase.DefaultInstance.GetReference (DBTable.User.ToString ()).Child (appointment.userID).Child (Parameters.appointments.ToString ()).Child (appointment.appointmentID).RemoveValueAsync ().ContinueWith (task2 => {
 					if (task2.IsFaulted) {
 						fail (task2.Exception.ToString ());
 					} else {
-						FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsible.ToString ()).Child (appointment.responsableID).Child (Parameters.appointments.ToString ()).RemoveValueAsync ().ContinueWith (task3 => {
+						FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsible.ToString ()).Child (appointment.responsableID).Child (Parameters.appointments.ToString ()).Child (appointment.appointmentID).RemoveValueAsync ().ContinueWith (task3 => {
 							if (task3.IsFaulted) {
 								fail (task3.Exception.ToString ());
 							} else {

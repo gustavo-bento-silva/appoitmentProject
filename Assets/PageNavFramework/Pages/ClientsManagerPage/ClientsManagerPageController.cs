@@ -16,8 +16,8 @@ public class ClientsManagerPageController : PageController
 	void Start ()
 	{
 		Loading = true;
-		if (DataManager.responsibles != null) {
-			if (DataManager.responsibles.Count != 0) {
+		if ((DataManager.currentUser as CompanyModel).clients != null) {
+			if ((DataManager.currentUser as CompanyModel).clients.Count != 0) {
 				foreach (var clientKey in (DataManager.currentUser as CompanyModel).clients.Keys) {
 					clientsList.Add ((UserModel)(DataManager.currentUser as CompanyModel).clients [clientKey]);
 				}
@@ -34,7 +34,9 @@ public class ClientsManagerPageController : PageController
 
 	void FillList ()
 	{
-		clientsList.ForEach (x => userCell.Add (ClientCellController.Instantiate (cellPrefab, x)));
+		clientsList.ForEach (x => userCell.Add (ClientCellController.Instantiate (cellPrefab, x, delegate(UserModel user) {
+			
+		})));
 		StartCoroutine (OnFillList ());
 	}
 
@@ -55,5 +57,12 @@ public class ClientsManagerPageController : PageController
 		var number = (((RectTransform)cellPrefab).rect.height * (size + 1));
 
 		scrollContentList.offsetMin = new Vector2 (0, -number);
+	}
+
+	public void CreateNewClientPageWithArgs ()
+	{
+		var dict = new Dictionary<string, object> ();
+		dict.Add ("0", true);
+		PageNav.GetPageNavInstance ().PushPageToStackWithArgs (PagesEnum.CreateNewClientPage, dict);
 	}
 }

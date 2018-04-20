@@ -23,16 +23,29 @@ public class ConfirmDeleteAppointmentPopupController : PageController
 	public void OnYesClick ()
 	{
 		Loading = true;
-		DataManager.RemoveAppointmentFromUser (appointment, delegate {
-			Loading = false;
-			CloseModal ();
-			Constants.LoadHomePage ();
-		}, delegate(string error) {
-			Loading = false;
-			Error = true;
-			CloseModal ();
-			Constants.LoadHomePage ();
-		});
+		if (DataManager.currentUser.userType == Constants.UserType.Responsible.ToString ()) {
+			DataManager.RemoveAppointmentFromResponsible (appointment, delegate {
+				Loading = false;
+				CloseModal ();
+				Constants.LoadHomePage ();
+			}, delegate(string error) {
+				Loading = false;
+				Error = true;
+				CloseModal ();
+				Constants.LoadHomePage ();
+			});
+		} else {
+			DataManager.RemoveAppointmentFromUser (appointment, delegate {
+				Loading = false;
+				CloseModal ();
+				Constants.LoadHomePage ();
+			}, delegate(string error) {
+				Loading = false;
+				Error = true;
+				CloseModal ();
+				Constants.LoadHomePage ();
+			});
+		}
 	}
 
 	public void OnNoClick ()

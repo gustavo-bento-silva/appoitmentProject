@@ -14,6 +14,11 @@ public class MainPageController : MonoBehaviour
 
 	public static MainPageController _instance;
 
+	public GameObject myAppointment;
+	public GameObject manageResponsible;
+	public GameObject manageServices;
+	public GameObject manageClients;
+
 	public Text userName;
 	public Canvas canvas;
 	public GameObject menu;
@@ -40,6 +45,24 @@ public class MainPageController : MonoBehaviour
 		if (DataManager.currentUser != null) {
 			userName.text = DataManager.currentUser.name;
 		}
+	}
+
+	public void SetClientMenu ()
+	{
+		manageResponsible.SetActive (false);
+		manageServices.SetActive (false);
+		manageClients.SetActive (false);
+	}
+
+	public void SetCompanyMenu ()
+	{
+		myAppointment.SetActive (false);
+	}
+
+	public void SetResponsibleMenu ()
+	{
+		manageResponsible.SetActive (false);
+		manageServices.SetActive (false);
 	}
 
 	public void OnHomeClick ()
@@ -70,6 +93,19 @@ public class MainPageController : MonoBehaviour
 	public void OnServicesManagerClick ()
 	{
 		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.ManageServicesProvided);
+		OnMenuClick ();
+	}
+
+
+	public void OnClientsManagerClick ()
+	{
+		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.ClientsManagerPage);
+		OnMenuClick ();
+	}
+
+	public void OnResponsiblesManagerClick ()
+	{
+		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.ManageResponsiblePage);
 		OnMenuClick ();
 	}
 

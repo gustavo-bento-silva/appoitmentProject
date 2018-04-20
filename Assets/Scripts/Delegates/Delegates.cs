@@ -48,6 +48,8 @@ public static class Delegates
 
 	public delegate void OnSelectServiceFromResponsibleClick (ServicesProvidedModel serviceprovided, int index);
 
+	public delegate void OnSelectClientClick (UserModel user);
+
 	public delegate void OnSelectServiceClick (ServicesProvidedModel serviceprovided, bool status);
 
 

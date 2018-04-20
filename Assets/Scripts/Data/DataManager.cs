@@ -46,10 +46,8 @@ public class DataManager : MonoBehaviour
 	{
 //		Empresa:
 		string ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
-//		Thamyris:
-//		string ID = "uWkT3ATlOPdxIjfUYEH4ybb2hf33";
-//		Gustavo:
-//		string ID = "DUN4RgbN6EZNvFPxAPwFrJoIggq1";
+//		Gabriel:
+//		string ID = "pXUabzqkutUNJM6418MfCQ43YwC3";
 		FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel user) {
 			if (user.userType == Constants.UserType.Company.ToString ()) {
 				currentUser = new CompanyModel (user);
@@ -124,6 +122,14 @@ public class DataManager : MonoBehaviour
 			mPhone = (currentUser as CompanyModel).phone;
 		}
 		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (reponsibleID, (currentUser as CompanyModel).userID, name, services, daysWorked, initTime, finishTime, mPhone));
+	}
+
+	public static void DeleteClient (UserModel client, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		FireBaseManager.GetFireBaseInstance ().DeleteClientToCompany (currentUser.userID, client, delegate() {
+			(currentUser as CompanyModel).clients.Remove (client.userID);
+			success ();
+		}, fail);
 	}
 
 	public static void CreateNewClientToCompany (string name, string phone, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
@@ -246,7 +252,7 @@ public class DataManager : MonoBehaviour
 				fail (error);
 			});
 		} else if (from.userType == Constants.UserType.Client.ToString ()) {
-			FireBaseManager.GetFireBaseInstance ().CreateNewMessageScheduleByCompany (mMessage, toID, currentUser.userID, delegate() {
+			FireBaseManager.GetFireBaseInstance ().CreateNewMessageScheduleByCompany (mMessage, toID, currentResponsible.companyID, delegate() {
 				success ();
 			}, delegate(string error) {
 				fail (error);
