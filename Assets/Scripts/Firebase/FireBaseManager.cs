@@ -220,7 +220,9 @@ public class FireBaseManager : MonoBehaviour
 	public void AddServicesToResponsible (string companyID, ResponsibleModel responsible, List<ServicesProvidedModel> services)
 	{
 		foreach (var service in services) {
-			responsible.servicesProvided.Add (service.serviceID, (object)service);
+			if (!responsible.servicesProvided.ContainsKey (service.serviceID)) {
+				responsible.servicesProvided.Add (service.serviceID, (object)service);
+			}
 			string json = JsonUtility.ToJson (service);
 			reference.Child (DBTable.Responsible.ToString ()).Child (responsible.userID).Child (Parameters.servicesProvided.ToString ()).Child (service.serviceID).SetRawJsonValueAsync (json);
 			reference.Child (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.responsibles.ToString ()).Child (responsible.userID).Child (Parameters.servicesProvided.ToString ()).Child (service.serviceID).SetRawJsonValueAsync (json);

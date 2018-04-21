@@ -431,6 +431,7 @@ public class DataManager : MonoBehaviour
 	{
 		FirebaseAPIHelper.GetFireBaseAPIHelperInstance ().RemoveUser (user.userID, delegate() {
 			FireBaseManager.GetFireBaseInstance ().RemoveResponsibleFromCompany (currentUser.userID, user.userID, user.userType, delegate() {
+				responsibles.Remove (user as ResponsibleModel);
 				GetAllResponsablesFromCompanyAsUser ();
 				success ();
 			});

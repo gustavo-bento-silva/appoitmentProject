@@ -52,6 +52,8 @@ public static class Delegates
 
 	public delegate void OnSelectServiceClick (ServicesProvidedModel serviceprovided, bool status);
 
+	public delegate void OnSpriteSuccess (Sprite sprite);
 
-	
+
+
 }
