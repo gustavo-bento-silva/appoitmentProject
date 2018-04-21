@@ -2,14 +2,16 @@ using UnityEngine;
 using System.Collections;
 using PageNavFrameWork;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class ConfirmDeleteUserPopUpController : PageController
 {
+	public Text message;
 	UserModel user;
 
 	void Start ()
 	{
-
+		message.text = string.Format ("Deseja relamente deletar a conta de {0}?", user.name);
 	}
 
 	public void OnYesClick ()

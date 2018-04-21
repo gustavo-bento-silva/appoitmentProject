@@ -16,10 +16,19 @@ public class ClientsManagerPageController : PageController
 	void Start ()
 	{
 		Loading = true;
-		if ((DataManager.currentUser as CompanyModel).clients != null) {
-			if ((DataManager.currentUser as CompanyModel).clients.Count != 0) {
-				foreach (var clientKey in (DataManager.currentUser as CompanyModel).clients.Keys) {
-					clientsList.Add ((UserModel)(DataManager.currentUser as CompanyModel).clients [clientKey]);
+		if (DataManager.currentUser.userType == Constants.UserType.Company.ToString ()) {
+			CaseUserAsCompany ((DataManager.currentUser as CompanyModel));
+		} else {
+			CaseUserAsResponsible ();
+		}
+	}
+
+	void CaseUserAsCompany (CompanyModel user)
+	{
+		if (user.clients != null) {
+			if (user.clients.Count != 0) {
+				foreach (var clientKey in user.clients.Keys) {
+					clientsList.Add ((UserModel)user.clients [clientKey]);
 				}
 				FillList ();
 			} else {
@@ -30,6 +39,17 @@ public class ClientsManagerPageController : PageController
 			nullListMessage.SetActive (true);
 			Loading = false;
 		}
+	}
+
+	void CaseUserAsResponsible ()
+	{
+		DataManager.GetUserById ((DataManager.currentUser as ResponsibleModel).companyID, delegate(UserModel user) {
+			CompanyModel company = new CompanyModel (user);
+			DataManager.GetAllClientsFromCompany (user.userID, delegate(List<UserModel> users) {
+				users.ForEach (x => company.clients.Add (x.userID, (object)x));
+				CaseUserAsCompany (company);
+			});
+		});
 	}
 
 	void FillList ()

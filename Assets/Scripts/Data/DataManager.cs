@@ -45,9 +45,9 @@ public class DataManager : MonoBehaviour
 	public static void LoadUserInfoAux (Delegates.GeneralListenerSuccess success)
 	{
 //		Empresa:
-		string ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
-//		Gabriel:
-//		string ID = "pXUabzqkutUNJM6418MfCQ43YwC3";
+//		string ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
+//		Gustavo:
+		string ID = "4VpwAC7NBjVSW3ab86sgAnG1mC83";
 		FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel user) {
 			if (user.userType == Constants.UserType.Company.ToString ()) {
 				currentUser = new CompanyModel (user);
@@ -446,6 +446,11 @@ public class DataManager : MonoBehaviour
 	public static void RemoveServiceFromCompanyAsUser (String serviceID)
 	{
 		FireBaseManager.GetFireBaseInstance ().DeleteService (currentUser.userID, serviceID);
+	}
+
+	public static void JustRemoveAppointmentWithouMessage (AppointmentModel appointment, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		FireBaseManager.GetFireBaseInstance ().DeleteAppointment (appointment, success, fail);
 	}
 
 	public static void RemoveAppointmentFromResponsible (AppointmentModel appointment, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)

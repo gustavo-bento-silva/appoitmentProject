@@ -47,6 +47,7 @@ public class MyAppointmentsPageController : PageController
 		Loading = true;
 		if (DataManager.currentUser != null) {
 			if (DataManager.currentUser.appoitments.Count >= 1) {
+				ClearAppointments ();
 				nullListMessage.SetActive (false);
 				FillList ();
 			} else {
@@ -56,6 +57,20 @@ public class MyAppointmentsPageController : PageController
 		} else {
 			nullListMessage.SetActive (true);
 			Loading = false;
+		}
+	}
+
+	void ClearAppointments ()
+	{
+		CultureInfo provider = new CultureInfo ("pt-BR");
+		foreach (var key in DataManager.currentUser.appoitments.Keys) {
+			AppointmentModel appointment = (AppointmentModel)DataManager.currentUser.appoitments [key];
+			if (DateTime.ParseExact (appointment.data, Constants.dateformat, provider).CompareTo (DateTime.Now) < 0) {
+				DataManager.JustRemoveAppointmentWithouMessage (appointment, delegate() {
+				}, delegate(string error) {
+					
+				});
+			}
 		}
 	}
 
