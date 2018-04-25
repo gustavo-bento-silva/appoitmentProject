@@ -57,6 +57,7 @@ public class CalendarPageController : PageController
 
 	void CallbackGetAllServices (List<ResponsibleModel> mResponsibles)
 	{
+		responsibles.Clear ();
 		responsibles = mResponsibles;
 		FillEmployerList ();
 	}
@@ -84,6 +85,10 @@ public class CalendarPageController : PageController
 	void FillServiceList ()
 	{
 		Loading = true;
+		if (servicesCell.Count > 0) {
+			servicesCell.ForEach (x => GameObject.Destroy (x));
+		}
+		servicesCell.Clear ();
 		var index = 0;
 		services.ForEach (x => {
 			servicesCell.Add (SelectServiceCellController.Instantiate (ServiceCellPrefab, x, index, delegate(ServicesProvidedModel serviceprovided, int mIndex) {
@@ -167,10 +172,7 @@ public class CalendarPageController : PageController
 
 	public void GoCalendarsToOriginalPosition ()
 	{
-		var myOffset = 0;
-		myOffset = actualPositionIndex * positionXOffset;
-		var position = calendars.transform.localPosition.x + myOffset;
-		iTween.MoveTo (calendars, iTween.Hash ("x", position, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInOutBack));
+		iTween.MoveTo (calendars, iTween.Hash ("x", 0, "islocal", true, "time", 0.5, "easetype", iTween.EaseType.easeInOutBack));
 	}
 
 	public void OnNextButtonClick ()

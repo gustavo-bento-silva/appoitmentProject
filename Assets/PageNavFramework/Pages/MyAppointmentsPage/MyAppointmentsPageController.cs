@@ -65,7 +65,8 @@ public class MyAppointmentsPageController : PageController
 		CultureInfo provider = new CultureInfo ("pt-BR");
 		foreach (var key in DataManager.currentUser.appoitments.Keys) {
 			AppointmentModel appointment = (AppointmentModel)DataManager.currentUser.appoitments [key];
-			if (DateTime.ParseExact (appointment.data, Constants.dateformat, provider).CompareTo (DateTime.Now) < 0) {
+			DateTime date = DateTime.ParseExact (appointment.data, Constants.dateformat, provider).AddHours (appointment.hour).AddMinutes (appointment.minute);
+			if (date.CompareTo (DateTime.Now) < 0) {
 				DataManager.JustRemoveAppointmentWithouMessage (appointment, delegate() {
 				}, delegate(string error) {
 					

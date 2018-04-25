@@ -45,9 +45,9 @@ public class DataManager : MonoBehaviour
 	public static void LoadUserInfoAux (Delegates.GeneralListenerSuccess success)
 	{
 //		Empresa:
-//		string ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
+		string ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
 //		Gustavo:
-		string ID = "4VpwAC7NBjVSW3ab86sgAnG1mC83";
+//		string ID = "4VpwAC7NBjVSW3ab86sgAnG1mC83";
 		FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel user) {
 			if (user.userType == Constants.UserType.Company.ToString ()) {
 				currentUser = new CompanyModel (user);
@@ -68,6 +68,7 @@ public class DataManager : MonoBehaviour
 				currentUser = user;
 			}
 			FirebaseMessaging.SubscribeToTopic ();
+			MainPageController.GetMainPageInstance ().UpdateText ();
 			success ();
 			ActiveListeners ();
 		});
@@ -543,9 +544,9 @@ public class DataManager : MonoBehaviour
 					i++;
 			});
 			if (i > 0) {
-				MainPageController.GetMainPageINstance ().ActiveMyAppointmentsBadge (i);
+				MainPageController.GetMainPageInstance ().ActiveMyAppointmentsBadge (i);
 			} else {
-				MainPageController.GetMainPageINstance ().HideMyAppointmentsBadge ();
+				MainPageController.GetMainPageInstance ().HideMyAppointmentsBadge ();
 			}
 		}
 	}
@@ -559,9 +560,9 @@ public class DataManager : MonoBehaviour
 					i++;
 			});
 			if (i > 0) {
-				MainPageController.GetMainPageINstance ().ActiveMessagesBadge (i);
+				MainPageController.GetMainPageInstance ().ActiveMessagesBadge (i);
 			} else {
-				MainPageController.GetMainPageINstance ().HideMessagesBadge ();
+				MainPageController.GetMainPageInstance ().HideMessagesBadge ();
 			}
 		}
 	}

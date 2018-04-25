@@ -20,6 +20,7 @@ namespace PageNavFrameWork
 		public PagesEnum LoadingPage = PagesEnum.None;
 		public PagesEnum ErrorPopup = PagesEnum.None;
 		public PagesEnum SuccessPopup = PagesEnum.None;
+		public PagesEnum InternetErrorPopup = PagesEnum.None;
 		public PageTransition DefaultPageTransition = null;
 		public PageTransition DefaultModalTransition = null;
 		[HideInInspector]
@@ -40,6 +41,7 @@ namespace PageNavFrameWork
 		private RectTransform _loadingPage = null;
 		private RectTransform _successPopup = null;
 		private RectTransform _errorPopup = null;
+		private RectTransform _internetErrorPopup = null;
 		private GameObject _PopUp = null;
 		private PageController _PopUpController = null;
 		private bool mutex = false;
@@ -205,6 +207,18 @@ namespace PageNavFrameWork
 			(pageInstance.transform as RectTransform).offsetMax = Vector2.zero;
 			(pageInstance.transform as RectTransform).offsetMin = Vector2.zero;
 			(pageInstance.transform as RectTransform).localScale = new Vector3 (1, 1, 1);
+		}
+
+		public void SetInternetErrorVisibility (bool state)
+		{
+			if (!_internetErrorPopup) {
+				return;
+			}
+			if (_loadingPage) {
+				SetLoadingVisibility (false);
+			}
+			_internetErrorPopup.SetAsLastSibling ();
+			_internetErrorPopup.gameObject.SetActive (state);
 		}
 
 		public void SetSuccessVisibility (bool state)

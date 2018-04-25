@@ -20,8 +20,11 @@ public class ServicesProvidedCell : MonoBehaviour
 	{
 		GameObject go = GameObject.Instantiate (CellPrefabTransform).gameObject;
 		var myServiceProvidedCellController = go.GetComponent<ServicesProvidedCell> ();
-		var servicePrice = float.Parse (service.price) % 1;
-		string text = string.Format ("{0} - R${1},{2}", service.name, Mathf.Floor (float.Parse (service.price)), servicePrice.ToString ("00"));
+		string text = "";
+		if (!string.IsNullOrEmpty (service.price)) {
+			var servicePrice = float.Parse (service.price) % 1;
+			text = string.Format ("{0} - R${1},{2}", service.name, Mathf.Floor (float.Parse (service.price)), servicePrice.ToString ("00"));
+		}
 		myServiceProvidedCellController.serviceName.text = text;
 		myServiceProvidedCellController.serviceModel = service;
 		myServiceProvidedCellController.serviceCallback = serviceClickCallback;

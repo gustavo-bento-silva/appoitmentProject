@@ -26,6 +26,16 @@ namespace PageNavFrameWork
 			}
 		}
 
+		public bool InternetError {
+			get {
+				return _internetError;
+			}
+			set {
+				_internetError = value;
+				PageNav.GetPageNavInstance ().SetInternetErrorVisibility (value);
+			}
+		}
+
 		public bool Error {
 			get {
 				return _error;
@@ -48,6 +58,7 @@ namespace PageNavFrameWork
 		protected bool _loading;
 		protected bool _success;
 		protected bool _error;
+		protected bool _internetError;
 		protected PageNav PageNavInstance = null;
 		protected GameObject PagePrefab = null;
 

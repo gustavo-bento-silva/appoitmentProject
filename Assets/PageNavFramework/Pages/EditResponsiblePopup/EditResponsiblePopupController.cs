@@ -9,6 +9,7 @@ public class EditResponsiblePopupController : PageController
 
 	public Transform cellPrefab;
 	public RectTransform scrollContentList;
+	public GameObject error;
 
 	ResponsibleModel responsible;
 	Delegates.OnSelectServiceClick selectServiceDelegate;
@@ -29,16 +30,32 @@ public class EditResponsiblePopupController : PageController
 
 	public void OnClickUpdateButton ()
 	{
-		Loading = true;
-		DataManager.UpdateResponsibleServices (responsible, GetServices (), delegate() {
-			Success = true;
-			Loading = false;
-		}, delegate(string error) {
-			Loading = false;
-			Error = true;
-			CloseModal ();
-			Constants.LoadHomePage ();
+		if (IsThereOneServiceAtLeast ()) {
+			error.SetActive (false);
+			Loading = true;
+			DataManager.UpdateResponsibleServices (responsible, GetServices (), delegate() {
+				Success = true;
+				Loading = false;
+			}, delegate(string error) {
+				Loading = false;
+				Error = true;
+				CloseModal ();
+				Constants.LoadHomePage ();
+			});
+		} else {
+			error.SetActive (true);
+		}
+	}
+
+	bool IsThereOneServiceAtLeast ()
+	{
+		bool isThereOneServiceAtLeast = false;
+		servicesProvidedByResponsible.ForEach (x => {
+			if (x) {
+				isThereOneServiceAtLeast = true;
+			}
 		});
+		return isThereOneServiceAtLeast;
 	}
 
 	void OnInitServicesWindow ()

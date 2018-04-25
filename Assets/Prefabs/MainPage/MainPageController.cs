@@ -31,8 +31,11 @@ public class MainPageController : MonoBehaviour
 	MenuState menuState = MenuState.Closed;
 	float xPosition;
 
+	int messagesBadgesQuantity = 0;
+	int appointmentsBadgesQuantity = 0;
+	int homeBadgesQuantity = 0;
 
-	public static MainPageController GetMainPageINstance ()
+	public static MainPageController GetMainPageInstance ()
 	{
 		return _instance;
 	}
@@ -42,6 +45,10 @@ public class MainPageController : MonoBehaviour
 		if (_instance == null) {
 			_instance = this;
 		}
+	}
+
+	public void UpdateText ()
+	{
 		if (DataManager.currentUser != null) {
 			userName.text = DataManager.currentUser.name;
 		}
@@ -133,10 +140,9 @@ public class MainPageController : MonoBehaviour
 		iTween.MoveTo (menu, iTween.Hash ("x", -xPosition, "time", time, "easeType", iTween.EaseType.linear.ToString ()));
 	}
 
-	public void ActiveHomeBadge (int quantity)
+	public void ActiveHomeBadge ()
 	{
-		var homeBadgeText = homeBadge.GetComponentInChildren<Text> ();
-		homeBadgeText.text = quantity.ToString ();
+		UpdateHomeBadgeText ();
 		homeBadge.SetActive (true);
 	}
 
@@ -149,15 +155,21 @@ public class MainPageController : MonoBehaviour
 
 	public void ActiveMessagesBadge (int quantity)
 	{
+		messagesBadgesQuantity += quantity;
+		homeBadgesQuantity += quantity;
+		ActiveHomeBadge ();
 		var messagesBadgeText = messagesBadge.GetComponentInChildren<Text> ();
-		messagesBadgeText.text = quantity.ToString ();
+		messagesBadgeText.text = messagesBadgesQuantity.ToString ();
 		messagesBadge.SetActive (true);
 	}
 
 	public void ActiveMyAppointmentsBadge (int quantity)
 	{
+		appointmentsBadgesQuantity += quantity;
+		homeBadgesQuantity += quantity;
+		ActiveHomeBadge ();
 		var myAppointmentsBadgeText = myAppointmentsBadge.GetComponentInChildren<Text> ();
-		myAppointmentsBadgeText.text = quantity.ToString ();
+		myAppointmentsBadgeText.text = appointmentsBadgesQuantity.ToString ();
 		myAppointmentsBadge.SetActive (true);
 	}
 
@@ -173,11 +185,31 @@ public class MainPageController : MonoBehaviour
 
 	public void HideMessagesBadge ()
 	{
+		CheckIfShouldHideHomeBadge (messagesBadgesQuantity);
+		messagesBadgesQuantity = 0;
 		messagesBadge.SetActive (false);
 	}
 
 	public void HideMyAppointmentsBadge ()
 	{
+		CheckIfShouldHideHomeBadge (appointmentsBadgesQuantity);
+		appointmentsBadgesQuantity = 0;
 		myAppointmentsBadge.SetActive (false);
+	}
+
+	public void CheckIfShouldHideHomeBadge (int quantity)
+	{
+		homeBadgesQuantity = homeBadgesQuantity - quantity;
+		if (homeBadgesQuantity <= 0) {
+			HideHomeBadge ();
+		} else {
+			UpdateHomeBadgeText ();
+		}
+	}
+
+	void UpdateHomeBadgeText ()
+	{
+		var homeBadgeText = homeBadge.GetComponentInChildren<Text> ();
+		homeBadgeText.text = homeBadgesQuantity.ToString ();
 	}
 }

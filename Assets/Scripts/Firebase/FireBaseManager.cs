@@ -193,6 +193,8 @@ public class FireBaseManager : MonoBehaviour
 	{
 		if (user.userType == Constants.UserType.Responsible.ToString ()) {
 			reference.Child (DBTable.Responsible.ToString ()).Child (user.userID).Child (Parameters.messages.ToString ()).Child (message.id).Child (Parameters.isNew.ToString ()).SetValueAsync (false);
+		} else if (user.userType == Constants.UserType.Company.ToString ()) {
+			reference.Child (DBTable.Company.ToString ()).Child (user.userID).Child (Parameters.messages.ToString ()).Child (message.id).Child (Parameters.isNew.ToString ()).SetValueAsync (false);
 		} else {
 			reference.Child (DBTable.User.ToString ()).Child (user.userID).Child (Parameters.messages.ToString ()).Child (message.id).Child (Parameters.isNew.ToString ()).SetValueAsync (false);
 		}
@@ -650,6 +652,15 @@ public class FireBaseManager : MonoBehaviour
 					success ();
 				}
 			});
+		} else if (user is CompanyModel) {
+			FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child (user.userID).Child (Parameters.messages.ToString ()).Child (messageID).RemoveValueAsync ()
+				.ContinueWith (task => {
+				if (task.IsFaulted) {
+
+				} else {
+					success ();
+				}
+			});
 		} else {
 			FirebaseDatabase.DefaultInstance.GetReference (DBTable.User.ToString ()).Child (user.userID).Child (Parameters.messages.ToString ()).Child (messageID).RemoveValueAsync ()
 				.ContinueWith (task => {
@@ -659,7 +670,6 @@ public class FireBaseManager : MonoBehaviour
 					success ();
 				}
 			});
-			;
 		}
 	}
 
