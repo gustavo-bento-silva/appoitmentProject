@@ -39,14 +39,14 @@ public class LoginWithEmailPopupController : PageController
 
 		if (everyThingIsRight >= 2) {
 			Loading = true;
-			FirebaseAuth.GetFireBaseAuthInstance ().UserLogin (email.GetComponent<InputField> ().text, password.GetComponent<InputField> ().text, delegate {
-				CloseModal ();
-				Loading = false;
-				Success = true;
-				LoadHomeSceneAsync ();
+			FirebaseAuth.GetFireBaseAuthInstance ().UserLogin (email.GetComponent<InputField> ().text, password.GetComponent<InputField> ().text, delegate (string id) {
+				DataManager.LoadUserInfoAux (id, delegate {
+					Loading = false;
+					LoadHomeSceneAsync ();
+				});
 			}, delegate(string error) {
 				Loading = false;
-				Error = true;
+				OpenErrorPopup (error);
 			});
 		}		
 	}

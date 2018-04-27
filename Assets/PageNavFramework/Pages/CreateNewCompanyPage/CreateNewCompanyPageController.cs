@@ -39,7 +39,7 @@ public class CreateNewCompanyPageController : PageController
 			CreateNewCompanyDataBase (userID);
 		}, delegate(string error) {
 			Loading = false;
-			Error = true;
+			OpenErrorPopup (error);
 		});
 	}
 

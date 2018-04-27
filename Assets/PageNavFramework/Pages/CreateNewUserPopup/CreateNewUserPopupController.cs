@@ -57,7 +57,7 @@ public class CreateNewUserPopupController : PageController
 				LoadHomeSceneAsync ();	
 			}, delegate(string error) {
 				Loading = false;
-				Error = true;
+				OpenErrorPopup (error);
 			});
 		}
 	}

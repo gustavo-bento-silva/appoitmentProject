@@ -42,10 +42,10 @@ public class DataManager : MonoBehaviour
 		FireBaseManager.GetFireBaseInstance ().CreateNewUser ("123456", "Gustavinho", "35442543");
 	}
 
-	public static void LoadUserInfoAux (Delegates.GeneralListenerSuccess success)
+	public static void LoadUserInfoAux (string ID, Delegates.GeneralListenerSuccess success)
 	{
 //		Empresa:
-		string ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
+//		string ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
 //		Gustavo:
 //		string ID = "4VpwAC7NBjVSW3ab86sgAnG1mC83";
 		FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel user) {
@@ -70,30 +70,6 @@ public class DataManager : MonoBehaviour
 			FirebaseMessaging.SubscribeToTopic ();
 			MainPageController.GetMainPageInstance ().UpdateText ();
 			success ();
-			ActiveListeners ();
-		});
-	}
-
-	public static void LoadUserInfo (string ID)
-	{
-		FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel user) {
-			if (user.userType == Constants.UserType.Company.ToString ()) {
-				currentUser = new CompanyModel (user);
-				GetAllResponsablesFromCompanyAsUser ();
-				GetAllClientsFromCompanyAsUser ();
-				GetAllServicesProvidedFromCompanyAsUser ();
-				GetAllDaysWorkedFromCompanyAsUser ();
-				GetAllInitWorkFromCompanyAsUser ();
-				GetAllEndWorkFromCompanyAsUser ();
-				companyData = user as CompanyModel;
-			} else if (user.userType == Constants.UserType.Responsible.ToString ()) {
-				currentUser = user;
-				FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel muser) {
-					companyData = muser as CompanyModel;
-				});
-			} else {
-				currentUser = user;
-			}
 			ActiveListeners ();
 		});
 	}

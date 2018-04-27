@@ -32,7 +32,7 @@ public static class Delegates
 
 	public delegate void GetResponsiblesByID (ResponsibleModel responsable);
 
-	public delegate void UserLoginSuccess ();
+	public delegate void UserLoginSuccess (string userId);
 
 	public delegate void UserLoginFail (string error);
 

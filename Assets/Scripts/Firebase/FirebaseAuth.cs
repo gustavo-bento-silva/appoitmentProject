@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Firebase.Auth;
+using System;
+using Firebase;
 
 public class FirebaseAuth : MonoBehaviour
 {
@@ -17,7 +20,6 @@ public class FirebaseAuth : MonoBehaviour
 
 	void Awake ()
 	{
-		
 		auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
 		auth.StateChanged += AuthStateChanged;
 		AuthStateChanged (this, null);
@@ -59,7 +61,7 @@ public class FirebaseAuth : MonoBehaviour
 				}
 				if (task.IsFaulted) {
 					Debug.LogError ("SendPasswordResetEmailAsync encountered an error: " + task.Exception);
-					failListener (task.Exception.ToString ());
+					failListener (GetErrorMessage (task.Exception.InnerExceptions [0] as FirebaseException));
 					return;
 				}
 
@@ -77,17 +79,14 @@ public class FirebaseAuth : MonoBehaviour
 				failListener ("SignInWithEmailAndPasswordAsync was canceled.");
 				return;
 			}
-			if (task.IsFaulted) {
-//				task.Exception as Firebase.FirebaseException
+			if (task.IsFaulted || task.Exception != null) {
 				Debug.LogError ("SignInWithEmailAndPasswordAsync encountered an error: " + task.Exception);
-				failListener (task.Exception.ToString ());
+				failListener (GetErrorMessage (task.Exception.InnerExceptions [0] as FirebaseException));
 				return;
 			}
-
 			user = task.Result;
 			var id = auth.CurrentUser.UserId;
-			DataManager.LoadUserInfo (id);
-			successListener ();
+			successListener (id);
 			Debug.LogFormat ("User signed in successfully: {0} ({1})",
 				user.DisplayName, user.UserId);
 		});
@@ -102,7 +101,7 @@ public class FirebaseAuth : MonoBehaviour
 				return;
 			}
 			if (task.IsFaulted) {
-				fail ("Ocorreu um erro na criação do usuário!" + task.Exception);
+				fail (GetErrorMessage (task.Exception.InnerExceptions [0] as FirebaseException));
 				Debug.LogError ("CreateUserWithEmailAndPasswordAsync encountered an error: " + task.Exception);
 				return;
 			}
@@ -130,7 +129,7 @@ public class FirebaseAuth : MonoBehaviour
 				return;
 			}
 			if (task.IsFaulted) {
-				fail ("Ocorreu um erro na criação do usuário!" + task.Exception);
+				fail (GetErrorMessage (task.Exception.InnerExceptions [0] as FirebaseException));
 				Debug.LogError ("CreateUserWithEmailAndPasswordAsync encountered an error: " + task.Exception);
 				return;
 			}
@@ -166,5 +165,55 @@ public class FirebaseAuth : MonoBehaviour
 
 			Debug.Log ("User profile updated successfully.");
 		});
+	}
+
+	public string GetErrorMessage (FirebaseException exception)
+	{
+		Debug.Log (exception.ToString ());
+		if (exception != null) {
+			var errorCode = (AuthError)exception.ErrorCode;
+			return GetErrorMessage (errorCode);
+		}
+
+		return exception.ToString ();
+	}
+
+	private string GetErrorMessage (AuthError errorCode)
+	{
+		var message = "";
+		Debug.Log ("MyTag!!" + errorCode.ToString ());
+		switch (errorCode) {
+		case AuthError.AccountExistsWithDifferentCredentials:
+			message = "Já existe uma conta com credenciais diferentes.";
+			break;
+		case AuthError.MissingPassword:
+			message = "É obrigatório o uso de uma senha";
+			break;
+		case AuthError.WeakPassword:
+			message = "Senha muito fraca, é necessário ao menos 6 caracteres.";
+			break;
+		case AuthError.WrongPassword:
+			message = "Senha incorreta";
+			break;
+		case AuthError.EmailAlreadyInUse:
+			message = "Esse email já está sendo usado.";
+			break;
+		case AuthError.InvalidEmail:
+			message = "Email inválido";
+			break;
+		case AuthError.MissingEmail:
+			message = "É obrigatório o uso de uma senha";
+			break;
+		case AuthError.UserNotFound:
+			message = "Usuário não encontrado";
+			break;
+		case AuthError.NetworkRequestFailed:
+			message = "Sem conexão! Verifique a internet e tente novamente!";
+			break;
+		default:
+			message = "Ocorreu um erro. Tente novamente mais tarde!";
+			break;
+		}
+		return message;
 	}
 }
