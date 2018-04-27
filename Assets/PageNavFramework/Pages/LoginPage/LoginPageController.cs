@@ -23,6 +23,20 @@ public class LoginPageController : PageController
 
 	}
 
+	public void FacebookLogin ()
+	{
+		Loading = true;
+		FirebaseAuth.GetFireBaseAuthInstance ().FacebookLogin (delegate(string userId) {
+			DataManager.LoadUserInfoAux (userId, delegate {
+				Loading = false;
+				ChangeScene ();
+			});
+		}, delegate(string error) {
+			Loading = false;
+			Error = true;
+		});
+	}
+
 	void ChangeScene ()
 	{
 		SceneManager.LoadSceneAsync (homeScene);

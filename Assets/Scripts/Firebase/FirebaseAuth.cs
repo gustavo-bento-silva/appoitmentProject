@@ -151,6 +151,33 @@ public class FirebaseAuth : MonoBehaviour
 		});
 	}
 
+	public void FacebookLogin (Delegates.UserLoginSuccess successListener, Delegates.UserLoginFail failListener)
+	{
+		FacebookManager.FacebookManagerInstance ().FacebookLogin (delegate(string accessToken) {
+			Firebase.Auth.Credential credential =
+				Firebase.Auth.FacebookAuthProvider.GetCredential (accessToken);
+			auth.SignInWithCredentialAsync (credential).ContinueWith (task => {
+				if (task.IsCanceled) {
+					Debug.LogError ("SignInWithCredentialAsync was canceled.");
+					failListener ("SignInWithCredentialAsync was canceled.");
+					return;
+				}
+				if (task.IsFaulted || task.Exception != null) {
+					Debug.LogError ("SignInWithCredentialAsync encountered an error: " + task.Exception);
+					failListener (GetErrorMessage (task.Exception.InnerExceptions [0] as FirebaseException));
+					return;
+				}
+
+				Firebase.Auth.FirebaseUser newUser = task.Result;
+				successListener (newUser.UserId);
+				Debug.LogFormat ("User signed in successfully: {0} ({1})",
+					newUser.DisplayName, newUser.UserId);
+			});
+		}, delegate(string error) {
+			failListener (error);
+		});
+	}
+
 	public void UpdateUserProfile (Firebase.Auth.UserProfile profile)
 	{
 		user.UpdateUserProfileAsync (profile).ContinueWith (task => {

@@ -54,6 +54,4 @@ public static class Delegates
 
 	public delegate void OnSpriteSuccess (Sprite sprite);
 
-
-
 }
