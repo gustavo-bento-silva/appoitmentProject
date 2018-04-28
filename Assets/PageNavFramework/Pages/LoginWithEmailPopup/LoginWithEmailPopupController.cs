@@ -43,6 +43,9 @@ public class LoginWithEmailPopupController : PageController
 				DataManager.LoadUserInfoAux (id, delegate {
 					Loading = false;
 					LoadHomeSceneAsync ();
+				}, delegate(string error) {
+					Loading = false;
+					Error = true;
 				});
 			}, delegate(string error) {
 				Loading = false;

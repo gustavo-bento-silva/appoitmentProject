@@ -36,6 +36,9 @@ public class FacebookManager : MonoBehaviour
 
 	public void FacebookLogin (Delegates.UserLoginSuccess success, Delegates.UserLoginFail fail)
 	{
+		if (FB.IsLoggedIn)
+			FB.LogOut ();
+		
 		successCalback = success;
 		failcallback = fail;
 		var perms = new List<string> (){ "public_profile", "email" };
@@ -47,9 +50,9 @@ public class FacebookManager : MonoBehaviour
 		if (FB.IsLoggedIn) {
 			// AccessToken class will have session details
 			var aToken = Facebook.Unity.AccessToken.CurrentAccessToken;
-			successCalback (aToken.UserId);
+			successCalback (aToken.TokenString);
 			// Print current access token's User ID
-			Debug.Log (aToken.UserId);
+			Debug.Log ("UserID: " + aToken.UserId + "TokenID: " + aToken.TokenString);
 			// Print current access token's granted permissions
 			foreach (string perm in aToken.Permissions) {
 				Debug.Log (perm);

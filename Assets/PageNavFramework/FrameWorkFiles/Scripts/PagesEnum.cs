@@ -30,6 +30,7 @@ namespace PageNavFrameWork{
 		ConfirmDeleteAppointmentPopup=24,
 		EditServicePopup=25,
 		EditResponsiblePopup=26,
-		InternetErrorPopup=27
+		InternetErrorPopup=27,
+		CompleteFacebookLoginPage=28
 	}
 }

@@ -151,7 +151,7 @@ public class FirebaseAuth : MonoBehaviour
 		});
 	}
 
-	public void FacebookLogin (Delegates.UserLoginSuccess successListener, Delegates.UserLoginFail failListener)
+	public void FacebookLogin (Delegates.UserFacebookLoginSuccess successListener, Delegates.UserLoginFail failListener)
 	{
 		FacebookManager.FacebookManagerInstance ().FacebookLogin (delegate(string accessToken) {
 			Firebase.Auth.Credential credential =
@@ -169,7 +169,7 @@ public class FirebaseAuth : MonoBehaviour
 				}
 
 				Firebase.Auth.FirebaseUser newUser = task.Result;
-				successListener (newUser.UserId);
+				successListener (newUser.UserId, newUser.DisplayName);
 				Debug.LogFormat ("User signed in successfully: {0} ({1})",
 					newUser.DisplayName, newUser.UserId);
 			});

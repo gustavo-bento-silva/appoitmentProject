@@ -42,13 +42,17 @@ public class DataManager : MonoBehaviour
 		FireBaseManager.GetFireBaseInstance ().CreateNewUser ("123456", "Gustavinho", "35442543");
 	}
 
-	public static void LoadUserInfoAux (string ID, Delegates.GeneralListenerSuccess success)
+	public static void LoadUserInfoAux (string ID, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
 	{
 //		Empresa:
 //		string ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
 //		Gustavo:
 //		string ID = "4VpwAC7NBjVSW3ab86sgAnG1mC83";
 		FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel user) {
+			if (user == null) {
+				fail ("Não foi possível carregar os dados");
+				return;
+			}
 			if (user.userType == Constants.UserType.Company.ToString ()) {
 				currentUser = new CompanyModel (user);
 				GetAllResponsablesFromCompanyAsUser ();
@@ -72,6 +76,12 @@ public class DataManager : MonoBehaviour
 			success ();
 			ActiveListeners ();
 		});
+	}
+
+	public static void CreateNewUserAndLogin (string userID, string userName, string userPhone, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		FireBaseManager.GetFireBaseInstance ().CreateNewUser (userID, userName, userPhone);
+		LoadUserInfoAux (userID, success, fail);
 	}
 
 	public static void GetUserById (string userID, Delegates.GetUserByID getUserSucess)

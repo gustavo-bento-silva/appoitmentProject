@@ -34,6 +34,8 @@ public static class Delegates
 
 	public delegate void UserLoginSuccess (string userId);
 
+	public delegate void UserFacebookLoginSuccess (string userId, string userName);
+
 	public delegate void UserLoginFail (string error);
 
 	public delegate void GeneralListenerSuccess ();

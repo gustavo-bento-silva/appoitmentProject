@@ -26,10 +26,23 @@ public class LoginPageController : PageController
 	public void FacebookLogin ()
 	{
 		Loading = true;
-		FirebaseAuth.GetFireBaseAuthInstance ().FacebookLogin (delegate(string userId) {
-			DataManager.LoadUserInfoAux (userId, delegate {
-				Loading = false;
-				ChangeScene ();
+		FirebaseAuth.GetFireBaseAuthInstance ().FacebookLogin (delegate(string userId, string userName) {
+			DataManager.GetUserById (userId, delegate(UserModel user) {
+				if (user == null) {
+					Loading = false;
+					var dict = new Dictionary<string, object> ();
+					dict.Add ("name", userName);
+					dict.Add ("id", userId);
+					PageNav.GetPageNavInstance ().PushPageToStackWithArgs (PagesEnum.CompleteFacebookLoginPage, dict);
+				} else {
+					DataManager.LoadUserInfoAux (userId, delegate {
+						Loading = false;
+						ChangeScene ();
+					}, delegate(string error) {
+						Loading = false;
+						Error = true;
+					});
+				}
 			});
 		}, delegate(string error) {
 			Loading = false;

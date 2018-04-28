@@ -460,9 +460,12 @@ public class FireBaseManager : MonoBehaviour
 			if (task.IsFaulted) {
 				Debug.Log ("Falha no get user by id");
 			} else if (task.IsCompleted) {
-				DataSnapshot snapshot = task.Result;
-				var userJson = snapshot.GetRawJsonValue ();
-				var user = JsonUtility.FromJson<UserModel> (userJson);
+				UserModel user = null;
+				if (task.Result != null) {
+					DataSnapshot snapshot = task.Result;
+					var userJson = snapshot.GetRawJsonValue ();
+					user = JsonUtility.FromJson<UserModel> (userJson);
+				} 
 //				GetUserAppointments (user.userID, delegate(List<AppointmentModel> appointments) {
 //					user.appoitments = new Dictionary<string, object> ();
 //					foreach (var appointment in appointments) {
