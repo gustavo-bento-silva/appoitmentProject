@@ -4,9 +4,11 @@ using PageNavFrameWork;
 using System.Collections.Generic;
 using System;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class LoginPageController : PageController
 {
+	public InputField idTest;
 	public string homeScene;
 	public string url = "http://servicodados.ibge.gov.br/api/v1/localidades/estados/33/municipios";
 
@@ -23,27 +25,63 @@ public class LoginPageController : PageController
 
 	}
 
+	public void LoginTest ()
+	{
+		Loading = true;
+		FireBaseManager.GetFireBaseInstance ().IsThereUser (idTest.text, delegate(bool isThereUser) {
+			if (isThereUser) {
+				DataManager.userID = idTest.text;
+				Loading = false;
+				ChangeScene ();
+			} else {
+				DataManager.userID = idTest.text;
+				DataManager.CreateNewUserAndLogin (idTest.text, "userName" + idTest.text, idTest.text);
+				Loading = false;
+				ChangeScene ();
+			}
+		}, delegate(string error) {
+			Debug.Log (error);
+		});
+	}
+
 	public void FacebookLogin ()
 	{
 		Loading = true;
 		FirebaseAuth.GetFireBaseAuthInstance ().FacebookLogin (delegate(string userId, string userName) {
-			DataManager.GetUserById (userId, delegate(UserModel user) {
-				if (user == null) {
+			FireBaseManager.GetFireBaseInstance ().IsThereUser (userId, delegate(bool isThereUser) {
+				if (isThereUser) {
+					DataManager.userID = userId;
+					Loading = false;
+					ChangeScene ();
+				} else {
+					DataManager.userID = userId;
 					Loading = false;
 					var dict = new Dictionary<string, object> ();
 					dict.Add ("name", userName);
 					dict.Add ("id", userId);
 					PageNav.GetPageNavInstance ().PushPageToStackWithArgs (PagesEnum.CompleteFacebookLoginPage, dict);
-				} else {
-					DataManager.LoadUserInfoAux (userId, delegate {
-						Loading = false;
-						ChangeScene ();
-					}, delegate(string error) {
-						Loading = false;
-						Error = true;
-					});
 				}
+			}, delegate(string error) {
+				Loading = false;
+				Error = true;
 			});
+//			DataManager.GetUserById (userId, delegate(UserModel user) {
+//				if (user == null) {
+//					Loading = false;
+//					var dict = new Dictionary<string, object> ();
+//					dict.Add ("name", userName);
+//					dict.Add ("id", userId);
+//					PageNav.GetPageNavInstance ().PushPageToStackWithArgs (PagesEnum.CompleteFacebookLoginPage, dict);
+//				} else {
+//					DataManager.LoadUserInfoAux (userId, delegate {
+//						Loading = false;
+//						ChangeScene ();
+//					}, delegate(string error) {
+//						Loading = false;
+//						Error = true;
+//					});
+//				}
+//			});
 		}, delegate(string error) {
 			Loading = false;
 			Error = true;

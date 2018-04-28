@@ -38,6 +38,8 @@ public static class Delegates
 
 	public delegate void UserLoginFail (string error);
 
+	public delegate void IsThereUser (bool isThereUser);
+
 	public delegate void GeneralListenerSuccess ();
 
 	public delegate void GeneralListenerFail (string error);

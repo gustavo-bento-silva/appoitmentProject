@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class DataManager : MonoBehaviour
 {
+	public static string userID = "";
 	public static UserModel currentUser;
 	public static List<MessageModel> userMessages = new List<MessageModel> ();
 	public static List<AppointmentModel> responsibleAppointmentList = new List<AppointmentModel> ();
@@ -78,10 +79,10 @@ public class DataManager : MonoBehaviour
 		});
 	}
 
-	public static void CreateNewUserAndLogin (string userID, string userName, string userPhone, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	public static bool CreateNewUserAndLogin (string userID, string userName, string userPhone)
 	{
 		FireBaseManager.GetFireBaseInstance ().CreateNewUser (userID, userName, userPhone);
-		LoadUserInfoAux (userID, success, fail);
+		return true;
 	}
 
 	public static void GetUserById (string userID, Delegates.GetUserByID getUserSucess)

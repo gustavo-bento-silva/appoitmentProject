@@ -453,6 +453,28 @@ public class FireBaseManager : MonoBehaviour
 
 	}
 
+	public void IsThereUser (string userID, Delegates.IsThereUser isThereUser, Delegates.GeneralListenerFail fail)
+	{
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.User.ToString ())
+			.GetValueAsync ().ContinueWith (task => {
+			if (task.IsFaulted) {
+				Debug.Log ("Falha no get user by id");
+				fail (task.Exception.ToString ());
+			} else if (task.IsCompleted) {
+				DataSnapshot snapshot = task.Result;
+				bool isThere = false;
+				foreach (var userId in snapshot.Children) {
+					if ((string)userId.Key == userID) {
+						isThere = true;
+						break;
+					}
+				}
+				isThereUser (isThere);
+			}
+		});
+	}
+
+
 	public void GetUserByID (string userID, Delegates.GetUserByID getUserById)
 	{
 		FirebaseDatabase.DefaultInstance.GetReference (DBTable.User.ToString ()).Child (userID)
@@ -460,12 +482,11 @@ public class FireBaseManager : MonoBehaviour
 			if (task.IsFaulted) {
 				Debug.Log ("Falha no get user by id");
 			} else if (task.IsCompleted) {
-				UserModel user = null;
-				if (task.Result != null) {
-					DataSnapshot snapshot = task.Result;
-					var userJson = snapshot.GetRawJsonValue ();
-					user = JsonUtility.FromJson<UserModel> (userJson);
-				} 
+				DataSnapshot snapshot = task.Result;
+				var userJson = snapshot.GetRawJsonValue ();
+				var user = JsonUtility.FromJson<UserModel> (userJson);
+				getUserById (user);
+			} 
 //				GetUserAppointments (user.userID, delegate(List<AppointmentModel> appointments) {
 //					user.appoitments = new Dictionary<string, object> ();
 //					foreach (var appointment in appointments) {
@@ -476,8 +497,6 @@ public class FireBaseManager : MonoBehaviour
 //					Debug.Log ("Falha no get user by id");
 //				});
 
-				getUserById (user);
-			}
 		});
 	}
 

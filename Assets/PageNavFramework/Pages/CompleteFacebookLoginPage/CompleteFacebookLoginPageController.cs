@@ -18,12 +18,9 @@ public class CompleteFacebookLoginPageController : PageController
 		} else {
 			Loading = true;
 			phoneError.SetActive (false);
-			DataManager.CreateNewUserAndLogin (userID, userName, phone.text, delegate() {
-				Loading = false;
-				Constants.LoadHomePage ();
-			}, delegate(string error) {
-				Loading = false;
-			});
+			DataManager.CreateNewUserAndLogin (userID, userName, phone.text);
+			Loading = false;
+			Constants.LoadHomePage ();
 		}
 	}
 

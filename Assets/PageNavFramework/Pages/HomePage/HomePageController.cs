@@ -12,17 +12,23 @@ public class HomePageController : PageController
 
 	void Start ()
 	{
-		var currentUserType = DataManager.currentUser.userType;
-
-		if (currentUserType == Constants.UserType.User.ToString ()) {
-			LoadClientHome ();
-		} else if (currentUserType == Constants.UserType.Admin.ToString ()) {
-			LoadAdminHome ();
-		} else if (currentUserType == Constants.UserType.Company.ToString ()) {
-			LoadCompanyHome ();
-		} else if (currentUserType == Constants.UserType.Responsible.ToString ()) {
-			LoadResponsibleHome ();
-		}
+		Loading = true;
+		DataManager.LoadUserInfoAux (DataManager.userID, delegate() {
+			Loading = false;
+			var currentUserType = DataManager.currentUser.userType;
+			if (currentUserType == Constants.UserType.User.ToString ()) {
+				LoadClientHome ();
+			} else if (currentUserType == Constants.UserType.Admin.ToString ()) {
+				LoadAdminHome ();
+			} else if (currentUserType == Constants.UserType.Company.ToString ()) {
+				LoadCompanyHome ();
+			} else if (currentUserType == Constants.UserType.Responsible.ToString ()) {
+				LoadResponsibleHome ();
+			}
+		}, delegate(string error) {
+			Loading = false;
+			Constants.LoadHomePage ();
+		});
 
 	}
 
