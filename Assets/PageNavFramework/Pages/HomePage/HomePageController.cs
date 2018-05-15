@@ -13,6 +13,7 @@ public class HomePageController : PageController
 	void Start ()
 	{
 		Loading = true;
+		Debug.Log ("MyTag: User's info is loading. User ID: " + DataManager.userID);
 		DataManager.LoadUserInfoAux (DataManager.userID, delegate() {
 			Loading = false;
 			var currentUserType = DataManager.currentUser.userType;

@@ -29,7 +29,8 @@ public enum Parameters
 	daysOfWork,
 	companyID,
 	timeToBeginWork,
-	timeToFinishWork
+	timeToFinishWork,
+	blockDay
 }
 
 public class FireBaseManager : MonoBehaviour
@@ -309,6 +310,31 @@ public class FireBaseManager : MonoBehaviour
 		return user;
 	}
 
+	public void RemoveBlockDayForResponsible (ResponsibleModel responsible, BlockDay date, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		string json = JsonUtility.ToJson (date);
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsible.ToString ()).Child (responsible.userID).Child (Parameters.blockDay.ToString ()).Child (date.id).RemoveValueAsync ().ContinueWith (task => {
+			if (task.IsFaulted) {
+				fail (task.Exception.ToString ());
+			} else if (task.IsCompleted) {
+				success ();
+			}
+		});
+	}
+
+	public void AddBlockDayForResponsible (ResponsibleModel responsible, BlockDay date, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		date.id = reference.Child (DBTable.Responsible.ToString ()).Push ().Key;
+		string json = JsonUtility.ToJson (date);
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsible.ToString ()).Child (responsible.userID).Child (Parameters.blockDay.ToString ()).Child (date.id).SetRawJsonValueAsync (json).ContinueWith (task => {
+			if (task.IsFaulted) {
+				fail (task.Exception.ToString ());
+			} else if (task.IsCompleted) {
+				success ();
+			}
+		});
+	}
+
 	public ResponsibleModel CreateNewResponsibleToCompany (string responsibleID, string companyID, string name, List<ServicesProvidedModel> servicesProvided, List<bool> daysWorked, List<int> initTime, List<int> finishTime, string phone)
 	{
 		ResponsibleModel responsable = new ResponsibleModel (new UserModel (responsibleID, name, phone), companyID, servicesProvided, daysWorked, initTime, finishTime);
@@ -466,9 +492,9 @@ public class FireBaseManager : MonoBehaviour
 				foreach (var userId in snapshot.Children) {
 					if ((string)userId.Key == userID) {
 						isThere = true;
-						break;
 					}
 				}
+				Debug.Log ("MyTag: isThereUser - " + isThere);
 				isThereUser (isThere);
 			}
 		});
@@ -482,9 +508,11 @@ public class FireBaseManager : MonoBehaviour
 			if (task.IsFaulted) {
 				Debug.Log ("Falha no get user by id");
 			} else if (task.IsCompleted) {
+				Debug.Log ("MyTag - Getting user: " + task.Result.Key);
 				DataSnapshot snapshot = task.Result;
 				var userJson = snapshot.GetRawJsonValue ();
 				var user = JsonUtility.FromJson<UserModel> (userJson);
+				Debug.Log ("GetUser: " + user.userID + " " + user.name);
 				getUserById (user);
 			} 
 //				GetUserAppointments (user.userID, delegate(List<AppointmentModel> appointments) {
@@ -583,6 +611,26 @@ public class FireBaseManager : MonoBehaviour
 			}
 		});
 		
+	}
+
+	public void GetResponsibleBlockDays (string responsibleID, Delegates.GetResponsibleBlockDay success, Delegates.GeneralListenerFail fail)
+	{
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsible.ToString ()).Child (responsibleID).Child (Parameters.blockDay.ToString ())
+			.GetValueAsync ().ContinueWith (task => {
+			if (task.IsFaulted) {
+				fail (task.Exception.ToString ());
+			} else if (task.IsCompleted) {
+				DataSnapshot snapshot = task.Result;
+				List<BlockDay> blockDays = new List<BlockDay> ();
+				foreach (var blockDay in snapshot.Children) {
+					string json = blockDay.GetRawJsonValue ();
+					BlockDay mBlockDay = JsonUtility.FromJson<BlockDay> (json);
+					blockDays.Add (mBlockDay);
+				}
+				success (blockDays);
+			}
+		});
+
 	}
 
 	public void GetUserAppointments (string userID, Delegates.GetResponsibleAppointments success, Delegates.GeneralListenerFail fail)
@@ -695,13 +743,19 @@ public class FireBaseManager : MonoBehaviour
 		}
 	}
 
-	public void DeleteService (String companyID, String serviceID)
+	public void DeleteService (String companyID, String serviceID, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
 	{
-		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.servicesProvided.ToString ()).Child (serviceID).RemoveValueAsync ();
-		GetAllResponsiblesFromCompany (companyID, delegate(List<ResponsibleModel> responsables) {
-			responsables.ForEach (x => {
-				FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsible.ToString ()).Child (x.userID).Child (Parameters.servicesProvided.ToString ()).Child (serviceID).RemoveValueAsync ();
-			});
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.servicesProvided.ToString ()).Child (serviceID).RemoveValueAsync ().ContinueWith (task => {
+			if (task.IsFaulted) {
+				fail (task.Exception.ToString ());
+			} else {
+				success ();
+				GetAllResponsiblesFromCompany (companyID, delegate(List<ResponsibleModel> responsables) {
+					responsables.ForEach (x => {
+						FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsible.ToString ()).Child (x.userID).Child (Parameters.servicesProvided.ToString ()).Child (serviceID).RemoveValueAsync ();
+					});
+				});
+			}
 		});
 	}
 

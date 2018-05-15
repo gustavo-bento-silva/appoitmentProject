@@ -39,6 +39,7 @@ public class FirebaseAuth : MonoBehaviour
 			}
 			user = auth.CurrentUser;
 			if (signedIn) {
+				DataManager.userID = user.UserId;
 				PlayerPreferences.userIsLogged = true;
 			}
 		}

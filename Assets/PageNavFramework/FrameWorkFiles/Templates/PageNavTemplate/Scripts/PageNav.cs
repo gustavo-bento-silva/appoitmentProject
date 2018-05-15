@@ -236,9 +236,11 @@ namespace PageNavFrameWork
 				return;
 			}
 			_errorPopup.SetAsLastSibling ();
+			string message = "Ocorreu um erro durante a solicitação.\n\n Tente novamente mais tarde!";
 			if (!string.IsNullOrEmpty (msg)) {
-				Helper.FindComponentInChildWithTag <Text> (_errorPopup.gameObject, "ErrorMessage").text = msg;
+				message = msg;
 			}
+			Helper.FindComponentInChildWithTag <Text> (_errorPopup.gameObject, "ErrorMessage").text = message;
 			_errorPopup.gameObject.SetActive (state);
 		}
 

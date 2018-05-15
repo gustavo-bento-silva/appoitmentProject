@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using PageNavFrameWork;
+using System.Globalization;
+using System;
 
 public class MyAppointmentController : MonoBehaviour
 {
@@ -11,6 +13,7 @@ public class MyAppointmentController : MonoBehaviour
 	public Text day;
 	public Text month;
 	public Text description;
+	public GameObject removeButton;
 	public AppointmentModel appointment;
 
 
@@ -31,6 +34,16 @@ public class MyAppointmentController : MonoBehaviour
 		myAppointmentController.month.text = month;
 		myAppointmentController.time.text = time;
 		myAppointmentController.appointment = appointment;
+		CultureInfo provider = new CultureInfo ("pt-BR");
+		var appointmentDate = DateTime.ParseExact (appointment.data, Constants.dateformat, provider);
+		var dtNow = DateTime.Now;
+		TimeSpan timeSpan = appointmentDate - dtNow;
+
+		if (timeSpan.Days < 0) {
+			if (timeSpan.Hours > -1) {
+				myAppointmentController.removeButton.SetActive (false);
+			}
+		}
 		return go;
 	}
 

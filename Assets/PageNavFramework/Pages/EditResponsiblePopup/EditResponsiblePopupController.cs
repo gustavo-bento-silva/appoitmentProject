@@ -79,12 +79,11 @@ public class EditResponsiblePopupController : PageController
 	{
 		int index = 0;
 		List<ServicesProvidedModel> services = new List<ServicesProvidedModel> ();
-		services.Clear ();
 		servicesProvidedByResponsible.ForEach (x => {
 			if (x) {
 				services.Add (servicesProvidedList [index]);
-				index++;
 			}
+			index++;
 		});
 		return services;
 	}

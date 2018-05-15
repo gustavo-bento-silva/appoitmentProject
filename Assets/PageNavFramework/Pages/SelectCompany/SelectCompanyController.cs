@@ -77,7 +77,9 @@ public class SelectCompanyController : PageController
 	{
 		DataManager.companyData = company;
 		ChangeSelectCompanyColor (index);
-		PageNav.GetPageNavInstance ().PushPageToStack (PagesEnum.CalendarPage);
+		var dict = new Dictionary<string, object> ();
+		dict.Add ("isFromCompanySelectPage", (object)true);
+		PageNav.GetPageNavInstance ().PushPageToStackWithArgs (PagesEnum.CalendarPage, dict);
 	}
 
 	void ReadjustScrollSize (int size)

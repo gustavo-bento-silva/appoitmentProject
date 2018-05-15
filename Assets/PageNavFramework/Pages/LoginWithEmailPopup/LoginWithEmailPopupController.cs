@@ -39,7 +39,9 @@ public class LoginWithEmailPopupController : PageController
 
 		if (everyThingIsRight >= 2) {
 			Loading = true;
+			Debug.Log ("MyTag: userlogin will be called");
 			FirebaseAuth.GetFireBaseAuthInstance ().UserLogin (email.GetComponent<InputField> ().text, password.GetComponent<InputField> ().text, delegate (string id) {
+				Debug.Log ("MyTag: userlogin was successfully - id: " + id);
 				DataManager.userID = id;
 				Loading = false;
 				LoadHomeSceneAsync ();

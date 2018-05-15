@@ -154,11 +154,7 @@ public class MyAppointmentsPageController : PageController
 	public void MoveBar (int position)
 	{
 		var diference = (position - actualPositionIndex);
-		if (diference < 0) {
-			actualPositionIndex--;
-		} else if (diference > 0) {
-			actualPositionIndex++;
-		}
+		actualPositionIndex = position;
 
 		var mPosition = imageBar.transform.localPosition.x + (diference * xPositionOffset);
 		iTween.MoveTo (imageBar, iTween.Hash ("x", mPosition, "islocal", true, "time", 0.4, "easetype", iTween.EaseType.easeOutBack));

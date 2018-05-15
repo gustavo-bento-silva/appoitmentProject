@@ -8,6 +8,8 @@ public static class Delegates
 
 	public delegate void GetResponsibleAppointments (List<AppointmentModel> appointments);
 
+	public delegate void GetResponsibleBlockDay (List<BlockDay> blockDayList);
+
 	public delegate void GetUserAppointments (List<AppointmentModel> appointments);
 
 	public delegate void GetAllServicesProvided (List<ResponsibleModel> responsablesWithServices);

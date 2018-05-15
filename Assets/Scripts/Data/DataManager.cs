@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System.Globalization;
 
 public class DataManager : MonoBehaviour
 {
@@ -46,9 +47,9 @@ public class DataManager : MonoBehaviour
 	public static void LoadUserInfoAux (string ID, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
 	{
 //		Empresa:
-//		string ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
+//		ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
 //		Gustavo:
-//		string ID = "4VpwAC7NBjVSW3ab86sgAnG1mC83";
+//		ID = "7Mu4RNXJUbNPiONAZN05y62HMcv1";
 		FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel user) {
 			if (user == null) {
 				fail ("Não foi possível carregar os dados");
@@ -77,6 +78,47 @@ public class DataManager : MonoBehaviour
 			success ();
 			ActiveListeners ();
 		});
+	}
+
+	public static void GetBlockDayByResponsible (string responsibleID, Delegates.GetResponsibleBlockDay success, Delegates.GeneralListenerFail fail)
+	{
+		FireBaseManager.GetFireBaseInstance ().GetResponsibleBlockDays (responsibleID, delegate(List<BlockDay> blockDayList) {
+			currentResponsible.blockDayList.Clear ();
+			currentResponsible.blockDayList = blockDayList;
+			DateTime dateNow = DateTime.Now;
+			CultureInfo provider = new CultureInfo ("pt-BR");
+			blockDayList.ForEach (x => {
+				DateTime date = DateTime.ParseExact (x.data, Constants.dateformat, provider);
+				if (date.CompareTo (dateNow) < 0) {
+					RemoveBlockDayForResponsible (currentResponsible, date, delegate() {
+						
+					}, delegate(string error) {
+						
+					});
+				}
+			});
+			success (currentResponsible.blockDayList);
+		}, fail);
+	}
+
+	public static void AddBlockDayForResponsible (ResponsibleModel responsible, DateTime date, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		var blockDay = new BlockDay (date);
+		FireBaseManager.GetFireBaseInstance ().AddBlockDayForResponsible (responsible, blockDay, delegate {
+			responsible.blockDayList.Add (blockDay);
+			success ();
+		}, fail);
+	}
+
+	public static void RemoveBlockDayForResponsible (ResponsibleModel responsible, DateTime date, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
+	{
+		var blockDay = new BlockDay (date);
+		FireBaseManager.GetFireBaseInstance ().RemoveBlockDayForResponsible (responsible, blockDay, delegate {
+			if (responsible.blockDayList.Contains (blockDay)) {
+				responsible.blockDayList.Remove (blockDay);
+			}
+			success ();
+		}, fail);
 	}
 
 	public static bool CreateNewUserAndLogin (string userID, string userName, string userPhone)
@@ -195,7 +237,7 @@ public class DataManager : MonoBehaviour
 		FireBaseManager.GetFireBaseInstance ().CreateNewAppoitment (user, currentResponsible, appointment, delegate(AppointmentModel mappointment) {
 			success ();
 			string minute = (dateNewAppointment.Minute == 0 ? "00" : "0");
-			var message = string.Format ("{0} realizou novo agendamento de {1} para dia {2}/{3} às {4}:{5}h", user.name, currentservice.name, dateNewAppointment.Day, dateNewAppointment.Month, dateNewAppointment.Hour, minute);
+			var message = string.Format ("{0} realizou novo agendamento de {1} com {6} para dia {2}/{3} às {4}:{5}h", user.name, currentservice.name, dateNewAppointment.Day, dateNewAppointment.Month, dateNewAppointment.Hour, minute, currentResponsible.name);
 			if (user.userType == Constants.UserType.User.ToString ()) {
 				CreateNewMessageFromUserToResponsilbe (user, currentResponsible, message, Constants.MessageType.ScheduleAppointment.ToString (), delegate() {
 
@@ -214,10 +256,9 @@ public class DataManager : MonoBehaviour
 
 	public static void CreateNewMessageFromUserToResponsilbe (UserModel from, ResponsibleModel responsible, string message, string type, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
 	{
-		string companyID = "";
 		var mMessage = new MessageModel (from.name, responsible.userID, message, DateTime.Now.ToString (Constants.dateformat), type);
 		if (from.userType == Constants.UserType.User.ToString ()) {
-			FireBaseManager.GetFireBaseInstance ().CreateNewMessage (mMessage, from.userID, responsible.userID, responsible.companyID, delegate() {
+			FireBaseManager.GetFireBaseInstance ().CreateNewMessage (mMessage, responsible.userID, from.userID, responsible.companyID, delegate() {
 				success ();
 			}, delegate(string error) {
 				fail (error);
@@ -426,14 +467,14 @@ public class DataManager : MonoBehaviour
 		}, fail);
 	}
 
-	public static void RemoveServiceFromCompany (String companyID, String serviceID)
+	public static void RemoveServiceFromCompany (String companyID, String serviceID, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
 	{
-		FireBaseManager.GetFireBaseInstance ().DeleteService (companyID, serviceID);
+		FireBaseManager.GetFireBaseInstance ().DeleteService (companyID, serviceID, success, fail);
 	}
 
-	public static void RemoveServiceFromCompanyAsUser (String serviceID)
+	public static void RemoveServiceFromCompanyAsUser (String serviceID, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
 	{
-		FireBaseManager.GetFireBaseInstance ().DeleteService (currentUser.userID, serviceID);
+		FireBaseManager.GetFireBaseInstance ().DeleteService (currentUser.userID, serviceID, success, fail);
 	}
 
 	public static void JustRemoveAppointmentWithouMessage (AppointmentModel appointment, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)

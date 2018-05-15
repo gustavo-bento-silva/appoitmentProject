@@ -15,20 +15,13 @@ public class LoginPageController : PageController
 	void Start ()
 	{
 		Loading = false;
-		if (PlayerPreferences.userIsLogged) {
-			ChangeScene ();
-		}
-	}
-
-	void Update ()
-	{
-
 	}
 
 	public void LoginTest ()
 	{
 		Loading = true;
 		FireBaseManager.GetFireBaseInstance ().IsThereUser (idTest.text, delegate(bool isThereUser) {
+			Debug.Log ("MyTag: Is there user with id: " + DataManager.userID + " - " + isThereUser);
 			if (isThereUser) {
 				DataManager.userID = idTest.text;
 				Loading = false;
@@ -49,6 +42,7 @@ public class LoginPageController : PageController
 		Loading = true;
 		FirebaseAuth.GetFireBaseAuthInstance ().FacebookLogin (delegate(string userId, string userName) {
 			FireBaseManager.GetFireBaseInstance ().IsThereUser (userId, delegate(bool isThereUser) {
+				Debug.Log ("MyTag: isThereUserWithID " + isThereUser);
 				if (isThereUser) {
 					DataManager.userID = userId;
 					Loading = false;

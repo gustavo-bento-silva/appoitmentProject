@@ -12,7 +12,14 @@ public class ServiceManagerCell : MonoBehaviour
 
 	public void OnRemoveClick ()
 	{
-		DataManager.RemoveServiceFromCompanyAsUser (mServiceModel.serviceID);
+		PageNav.GetPageNavInstance ().SetLoadingVisibility (true);
+		DataManager.RemoveServiceFromCompanyAsUser (mServiceModel.serviceID, delegate() {
+			PageNav.GetPageNavInstance ().SetLoadingVisibility (false);
+			Constants.LoadHomePage ();
+		}, delegate(string error) {
+			PageNav.GetPageNavInstance ().SetLoadingVisibility (false);
+			PageNav.GetPageNavInstance ().SetErrorVisibility (true);
+		});
 	}
 
 	public void OnEditClick ()

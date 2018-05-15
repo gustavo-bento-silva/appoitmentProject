@@ -31,6 +31,8 @@ namespace PageNavFrameWork{
 		EditServicePopup=25,
 		EditResponsiblePopup=26,
 		InternetErrorPopup=27,
-		CompleteFacebookLoginPage=28
+		CompleteFacebookLoginPage=28,
+		CompanySchedulePage=29,
+		MyCalendarPage=30
 	}
 }

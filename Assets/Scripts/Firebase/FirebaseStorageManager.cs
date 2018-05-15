@@ -43,7 +43,7 @@ public class FirebaseStorageManager : MonoBehaviour
 		gs_reference.GetDownloadUrlAsync ().ContinueWith ((Task<Uri> task) => {
 			if (!task.IsFaulted && !task.IsCanceled) {
 				Debug.Log ("Download URL: " + task.Result);
-				StartCoroutine (task.Result.OriginalString, success);
+				StartCoroutine (LoadImageInternet (task.Result.OriginalString, success));
 			} else {
 
 				Debug.Log (task.Exception.ToString ());

@@ -1,15 +1,13 @@
-using System;
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 using PageNavFrameWork;
-using UnityEngine.UI;
+using System.Collections.Generic;
+using System;
 
-public class CalendarPageController : PageController
+public class MyCalendarPageController : PageController
 {
+
 	public GameObject container;
-	public Dropdown responsibleDropdown;
-	public Dropdown servicesDropdown;
 	public GameObject calendars;
 	public CalendarController[] calendarsController;
 
@@ -127,22 +125,6 @@ public class CalendarPageController : PageController
 		Loading = false;
 	}
 
-
-	void FillDropDownServices ()
-	{
-		List<String> namesList = new List<string> ();
-		servicesDropdown.ClearOptions ();
-		foreach (ServicesProvidedModel service in DataManager.currentResponsible.servicesProvided.Values) {
-			var servicePrice = float.Parse (service.price) % 1;
-			namesList.Add (string.Format ("{0} - R${1},{2}", service.name, Mathf.Floor (float.Parse (service.price)), servicePrice.ToString ("00")));
-		}
-
-		servicesDropdown.AddOptions (namesList);
-		GetServiceSelected (0);
-		Loading = false;
-	}
-
-
 	void GetServiceSelected (int newPosition)
 	{
 		Loading = true;
@@ -209,7 +191,7 @@ public class CalendarPageController : PageController
 		actualPositionIndex--;
 		var position = calendars.transform.localPosition.x + positionXOffset;
 		iTween.MoveTo (calendars, iTween.Hash ("x", position, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInOutBack));
-		
+
 	}
 
 	void ReadjustScrollSize (int size)
@@ -222,5 +204,4 @@ public class CalendarPageController : PageController
 
 		ResponsibleScrollContentList.offsetMin = new Vector2 (0, -number);
 	}
-		
 }
