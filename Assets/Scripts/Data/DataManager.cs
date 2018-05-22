@@ -236,6 +236,7 @@ public class DataManager : MonoBehaviour
 		var appointment = new AppointmentModel (dateNewAppointment, user.userID, user.name, currentResponsible.userID, currentResponsible.name, currentservice.name, Mathf.RoundToInt ((currentservice.duration) * 60));
 		FireBaseManager.GetFireBaseInstance ().CreateNewAppoitment (user, currentResponsible, appointment, delegate(AppointmentModel mappointment) {
 			success ();
+			FireBaseManager.GetFireBaseInstance ().AddAVisitToClient (user.userID, currentResponsible.companyID);
 			string minute = (dateNewAppointment.Minute == 0 ? "00" : "0");
 			var message = string.Format ("{0} realizou novo agendamento de {1} com {6} para dia {2}/{3} às {4}:{5}h", user.name, currentservice.name, dateNewAppointment.Day, dateNewAppointment.Month, dateNewAppointment.Hour, minute, currentResponsible.name);
 			if (user.userType == Constants.UserType.User.ToString ()) {
@@ -487,6 +488,8 @@ public class DataManager : MonoBehaviour
 		FireBaseManager.GetFireBaseInstance ().DeleteAppointment (appointment, delegate() {
 			currentUser.appoitments.Remove (appointment.appointmentID);
 
+			FireBaseManager.GetFireBaseInstance ().RemoveVisitToClient (appointment.userID, appointment.responsableID);
+
 			string minute = (appointment.minute.ToString () == "0" ? "00" : "0");
 			var message = string.Format ("{0} desmarcou o agendamento de {1} marcado para dia {2} às {3}:{4}h", currentUser.name, appointment.description, appointment.data, appointment.hour, minute);
 			string toID = "";
@@ -511,6 +514,7 @@ public class DataManager : MonoBehaviour
 		FireBaseManager.GetFireBaseInstance ().DeleteAppointment (appointment, delegate() {
 			currentUser.appoitments.Remove (appointment.appointmentID);
 
+			FireBaseManager.GetFireBaseInstance ().RemoveVisitToClient (appointment.userID, appointment.responsableID);
 			string minute = (appointment.minute.ToString () == "0" ? "00" : "0");
 			var message = string.Format ("{0} desmarcou o agendamento de {1} marcado para dia {2} às {3}:{4}h", currentUser.name, appointment.description, appointment.data, appointment.hour, minute);
 			CreateNewMessageFromUserToResponsilbe (currentUser, currentResponsible, message, Constants.MessageType.RemoveAppointment.ToString (), delegate() {

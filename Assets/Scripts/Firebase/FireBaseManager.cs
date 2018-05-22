@@ -68,6 +68,76 @@ public class FireBaseManager : MonoBehaviour
 
 	}
 
+	public void AddAVisitToClient (string userID, string companyID)
+	{
+
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.clients.ToString ()).GetValueAsync ().ContinueWith (task => {
+			if (task.IsFaulted) {
+				
+			} else if (task.IsCompleted) {
+				DataSnapshot snapshot = task.Result;
+				foreach (var clientData in snapshot.Children) {
+					string json = clientData.GetRawJsonValue ();
+					ClientModel client = JsonUtility.FromJson <ClientModel> (json);
+					if (client.userID == userID) {
+						client.visitCount++;
+						client.visitToCompany++;
+						string mjson = JsonUtility.ToJson (client);
+						SaveVisitToClient (userID, companyID, mjson);
+					}
+				}
+			}
+		});
+	}
+
+	public void RemoveVisitToClient (string userID, string responsibleID)
+	{
+//		GetUserByID()
+//		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.clients.ToString ()).GetValueAsync ().ContinueWith (task => {
+//			if (task.IsFaulted) {
+//
+//			} else if (task.IsCompleted) {
+//				DataSnapshot snapshot = task.Result;
+//				foreach (var clientData in snapshot.Children) {
+//					string json = clientData.GetRawJsonValue ();
+//					ClientModel client = JsonUtility.FromJson <ClientModel> (json);
+//					if (client.userID == userID) {
+//						client.visitCount--;
+//						client.visitToCompany--;
+//						string mjson = JsonUtility.ToJson (client);
+//						SaveVisitToClient (userID, companyID, mjson);
+//					}
+//				}
+//			}
+//		});
+	}
+
+	public void ResetVisitCountToClient (string userID, string companyID)
+	{
+
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.clients.ToString ()).GetValueAsync ().ContinueWith (task => {
+			if (task.IsFaulted) {
+
+			} else if (task.IsCompleted) {
+				DataSnapshot snapshot = task.Result;
+				foreach (var clientData in snapshot.Children) {
+					string json = clientData.GetRawJsonValue ();
+					ClientModel client = JsonUtility.FromJson <ClientModel> (json);
+					if (client.userID == userID) {
+						client.visitCount = 0;
+						string mjson = JsonUtility.ToJson (client);
+						SaveVisitToClient (userID, companyID, mjson);
+					}
+				}
+			}
+		});
+	}
+
+	void SaveVisitToClient (string userID, string companyID, string json)
+	{
+		reference.Child (DBTable.Company.ToString ()).Child (companyID).Child (Parameters.clients + "/" + userID).SetRawJsonValueAsync (json);
+	}
+
 	public void CreateNewAppoitment (UserModel user, ResponsibleModel responsable, AppointmentModel appointment, Delegates.CreateNewAppointment success, Delegates.GeneralListenerFail fail)
 	{
 		string appoitmentID = reference.Child (DBTable.Appointments.ToString ()).Push ().Key;

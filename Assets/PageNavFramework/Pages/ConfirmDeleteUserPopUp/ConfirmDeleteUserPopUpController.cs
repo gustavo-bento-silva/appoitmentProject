@@ -32,7 +32,7 @@ public class ConfirmDeleteUserPopUpController : PageController
 
 	public void OnNoClick ()
 	{
-		CloseModal ();
+		PopPageFromStack ();
 	}
 
 	public override void InstantiatedWithArgs (Dictionary<string,object> args)

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class CreateNewResponsibleToCompanyController : PageController
 {
 	public Text email;
-	public Text password;
+	public InputField password;
 	public Text name;
 
 	public GameObject nameError;
