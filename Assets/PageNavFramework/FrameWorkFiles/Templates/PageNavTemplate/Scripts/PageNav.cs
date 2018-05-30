@@ -270,7 +270,12 @@ namespace PageNavFrameWork
 		void EndTimer ()
 		{
 			SetLoadingVisibility (false);
-			SetErrorVisibility (true);
+
+			if (InternetReachability.IsConnected ()) {
+				SetErrorVisibility (true);
+			} else {
+				SetErrorVisibility (true, "Detectamos um problema com sua internet. Verifique sua conexão e tente novamente!");
+			}
 		}
 
 		public PageController GetCurrentPage ()

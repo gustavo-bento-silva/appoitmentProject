@@ -116,6 +116,12 @@ public class MainPageController : MonoBehaviour
 		OnMenuClick ();
 	}
 
+	public void OnContactClick ()
+	{
+		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.ContactPage);
+		OnMenuClick ();
+	}
+
 	public void OnMenuClick ()
 	{
 		if (menuState == MenuState.Closed) {

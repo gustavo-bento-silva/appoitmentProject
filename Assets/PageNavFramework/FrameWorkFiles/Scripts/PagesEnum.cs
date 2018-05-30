@@ -33,6 +33,7 @@ namespace PageNavFrameWork{
 		InternetErrorPopup=27,
 		CompleteFacebookLoginPage=28,
 		CompanySchedulePage=29,
-		MyCalendarPage=30
+		MyCalendarPage=30,
+		ContactPage=31
 	}
 }
