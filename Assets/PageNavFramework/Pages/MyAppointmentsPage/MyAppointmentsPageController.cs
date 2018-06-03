@@ -88,13 +88,13 @@ public class MyAppointmentsPageController : PageController
 		if (DataManager.currentUser.userType == Constants.UserType.Responsible.ToString ()) {
 			appointmentsList.ForEach (x => {
 				var data = x.data.Split ('-');
-				var month = GetMonth (int.Parse (data [1]));
+				var month = int.Parse (data [1]).ToString ("00");
 				appointmentsCell.Add (MyAppointmentController.Instantiate (cellPrefab, data [0], month, string.Format ("{0}:{1}h", x.hour, x.minute.ToString ("00")), x.description, x.userName, x));
 			});
 		} else {
 			appointmentsList.ForEach (x => {
 				var data = x.data.Split ('-');
-				var month = GetMonth (int.Parse (data [1]));
+				var month = int.Parse (data [1]).ToString ("00");
 				appointmentsCell.Add (MyAppointmentController.Instantiate (cellPrefab, data [0], month, string.Format ("{0}:{1}h", x.hour, x.minute.ToString ("00")), x.description, x.responsibleName, x));
 			});
 		}
@@ -250,6 +250,8 @@ public class MyAppointmentsPageController : PageController
 
 		scrollContentList.offsetMax = new Vector2 (0, 0);
 		var number = (((RectTransform)cellPrefab).rect.height * (size + 1));
+		if (number < 300)
+			number = 900;
 
 		scrollContentList.offsetMin = new Vector2 (0, -number);
 	}
