@@ -47,9 +47,9 @@ public class DataManager : MonoBehaviour
 	public static void LoadUserInfoAux (string ID, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
 	{
 //		Empresa:
-//		ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
+		ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
 //		Gustavo:
-		ID = "7Mu4RNXJUbNPiONAZN05y62HMcv1";
+//		ID = "7Mu4RNXJUbNPiONAZN05y62HMcv1";
 		FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel user) {
 			if (user == null) {
 				fail ("Não foi possível carregar os dados");

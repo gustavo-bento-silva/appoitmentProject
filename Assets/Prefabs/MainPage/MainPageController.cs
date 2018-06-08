@@ -18,6 +18,7 @@ public class MainPageController : MonoBehaviour
 	public GameObject manageResponsible;
 	public GameObject manageServices;
 	public GameObject manageClients;
+	public GameObject companyAppointments;
 
 	public Text userName;
 	public Canvas canvas;
@@ -59,6 +60,7 @@ public class MainPageController : MonoBehaviour
 		manageResponsible.SetActive (false);
 		manageServices.SetActive (false);
 		manageClients.SetActive (false);
+		companyAppointments.SetActive (false);
 	}
 
 	public void SetCompanyMenu ()
@@ -70,6 +72,7 @@ public class MainPageController : MonoBehaviour
 	{
 		manageResponsible.SetActive (false);
 		manageServices.SetActive (false);
+		companyAppointments.SetActive (false);
 	}
 
 	public void OnHomeClick ()
@@ -113,6 +116,12 @@ public class MainPageController : MonoBehaviour
 	public void OnResponsiblesManagerClick ()
 	{
 		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.ManageResponsiblePage);
+		OnMenuClick ();
+	}
+
+	public void OnCompanyScheduleClick ()
+	{
+		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.CompanySchedulePage);
 		OnMenuClick ();
 	}
 

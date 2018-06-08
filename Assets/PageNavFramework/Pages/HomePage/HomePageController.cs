@@ -37,34 +37,22 @@ public class HomePageController : PageController
 	{
 		MainPageController.GetMainPageInstance ().SetClientMenu ();
 		newAppointmentButton.SetActive (true);
-		myAppointments.SetActive (true);
-		myMessages.SetActive (true);
-		promotions.SetActive (true);
 	}
 
 	void LoadCompanyHome ()
 	{
 		MainPageController.GetMainPageInstance ().SetCompanyMenu ();
 		newAppointmentButton.SetActive (true);
-		myAppointments.SetActive (true);
-		myMessages.SetActive (true);
-		userManager.SetActive (true);
 	}
 
 	void LoadAdminHome ()
 	{
 		newAppointmentButton.SetActive (true);
-		myAppointments.SetActive (true);
-		myMessages.SetActive (true);
-		userManager.SetActive (true);
-		promotions.SetActive (true);
 	}
 
 	void LoadResponsibleHome ()
 	{
 		MainPageController.GetMainPageInstance ().SetResponsibleMenu ();
 		newAppointmentButton.SetActive (true);
-		myAppointments.SetActive (true);
-		myMessages.SetActive (true);
 	}
 }

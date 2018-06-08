@@ -59,6 +59,8 @@ public class ManageServicesProvidedController : PageController
 		scrollContentList.offsetMax = new Vector2 (0, 0);
 		var number = (((RectTransform)cellPrefab).rect.height * (size + 1));
 
-		scrollContentList.offsetMin = new Vector2 (0, -number);
+		if (number < scrollContentList.offsetMin.y) {
+			scrollContentList.offsetMin = new Vector2 (0, -number);
+		}
 	}
 }

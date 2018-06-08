@@ -31,6 +31,9 @@ public class CalendarPageController : PageController
 	private int positionXOffset = 1127;
 	private bool isFromCompanySelectPage = false;
 
+	private float positionFromCompanyPageOffset = 1934;
+	private float positionPageOffset = 1451.8f;
+
 	public override void InstantiatedWithArgs (Dictionary<string, object> args)
 	{
 		isFromCompanySelectPage = (bool)args ["isFromCompanySelectPage"];
@@ -98,7 +101,7 @@ public class CalendarPageController : PageController
 	{
 		yield return new WaitForSeconds (1f);
 		responsibleCell.ForEach (x => x.transform.SetParent (ResponsibleScrollContentList, false));
-		ReadjustScrollSize (responsibleCell.Count);
+		ReadjustResponsibleScrollSize (responsibleCell.Count);
 		Loading = false;
 	}
 
@@ -123,7 +126,7 @@ public class CalendarPageController : PageController
 	{
 		yield return new WaitForSeconds (1f);
 		servicesCell.ForEach (x => x.transform.SetParent (ServiceScrollContentList, false));
-		ReadjustScrollSize (servicesCell.Count);
+		ReadjustServiceScrollSize (servicesCell.Count);
 		Loading = false;
 	}
 
@@ -177,18 +180,31 @@ public class CalendarPageController : PageController
 
 	public void GoToNextPage ()
 	{
+		var offset = 0f;
+		if (!isFromCompanySelectPage) {
+			offset = positionFromCompanyPageOffset;
+		} else {
+			offset = positionPageOffset;
+		} 
 		actualPagePosition++;
-		var position = container.transform.localPosition.x - 1451.8f;
+		var position = container.transform.localPosition.x - offset;
 		iTween.MoveTo (container, iTween.Hash ("x", position, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInOutBack));
 	}
 
 	public void GoToPrevioslyPage ()
 	{
+		var offset = 0f;
+
+		if (!isFromCompanySelectPage) {
+			offset = positionFromCompanyPageOffset;
+		} else {
+			offset = positionPageOffset;
+		} 
 		if (actualPagePosition == 2) {
 			GoCalendarsToOriginalPosition ();
 		}
 		actualPagePosition--;
-		var position = container.transform.localPosition.x + 1451.8f;
+		var position = container.transform.localPosition.x + offset;
 		iTween.MoveTo (container, iTween.Hash ("x", position, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInOutBack));
 	}
 
@@ -212,7 +228,7 @@ public class CalendarPageController : PageController
 		
 	}
 
-	void ReadjustScrollSize (int size)
+	void ReadjustResponsibleScrollSize (int size)
 	{
 		ResponsibleScrollContentList.anchorMax = new Vector2 (1, 1);
 		ResponsibleScrollContentList.anchorMin = new Vector2 (0, 1);
@@ -220,7 +236,22 @@ public class CalendarPageController : PageController
 		ResponsibleScrollContentList.offsetMax = new Vector2 (0, 0);
 		var number = isFromCompanySelectPage ? (((RectTransform)ResponsibleCellPrefab).rect.height * (size + 1)) : (((RectTransform)ResponsibleManagerCellPrefab).rect.height * (size + 1));
 
-		ResponsibleScrollContentList.offsetMin = new Vector2 (0, -number);
+		if (number < ResponsibleScrollContentList.offsetMin.y) {
+			ResponsibleScrollContentList.offsetMin = new Vector2 (0, -number);
+		}
+	}
+
+	void ReadjustServiceScrollSize (int size)
+	{
+		ServiceScrollContentList.anchorMax = new Vector2 (1, 1);
+		ServiceScrollContentList.anchorMin = new Vector2 (0, 1);
+
+		ServiceScrollContentList.offsetMax = new Vector2 (0, 0);
+		var number = ((RectTransform)ServiceCellPrefab).rect.height * (size + 1);
+
+		if (number < ServiceScrollContentList.offsetMin.y) {
+			ServiceScrollContentList.offsetMin = new Vector2 (0, -number);
+		}
 	}
 		
 }

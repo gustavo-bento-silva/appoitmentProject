@@ -45,7 +45,7 @@ public class MyAppointmentsPageController : PageController
 	void CheckAppointments ()
 	{
 		Loading = true;
-		if (DataManager.currentUser != null) {
+		if (DataManager.currentUser.appoitments != null) {
 			if (DataManager.currentUser.appoitments.Count >= 1) {
 				ClearAppointments ();
 				nullListMessage.SetActive (false);
