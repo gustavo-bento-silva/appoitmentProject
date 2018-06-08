@@ -17,6 +17,8 @@ public class ResponsibleModel : UserModel
 	public List<bool> daysOfWork;
 	[SerializeField]
 	public List<BlockDay> blockDayList;
+	[SerializeField]
+	public LunchTime lunchTime;
 
 	public ResponsibleModel (UserModel user) : base (user.userID, user.name, user.phone, Constants.UserType.Responsible)
 	{
@@ -26,9 +28,10 @@ public class ResponsibleModel : UserModel
 		timeToBeginWork = new List<int> (new int[] { 8, 8, 8, 8, 8, 8, 8 });
 		timeToFinishWork = new List<int> (new int[] { 17, 17, 17, 17, 17, 17, 17 });
 		blockDayList = new List<BlockDay> ();
+		lunchTime = new LunchTime (0, 0);
 	}
 
-	public ResponsibleModel (UserModel user, string companyID, List<ServicesProvidedModel> services, List<bool> daysWorked, List<int> timeToBeginWork, List<int> timeToFinishWork) : base (user.userID, user.name, user.phone, Constants.UserType.Responsible)
+	public ResponsibleModel (UserModel user, string companyID, List<ServicesProvidedModel> services, List<bool> daysWorked, List<int> timeToBeginWork, List<int> timeToFinishWork, LunchTime lunchTime) : base (user.userID, user.name, user.phone, Constants.UserType.Responsible)
 	{
 		this.companyID = companyID;
 		servicesProvided = new Dictionary<string, object> ();
@@ -37,6 +40,7 @@ public class ResponsibleModel : UserModel
 		this.timeToBeginWork = timeToBeginWork;
 		this.timeToFinishWork = timeToFinishWork;
 		blockDayList = new List<BlockDay> ();
+		lunchTime = lunchTime;
 	}
 }
 
@@ -50,5 +54,22 @@ public class BlockDay
 	{
 		id = "";
 		data = mData.ToString (Constants.dateformat);
+	}
+}
+
+[System.Serializable]
+public class LunchTime
+{
+	public int initTime;
+	public int endTime;
+
+	public LunchTime ()
+	{
+	}
+
+	public LunchTime (int initTime, int endTime)
+	{
+		this.initTime = initTime;
+		this.endTime = endTime;
 	}
 }

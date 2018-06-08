@@ -24,6 +24,8 @@ public static class Delegates
 
 	public delegate void GetDaysTimeWorked (List<int> daysTime);
 
+	public delegate void GetLunchTime (LunchTime lunchTime);
+
 	public delegate void GetCompanyID (string companyID);
 
 	public delegate void CreateNewAppointment (AppointmentModel appointment);

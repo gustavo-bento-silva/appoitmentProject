@@ -26,6 +26,7 @@ public enum Parameters
 	clients,
 	servicesProvided,
 	isNew,
+	lunchTime,
 	daysOfWork,
 	companyID,
 	timeToBeginWork,
@@ -405,9 +406,9 @@ public class FireBaseManager : MonoBehaviour
 		});
 	}
 
-	public ResponsibleModel CreateNewResponsibleToCompany (string responsibleID, string companyID, string name, List<ServicesProvidedModel> servicesProvided, List<bool> daysWorked, List<int> initTime, List<int> finishTime, string phone)
+	public ResponsibleModel CreateNewResponsibleToCompany (string responsibleID, string companyID, string name, List<ServicesProvidedModel> servicesProvided, List<bool> daysWorked, List<int> initTime, List<int> finishTime, string phone, int initLunchTime, int endLunchtime)
 	{
-		ResponsibleModel responsable = new ResponsibleModel (new UserModel (responsibleID, name, phone), companyID, servicesProvided, daysWorked, initTime, finishTime);
+		ResponsibleModel responsable = new ResponsibleModel (new UserModel (responsibleID, name, phone), companyID, servicesProvided, daysWorked, initTime, finishTime, new LunchTime (initLunchTime, endLunchtime));
 		string json = JsonUtility.ToJson (responsable);
 
 		CreateTable (DBTable.Responsible, responsibleID, json);
@@ -508,6 +509,23 @@ public class FireBaseManager : MonoBehaviour
 					daysTime.Add ((int)daytime.Value);
 				}
 				daysTimeWorkedCallBack (daysTime);
+			}
+		});
+	}
+
+	public void GetLunchTimeFromResponsible (String responsibleID, Delegates.GetLunchTime lunchtimeCallback)
+	{
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsible.ToString ()).Child (responsibleID).Child (Parameters.lunchTime.ToString ())
+			.GetValueAsync ().ContinueWith (task => {
+			if (task.IsFaulted) {
+				// Handle the error...
+			} else if (task.IsCompleted) {
+				DataSnapshot snapshot = task.Result;
+				LunchTime lunchTimeList = new LunchTime ();
+				foreach (var daytime in snapshot.Children) {
+					lunchTimeList = (LunchTime)daytime.Value;
+				}
+				lunchtimeCallback (lunchTimeList);
 			}
 		});
 	}

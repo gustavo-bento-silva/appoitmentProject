@@ -145,13 +145,13 @@ public class DataManager : MonoBehaviour
 //		});
 	}
 
-	public static void CreateNewResponsibleToCompanyAsUser (string reponsibleID, string name, List<ServicesProvidedModel> services, List<bool> daysWorked, List<int> initTime, List<int> finishTime, string phone = "")
+	public static void CreateNewResponsibleToCompanyAsUser (string reponsibleID, string name, List<ServicesProvidedModel> services, List<bool> daysWorked, List<int> initTime, List<int> finishTime, int initLunchTime, int endLunchTime, string phone = "")
 	{
 		var mPhone = phone;
 		if (string.IsNullOrEmpty (phone)) {
 			mPhone = (currentUser as CompanyModel).phone;
 		}
-		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (reponsibleID, (currentUser as CompanyModel).userID, name, services, daysWorked, initTime, finishTime, mPhone));
+		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (reponsibleID, (currentUser as CompanyModel).userID, name, services, daysWorked, initTime, finishTime, mPhone, initLunchTime, endLunchTime));
 	}
 
 	public static void DeleteClient (UserModel client, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)

@@ -10,11 +10,15 @@ public class CreateNewResponsibleToCompanyController : PageController
 	public InputField password;
 	public Text name;
 
+	public InputField initLunchTime;
+	public InputField endLunchTime;
+
 	public GameObject nameError;
 	public GameObject emailError;
 	public GameObject passwordError;
 	public GameObject serviceError;
 	public GameObject daysError;
+	public GameObject lunchTimeError;
 
 	public GameObject container;
 
@@ -116,7 +120,7 @@ public class CreateNewResponsibleToCompanyController : PageController
 
 	void CreateNewResponsibleToCompany (string userID)
 	{
-		DataManager.CreateNewResponsibleToCompanyAsUser (userID, name.text, GetServices (), GetDaysWorked (), GetInitTime (), GetEndTime ());
+		DataManager.CreateNewResponsibleToCompanyAsUser (userID, name.text, GetServices (), GetDaysWorked (), GetInitTime (), GetEndTime (), int.Parse (initLunchTime.text), int.Parse (endLunchTime.text));
 		Loading = false;
 		Constants.LoadHomePage ();
 	}
@@ -141,10 +145,12 @@ public class CreateNewResponsibleToCompanyController : PageController
 			everythingOk = SecondStepVerify ();
 		} else if (actualPositionIndex == 2) {
 			everythingOk = ThirdStepVerify ();
+		} else if (actualPositionIndex == 2) {
+			everythingOk = FourthStepVerify ();
 		}
 
 		if (everythingOk) {
-			if (actualPositionIndex == 2) {
+			if (actualPositionIndex == 3) {
 				CreateUserLogin ();
 			} else {
 				actualPositionIndex++;
@@ -221,6 +227,17 @@ public class CreateNewResponsibleToCompanyController : PageController
 		} 
 		daysError.SetActive (true);
 		return false;
+	}
+
+	public bool FourthStepVerify ()
+	{
+		if (int.Parse (initLunchTime.text) <= int.Parse (endLunchTime.text)) {
+			lunchTimeError.SetActive (false);
+			return true;
+		} else {
+			lunchTimeError.SetActive (true);
+			return false;
+		}
 	}
 
 	public List<ServicesProvidedModel> GetServices ()
