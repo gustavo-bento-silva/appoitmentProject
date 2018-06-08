@@ -358,6 +358,11 @@ namespace PageNavFrameWork
 		/// <param name="PageEnum">Page enum.</param>
 		public void PushPageToStack (PagesEnum pageEnum, bool deactivateBehindPage = true)
 		{
+			if (pageEnum == PagesEnum.HomePage) {
+				MainPageController.GetMainPageInstance ().SetHeaderGrayColor ();
+			} else {
+				MainPageController.GetMainPageInstance ().SetHeaderPurpleColor ();
+			}
 			if ((int)pageEnum - 1 >= settings.PagesPrefabs.Count) {
 				Debug.LogWarning ("The pageEnum you are trying to use does not exist!");
 				return;

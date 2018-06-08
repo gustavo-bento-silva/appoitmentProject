@@ -14,6 +14,9 @@ public class MainPageController : MonoBehaviour
 
 	public static MainPageController _instance;
 
+	public Color purpleColor;
+	public Color greyColor;
+	public Image menuHeader;
 	public GameObject myAppointment;
 	public GameObject manageResponsible;
 	public GameObject manageServices;
@@ -55,6 +58,16 @@ public class MainPageController : MonoBehaviour
 		}
 	}
 
+	public void SetHeaderPurpleColor ()
+	{
+		menuHeader.color = purpleColor;
+	}
+
+	public void SetHeaderGrayColor ()
+	{
+		menuHeader.color = greyColor;
+	}
+
 	public void SetClientMenu ()
 	{
 		manageResponsible.SetActive (false);
@@ -78,6 +91,7 @@ public class MainPageController : MonoBehaviour
 	public void OnHomeClick ()
 	{
 		PageNavFrameWork.PageNav.GetPageNavInstance ().DropAllPagesFromStack ();
+		SetHeaderGrayColor ();
 		OnMenuClick ();
 	}
 
