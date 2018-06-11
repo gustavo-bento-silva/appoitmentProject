@@ -168,6 +168,9 @@ public class ScheduleDetailPageController : PageController
 
 	void InitializeScheduleTime ()
 	{
+		var initLunchTime = DataManager.currentResponsible.lunchTime.initTime;
+		var endLunchTime = DataManager.currentResponsible.lunchTime.endTime;
+		DateTime lunchTime = new DateTime (appointmentYear, appointmentMonth, appointmentDay, endLunchTime, 0, 0);
 		var dayOfWeek = (int)DataManager.dateNewAppointment.DayOfWeek;
 		limit = DataManager.currentResponsible.timeToFinishWork [dayOfWeek];
 		begin = DataManager.currentResponsible.timeToBeginWork [dayOfWeek];
@@ -197,7 +200,7 @@ public class ScheduleDetailPageController : PageController
 		var into = false;
 
 		for (var i = 0; i < limit; i++) {
-			if (isBlockDay || dt.CompareTo (DateTime.Now) < 0) {
+			if (isBlockDay || dt.CompareTo (DateTime.Now) < 0 || (dt.Hour >= initLunchTime && (dt.CompareTo (lunchTime) <= 0))) {
 				var cell = DayController.Instantiate (cellPrefabTransform, dt.Hour.ToString () + ":" + dt.Minute.ToString ("00"), "Bloqueado", false);
 				if (isFromSchedulePage)
 					cell.GetComponent<Button> ().interactable = false;

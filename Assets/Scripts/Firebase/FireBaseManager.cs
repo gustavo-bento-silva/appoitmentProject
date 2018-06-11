@@ -26,6 +26,7 @@ public enum Parameters
 	clients,
 	servicesProvided,
 	isNew,
+	lunchTime,
 	daysOfWork,
 	companyID,
 	timeToBeginWork,
@@ -215,9 +216,18 @@ public class FireBaseManager : MonoBehaviour
 		});
 	}
 
-	public CompanyModel CreateNewCompany (string companyID, string name, string phone, string city, string address, string cep)
+	public CompanyModel CreateNewCompany (string companyID, string name, string phone, string city, string address, string cep, int[] timeToBegin = null, int[] timeToFinish = null, bool[] daysWorked = null)
 	{
-		CompanyModel company = new CompanyModel (new UserModel (companyID, name, phone), city, address, cep);
+		if (timeToBegin == null) {
+			timeToBegin = new int[]{ 9, 9, 9, 9, 9, 9, 9 };
+		}
+		if (timeToFinish == null) {
+			timeToFinish = new int[]{ 18, 18, 18, 18, 18, 18, 18 };
+		}
+		if (daysWorked == null) {
+			daysWorked = new bool[]{ false, false, true, true, true, true, true };
+		}
+		CompanyModel company = new CompanyModel (new UserModel (companyID, name, phone), city, address, cep, timeToBegin, timeToFinish, daysWorked);
 
 		string json = JsonUtility.ToJson (company);
 		CreateTable (DBTable.Company, companyID, json);
@@ -405,9 +415,11 @@ public class FireBaseManager : MonoBehaviour
 		});
 	}
 
-	public ResponsibleModel CreateNewResponsibleToCompany (string responsibleID, string companyID, string name, List<ServicesProvidedModel> servicesProvided, List<bool> daysWorked, List<int> initTime, List<int> finishTime, string phone)
+	public ResponsibleModel CreateNewResponsibleToCompany (string responsibleID, string companyID, string name, List<ServicesProvidedModel> servicesProvided, List<bool> daysWorked, List<int> initTime, List<int> finishTime, string phone, int initLunchTime, int endLunchtime)
 	{
-		ResponsibleModel responsable = new ResponsibleModel (new UserModel (responsibleID, name, phone), companyID, servicesProvided, daysWorked, initTime, finishTime);
+		LunchTime mLunchTime = new LunchTime (initLunchTime, endLunchtime);
+		ResponsibleModel responsable = new ResponsibleModel (new UserModel (responsibleID, name, phone), companyID, servicesProvided, daysWorked, initTime, finishTime, mLunchTime);
+		responsable.lunchTime = mLunchTime;
 		string json = JsonUtility.ToJson (responsable);
 
 		CreateTable (DBTable.Responsible, responsibleID, json);
@@ -508,6 +520,23 @@ public class FireBaseManager : MonoBehaviour
 					daysTime.Add ((int)daytime.Value);
 				}
 				daysTimeWorkedCallBack (daysTime);
+			}
+		});
+	}
+
+	public void GetLunchTimeFromResponsible (String responsibleID, Delegates.GetLunchTime lunchtimeCallback)
+	{
+		FirebaseDatabase.DefaultInstance.GetReference (DBTable.Responsible.ToString ()).Child (responsibleID).Child (Parameters.lunchTime.ToString ())
+			.GetValueAsync ().ContinueWith (task => {
+			if (task.IsFaulted) {
+				// Handle the error...
+			} else if (task.IsCompleted) {
+				DataSnapshot snapshot = task.Result;
+				LunchTime lunchTimeList = new LunchTime ();
+				foreach (var daytime in snapshot.Children) {
+					lunchTimeList = (LunchTime)daytime.Value;
+				}
+				lunchtimeCallback (lunchTimeList);
 			}
 		});
 	}
