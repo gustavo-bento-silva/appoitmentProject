@@ -30,14 +30,15 @@ public class CompanyModel : UserModel
 		servicesProvided = new Dictionary<string, object> ();
 	}
 
-	public CompanyModel (UserModel user, string city, string address, string cep) : base (user.userID, user.name, user.phone, Constants.UserType.Company)
+	public CompanyModel (UserModel user, string city, string address, string cep, int[] timeToBegin, int[] timeToFinish, bool[] daysOfWork) : base (user.userID, user.name, user.phone, Constants.UserType.Company)
 	{
 		this.city = city;
 		this.address = address;
 		this.cep = cep;
-		this.daysOfWork = new List<bool> (new bool[] { false, true, true, true, true, true, true });
-		timeToBeginWork = new List<int> (new int[] { 8, 8, 8, 8, 8, 8, 8 });
-		timeToFinishWork = new List<int> (new int[] { 17, 17, 17, 17, 17, 17, 17 });
+		//Start at sunday
+		this.daysOfWork = new List<bool> (daysOfWork);
+		timeToBeginWork = new List<int> (timeToBegin);
+		timeToFinishWork = new List<int> (timeToFinish);
 		clients = new Dictionary<string, object> ();
 		employees = new Dictionary<string, object> ();
 	}

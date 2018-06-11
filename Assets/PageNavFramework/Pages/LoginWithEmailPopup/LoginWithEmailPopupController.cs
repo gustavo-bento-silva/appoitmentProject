@@ -58,6 +58,12 @@ public class LoginWithEmailPopupController : PageController
 		container.SetActive (false);
 	}
 
+	public void ForgotPasswordDisable ()
+	{
+		forgotPassword.SetActive (false);
+		container.SetActive (true);
+	}
+
 	public void OnConfirmForgotPasswordClick ()
 	{
 		if (string.IsNullOrEmpty (forgotEmail.text) || !forgotEmail.text.Contains ("@")) {

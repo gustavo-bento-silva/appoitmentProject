@@ -145,7 +145,7 @@ public class CreateNewResponsibleToCompanyController : PageController
 			everythingOk = SecondStepVerify ();
 		} else if (actualPositionIndex == 2) {
 			everythingOk = ThirdStepVerify ();
-		} else if (actualPositionIndex == 2) {
+		} else if (actualPositionIndex == 3) {
 			everythingOk = FourthStepVerify ();
 		}
 
@@ -231,7 +231,9 @@ public class CreateNewResponsibleToCompanyController : PageController
 
 	public bool FourthStepVerify ()
 	{
-		if (int.Parse (initLunchTime.text) <= int.Parse (endLunchTime.text)) {
+		var initTime = int.Parse (initLunchTime.text);
+		var finishTIme = int.Parse (endLunchTime.text);
+		if (initTime <= finishTIme) {
 			lunchTimeError.SetActive (false);
 			return true;
 		} else {

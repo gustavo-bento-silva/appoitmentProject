@@ -47,7 +47,7 @@ public class DataManager : MonoBehaviour
 	public static void LoadUserInfoAux (string ID, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
 	{
 //		Empresa:
-		ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
+//		ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
 //		Gustavo:
 //		ID = "7Mu4RNXJUbNPiONAZN05y62HMcv1";
 		FireBaseManager.GetFireBaseInstance ().GetUserByID (ID, delegate(UserModel user) {
@@ -180,6 +180,24 @@ public class DataManager : MonoBehaviour
 		FireBaseManager.GetFireBaseInstance ().AddServicesToCompany (currentUser.userID, new List<ServicesProvidedModel> () { service }, delegate(List<ServicesProvidedModel> services) {
 			services.ForEach (x => (currentUser as CompanyModel).servicesProvided.Add (x.serviceID, (object)x));
 		});
+	}
+
+	public static void CreateCompanyData (string companyID, string companyName, string phone, string city, string address, string cep, int[] timeToInit, int[] timeToFinish, bool[] daysOfWork)
+	{
+		companyData = FireBaseManager.GetFireBaseInstance ().CreateNewCompany (companyID, companyName, phone, city, address, cep, timeToInit, timeToFinish, daysOfWork);
+
+		//		var servicesList = new List<ServicesProvidedModel> ();
+		//		servicesList.Add (new ServicesProvidedModel ("Cabeleireiro", 1));
+		//		servicesList.Add (new ServicesProvidedModel ("Manicure", 0.5f));
+		//		servicesList.Add (new ServicesProvidedModel ("Pedicure", 1.5f));
+
+		//		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Funcionario 1", new List<ServicesProvidedModel> { servicesList [0] }));
+		//		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Funcionario 2", new List<ServicesProvidedModel> { servicesList [1] }));
+		//		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Funcionario 3", new List<ServicesProvidedModel> { servicesList [2] }));
+		//		responsibles.Add (FireBaseManager.GetFireBaseInstance ().CreateNewResponsibleToCompany (companyData.userID, "Funcionario 4", servicesList));
+
+		companyData.employees = responsibles.ToDictionary (x => x.userID, x => (object)x);
+
 	}
 
 	public static void CreateCompanyDataWithMockData (string companyID)
