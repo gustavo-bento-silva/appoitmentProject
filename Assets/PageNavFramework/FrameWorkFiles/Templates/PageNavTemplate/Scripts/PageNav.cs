@@ -5,6 +5,7 @@ using System.Threading;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System;
+using UnityEngine.SceneManagement;
 
 namespace PageNavFrameWork
 {
@@ -358,10 +359,12 @@ namespace PageNavFrameWork
 		/// <param name="PageEnum">Page enum.</param>
 		public void PushPageToStack (PagesEnum pageEnum, bool deactivateBehindPage = true)
 		{
-			if (pageEnum == PagesEnum.HomePage) {
-				MainPageController.GetMainPageInstance ().SetHeaderGrayColor ();
-			} else {
-				MainPageController.GetMainPageInstance ().SetHeaderPurpleColor ();
+			if (SceneManager.GetActiveScene ().name == "MainScene") {
+				if (pageEnum == PagesEnum.HomePage) {
+					MainPageController.GetMainPageInstance ().SetHeaderGrayColor ();
+				} else {
+					MainPageController.GetMainPageInstance ().SetHeaderPurpleColor ();
+				}
 			}
 			if ((int)pageEnum - 1 >= settings.PagesPrefabs.Count) {
 				Debug.LogWarning ("The pageEnum you are trying to use does not exist!");
@@ -563,6 +566,9 @@ namespace PageNavFrameWork
 		/// </summary>
 		public void DropAllPagesFromStack ()
 		{
+			if (SceneManager.GetActiveScene ().name == "MainScene")
+				MainPageController.GetMainPageInstance ().SetHeaderGrayColor ();
+
 			if (PagesStack.Count <= 1) {
 				return;
 			}
