@@ -20,7 +20,14 @@ public class SelectCompanyController : PageController
 
 	void Start ()
 	{
+//		Loading = true;
+//		if (DataManager.currentUser.userType == Constants.UserType.Company.ToString () || DataManager.currentUser.userType == Constants.UserType.Responsible.ToString ()) {
+//			var dict = new Dictionary<string, object> ();
+//			dict.Add ("isFromCompanySelectPage", (object)true);
+//			PageNav.GetPageNavInstance ().PushPageToStackWithArgs (PagesEnum.CalendarPage, dict);
+//		} else {
 		CheckCompanies ();
+//		}
 	}
 
 	void Update ()
