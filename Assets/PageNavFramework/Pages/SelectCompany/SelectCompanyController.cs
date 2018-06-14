@@ -76,7 +76,7 @@ public class SelectCompanyController : PageController
 	void OnCompanySelected (CompanyModel company, int index)
 	{
 		DataManager.companyData = company;
-		ChangeSelectCompanyColor (index);
+//		ChangeSelectCompanyColor (index);
 		var dict = new Dictionary<string, object> ();
 		dict.Add ("isFromCompanySelectPage", (object)true);
 		PageNav.GetPageNavInstance ().PushPageToStackWithArgs (PagesEnum.CalendarPage, dict);
@@ -84,11 +84,12 @@ public class SelectCompanyController : PageController
 
 	void ReadjustScrollSize (int size)
 	{
+		var offset = 1.06f;
 		scrollContentList.anchorMax = new Vector2 (1, 1);
 		scrollContentList.anchorMin = new Vector2 (0, 1);
 
 		scrollContentList.offsetMax = new Vector2 (0, 0);
-		var number = (((RectTransform)cellPrefab).rect.height * (size + 1));
+		var number = (((RectTransform)cellPrefab).rect.height * ((size + 1) * offset));
 
 		scrollContentList.offsetMin = new Vector2 (0, -number);
 	}

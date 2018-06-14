@@ -10,7 +10,14 @@ public class LoginPageController : PageController
 {
 	public InputField idTest;
 	public string homeScene;
-	public string url = "http://servicodados.ibge.gov.br/api/v1/localidades/estados/33/municipios";
+	public GameObject successMessage;
+	public GameObject forgotPassword;
+	public Text forgotEmail;
+	public GameObject forgotEmailError;
+	public GameObject email;
+	public GameObject password;
+	public GameObject emailError;
+	public GameObject passwordError;
 
 	void Start ()
 	{
@@ -82,41 +89,78 @@ public class LoginPageController : PageController
 		});
 	}
 
+	public void OnLoginClick ()
+	{
+		var emailText = email.GetComponent<InputField> ().text;
+		var passwordText = password.GetComponent<InputField> ().text;
+		int everyThingIsRight = 0;
+
+		if (string.IsNullOrEmpty (emailText) || !emailText.Contains ("@")) {
+			emailError.SetActive (true);
+		} else {
+			emailError.SetActive (false);
+			everyThingIsRight++;
+		}
+		if (passwordText.Length < 6) {
+			passwordError.SetActive (true);
+		} else {
+			passwordError.SetActive (false);
+			everyThingIsRight++;
+		}
+
+		if (everyThingIsRight >= 2) {
+			Loading = true;
+			Debug.Log ("MyTag: userlogin will be called");
+			FirebaseAuth.GetFireBaseAuthInstance ().UserLogin (email.GetComponent<InputField> ().text, password.GetComponent<InputField> ().text, delegate (string id) {
+				Debug.Log ("MyTag: userlogin was successfully - id: " + id);
+				DataManager.userID = id;
+				Loading = false;
+				ChangeScene ();
+			}, delegate(string error) {
+				Loading = false;
+				OpenErrorPopup (error);
+			});
+		}		
+	}
+
+	public void ForgotPasswordClick ()
+	{
+		forgotPassword.SetActive (true);
+	}
+
+	public void ForgotPasswordDisable ()
+	{
+		forgotPassword.SetActive (false);
+	}
+
+	public void SuccessDisable ()
+	{
+		successMessage.SetActive (false);
+	}
+
+	public void OnConfirmForgotPasswordClick ()
+	{
+		if (string.IsNullOrEmpty (forgotEmail.text) || !forgotEmail.text.Contains ("@")) {
+			forgotEmailError.SetActive (true);
+		} else {
+			Loading = true;
+			forgotEmailError.SetActive (false);
+			FirebaseAuth.GetFireBaseAuthInstance ().ForgotPassword (forgotEmail.text, delegate() {
+				successMessage.SetActive (true);
+				forgotPassword.SetActive (false);
+				Loading = false;
+			}, delegate(string error) {
+				Error = true;
+				Loading = false;
+			});
+		}
+	}
+
+
 	void ChangeScene ()
 	{
 		SceneManager.LoadSceneAsync (homeScene);
 	}
-
-
-	IEnumerator GetLocations ()
-	{
-		using (WWW www = new WWW (url)) {
-			yield return www;
-
-			if (www.error != null) {
-				Debug.LogError ("Erro na chamada da api");
-			} else {
-				Debug.Log (www.text);
-				Cities cities = JsonUtility.FromJson<Cities> (www.text);
-				foreach (CityModel city in cities.cities) {
-					Debug.Log (city.id + " " + city.nome);
-				}
-			}
-		}
-	}
-
+		
 }
-
-[Serializable]
-public class Cities
-{
-	public List<CityModel> cities;
-}
-
-[Serializable]
-public class CityModel
-{
-	public string id;
-	public string nome;
-	public Dictionary <string, object> microrregiao;
-}
+	

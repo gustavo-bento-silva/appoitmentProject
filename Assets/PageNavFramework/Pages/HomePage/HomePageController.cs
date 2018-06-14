@@ -36,12 +36,14 @@ public class HomePageController : PageController
 	void LoadClientHome ()
 	{
 		MainPageController.GetMainPageInstance ().SetClientMenu ();
+		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.SelectCompany);
 		newAppointmentButton.SetActive (true);
 	}
 
 	void LoadCompanyHome ()
 	{
 		MainPageController.GetMainPageInstance ().SetCompanyMenu ();
+		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.SelectCompany);
 		newAppointmentButton.SetActive (true);
 	}
 
@@ -53,6 +55,7 @@ public class HomePageController : PageController
 	void LoadResponsibleHome ()
 	{
 		MainPageController.GetMainPageInstance ().SetResponsibleMenu ();
+		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.SelectCompany);
 		newAppointmentButton.SetActive (true);
 	}
 }

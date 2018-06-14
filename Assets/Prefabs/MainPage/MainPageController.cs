@@ -22,6 +22,7 @@ public class MainPageController : MonoBehaviour
 	public GameObject manageServices;
 	public GameObject manageClients;
 	public GameObject companyAppointments;
+	public GameObject appointmentItem;
 
 	public Text userName;
 	public Canvas canvas;
@@ -54,7 +55,7 @@ public class MainPageController : MonoBehaviour
 	public void UpdateText ()
 	{
 		if (DataManager.currentUser != null) {
-			userName.text = DataManager.currentUser.name;
+			userName.text = DataManager.currentUser.name.ToUpper ();
 		}
 	}
 
@@ -74,6 +75,7 @@ public class MainPageController : MonoBehaviour
 		manageServices.SetActive (false);
 		manageClients.SetActive (false);
 		companyAppointments.SetActive (false);
+		appointmentItem.SetActive (false);
 	}
 
 	public void SetCompanyMenu ()

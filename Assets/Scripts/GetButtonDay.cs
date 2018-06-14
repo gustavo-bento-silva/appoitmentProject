@@ -12,6 +12,7 @@ public class GetButtonDay : MonoBehaviour
 	public void Start ()
 	{
 		dayText = gameObject.GetComponentInChildren<Text> ();
+		gameObject.GetComponent<Button> ().onClick.AddListener (OnButtonSelected);
 	}
 
 	public void OnButtonSelected ()

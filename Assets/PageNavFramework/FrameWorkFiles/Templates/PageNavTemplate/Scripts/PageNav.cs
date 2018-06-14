@@ -400,6 +400,13 @@ namespace PageNavFrameWork
 		/// <param name="args">Arguments.</param>
 		public void PushPageToStackWithArgs (PagesEnum pageEnum, Dictionary<string,object> args, bool deactivateBehindPage = true)
 		{
+			if (SceneManager.GetActiveScene ().name == "MainScene") {
+				if (pageEnum == PagesEnum.HomePage) {
+					MainPageController.GetMainPageInstance ().SetHeaderGrayColor ();
+				} else {
+					MainPageController.GetMainPageInstance ().SetHeaderPurpleColor ();
+				}
+			}
 			if ((int)pageEnum - 1 >= settings.PagesPrefabs.Count) {
 				Debug.LogWarning ("The pageEnum you are trying to use does not exist!");
 				return;
