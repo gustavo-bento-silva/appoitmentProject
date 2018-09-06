@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MainPageController : MonoBehaviour
@@ -23,6 +24,8 @@ public class MainPageController : MonoBehaviour
 	public GameObject manageClients;
 	public GameObject companyAppointments;
 	public GameObject appointmentItem;
+	public GameObject messages;
+	public GameObject login;
 
 	public Text userName;
 	public Canvas canvas;
@@ -40,207 +43,235 @@ public class MainPageController : MonoBehaviour
 	int appointmentsBadgesQuantity = 0;
 	int homeBadgesQuantity = 0;
 
-	public static MainPageController GetMainPageInstance ()
+	public static MainPageController GetMainPageInstance()
 	{
 		return _instance;
 	}
 
-	void Awake ()
+	void Awake()
 	{
-		if (_instance == null) {
+		if (_instance == null)
+		{
 			_instance = this;
 		}
 	}
 
-	public void UpdateText ()
+	public void UpdateText()
 	{
-		if (DataManager.currentUser != null) {
-			userName.text = DataManager.currentUser.name.ToUpper ();
+		if (DataManager.currentUser != null)
+		{
+			userName.text = DataManager.currentUser.name.ToUpper();
 		}
 	}
 
-	public void SetHeaderPurpleColor ()
+	public void SetHeaderPurpleColor()
 	{
 		menuHeader.color = purpleColor;
 	}
 
-	public void SetHeaderGrayColor ()
+	public void SetHeaderGrayColor()
 	{
 		menuHeader.color = greyColor;
 	}
 
-	public void SetClientMenu ()
+	public void SetClientMenu()
 	{
-		manageResponsible.SetActive (false);
-		manageServices.SetActive (false);
-		manageClients.SetActive (false);
-		companyAppointments.SetActive (false);
-		appointmentItem.SetActive (false);
+		manageResponsible.SetActive(false);
+		manageServices.SetActive(false);
+		manageClients.SetActive(false);
+		companyAppointments.SetActive(false);
+		appointmentItem.SetActive(false);
+		login.SetActive(false);
 	}
 
-	public void SetCompanyMenu ()
+	public void SetCompanyMenu()
 	{
-		myAppointment.SetActive (false);
+		myAppointment.SetActive(false);
+		login.SetActive(false);
 	}
 
-	public void SetResponsibleMenu ()
+	public void SetResponsibleMenu()
 	{
-		manageResponsible.SetActive (false);
-		manageServices.SetActive (false);
-		companyAppointments.SetActive (false);
+		manageResponsible.SetActive(false);
+		manageServices.SetActive(false);
+		companyAppointments.SetActive(false);
+		login.SetActive(false);
 	}
 
-	public void OnHomeClick ()
+	public void SetAnonymousMenu()
 	{
-		PageNavFrameWork.PageNav.GetPageNavInstance ().DropAllPagesFromStack ();
-		SetHeaderGrayColor ();
-		OnMenuClick ();
+		manageResponsible.SetActive(false);
+		manageServices.SetActive(false);
+		manageClients.SetActive(false);
+		companyAppointments.SetActive(false);
+		appointmentItem.SetActive(false);
+		myAppointment.SetActive(false);
+		messages.SetActive(false);
 	}
 
-	public void OnMessagesClick ()
+	public void OnHomeClick()
 	{
-		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.MessagesPage);
-		OnMenuClick ();
-	}
-
-
-	public void OnNewAppointmentClick ()
-	{
-		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.SelectCompany);
-		OnMenuClick ();
-	}
-
-	public void OnMyAppointmentsClick ()
-	{
-		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.MyAppointmentsPage);
-		OnMenuClick ();
-	}
-
-	public void OnServicesManagerClick ()
-	{
-		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.ManageServicesProvided);
-		OnMenuClick ();
+		PageNavFrameWork.PageNav.GetPageNavInstance().DropAllPagesFromStack();
+		SetHeaderGrayColor();
+		OnMenuClick();
 	}
 
 
-	public void OnClientsManagerClick ()
+	public void OnLoginClick()
 	{
-		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.ClientsManagerPage);
-		OnMenuClick ();
+		SceneManager.LoadSceneAsync("LoginScene");
 	}
 
-	public void OnResponsiblesManagerClick ()
+	public void OnMessagesClick()
 	{
-		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.ManageResponsiblePage);
-		OnMenuClick ();
+		PageNavFrameWork.PageNav.GetPageNavInstance().PushPageToStack(PageNavFrameWork.PagesEnum.MessagesPage);
+		OnMenuClick();
 	}
 
-	public void OnCompanyScheduleClick ()
+
+	public void OnNewAppointmentClick()
 	{
-		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.CompanySchedulePage);
-		OnMenuClick ();
+		PageNavFrameWork.PageNav.GetPageNavInstance().PushPageToStack(PageNavFrameWork.PagesEnum.SelectCompany);
+		OnMenuClick();
 	}
 
-	public void OnContactClick ()
+	public void OnMyAppointmentsClick()
 	{
-		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.ContactPage);
-		OnMenuClick ();
+		PageNavFrameWork.PageNav.GetPageNavInstance().PushPageToStack(PageNavFrameWork.PagesEnum.MyAppointmentsPage);
+		OnMenuClick();
 	}
 
-	public void OnMenuClick ()
+	public void OnServicesManagerClick()
 	{
-		if (menuState == MenuState.Closed) {
+		PageNavFrameWork.PageNav.GetPageNavInstance().PushPageToStack(PageNavFrameWork.PagesEnum.ManageServicesProvided);
+		OnMenuClick();
+	}
+
+
+	public void OnClientsManagerClick()
+	{
+		PageNavFrameWork.PageNav.GetPageNavInstance().PushPageToStack(PageNavFrameWork.PagesEnum.ClientsManagerPage);
+		OnMenuClick();
+	}
+
+	public void OnResponsiblesManagerClick()
+	{
+		PageNavFrameWork.PageNav.GetPageNavInstance().PushPageToStack(PageNavFrameWork.PagesEnum.ManageResponsiblePage);
+		OnMenuClick();
+	}
+
+	public void OnCompanyScheduleClick()
+	{
+		PageNavFrameWork.PageNav.GetPageNavInstance().PushPageToStack(PageNavFrameWork.PagesEnum.CompanySchedulePage);
+		OnMenuClick();
+	}
+
+	public void OnContactClick()
+	{
+		PageNavFrameWork.PageNav.GetPageNavInstance().PushPageToStack(PageNavFrameWork.PagesEnum.ContactPage);
+		OnMenuClick();
+	}
+
+	public void OnMenuClick()
+	{
+		if (menuState == MenuState.Closed)
+		{
 			menuState = MenuState.Opened;
-			background.SetActive (true);
-			ShowSideMenu ();
-		} else {
+			background.SetActive(true);
+			ShowSideMenu();
+		}
+		else
+		{
 			menuState = MenuState.Closed;
-			background.SetActive (false);
-			HideSideMenu ();
+			background.SetActive(false);
+			HideSideMenu();
 		}
 	}
 
-	void ShowSideMenu ()
+	void ShowSideMenu()
 	{
 		xPosition = (((RectTransform)menu.transform).sizeDelta.x * canvas.scaleFactor) / 2;
-		iTween.MoveTo (menu, iTween.Hash ("x", xPosition, "time", time, "easeType", iTween.EaseType.linear.ToString ()));
+		iTween.MoveTo(menu, iTween.Hash("x", xPosition, "time", time, "easeType", iTween.EaseType.linear.ToString()));
 	}
 
-	void HideSideMenu ()
+	void HideSideMenu()
 	{
-		iTween.MoveTo (menu, iTween.Hash ("x", -xPosition, "time", time, "easeType", iTween.EaseType.linear.ToString ()));
+		iTween.MoveTo(menu, iTween.Hash("x", -xPosition, "time", time, "easeType", iTween.EaseType.linear.ToString()));
 	}
 
-	public void ActiveHomeBadge ()
+	public void ActiveHomeBadge()
 	{
-		UpdateHomeBadgeText ();
-		homeBadge.SetActive (true);
+		UpdateHomeBadgeText();
+		homeBadge.SetActive(true);
 	}
 
-	public void ActiveNewAppointmentBadge (int quantity)
+	public void ActiveNewAppointmentBadge(int quantity)
 	{
-		var newAppointmentBadgeText = newAppointmentBadge.GetComponentInChildren<Text> ();
-		newAppointmentBadgeText.text = quantity.ToString ();
-		newAppointmentBadge.SetActive (true);
+		var newAppointmentBadgeText = newAppointmentBadge.GetComponentInChildren<Text>();
+		newAppointmentBadgeText.text = quantity.ToString();
+		newAppointmentBadge.SetActive(true);
 	}
 
-	public void ActiveMessagesBadge (int quantity)
+	public void ActiveMessagesBadge(int quantity)
 	{
 		messagesBadgesQuantity += quantity;
 		homeBadgesQuantity += quantity;
-		ActiveHomeBadge ();
-		var messagesBadgeText = messagesBadge.GetComponentInChildren<Text> ();
-		messagesBadgeText.text = messagesBadgesQuantity.ToString ();
-		messagesBadge.SetActive (true);
+		ActiveHomeBadge();
+		var messagesBadgeText = messagesBadge.GetComponentInChildren<Text>();
+		messagesBadgeText.text = messagesBadgesQuantity.ToString();
+		messagesBadge.SetActive(true);
 	}
 
-	public void ActiveMyAppointmentsBadge (int quantity)
+	public void ActiveMyAppointmentsBadge(int quantity)
 	{
 		appointmentsBadgesQuantity += quantity;
 		homeBadgesQuantity += quantity;
-		ActiveHomeBadge ();
-		var myAppointmentsBadgeText = myAppointmentsBadge.GetComponentInChildren<Text> ();
-		myAppointmentsBadgeText.text = appointmentsBadgesQuantity.ToString ();
-		myAppointmentsBadge.SetActive (true);
+		ActiveHomeBadge();
+		var myAppointmentsBadgeText = myAppointmentsBadge.GetComponentInChildren<Text>();
+		myAppointmentsBadgeText.text = appointmentsBadgesQuantity.ToString();
+		myAppointmentsBadge.SetActive(true);
 	}
 
-	public void HideHomeBadge ()
+	public void HideHomeBadge()
 	{
-		homeBadge.SetActive (false);
+		homeBadge.SetActive(false);
 	}
 
-	public void HideNewAppointmentBadge ()
+	public void HideNewAppointmentBadge()
 	{
-		newAppointmentBadge.SetActive (false);
+		newAppointmentBadge.SetActive(false);
 	}
 
-	public void HideMessagesBadge ()
+	public void HideMessagesBadge()
 	{
-		CheckIfShouldHideHomeBadge (messagesBadgesQuantity);
+		CheckIfShouldHideHomeBadge(messagesBadgesQuantity);
 		messagesBadgesQuantity = 0;
-		messagesBadge.SetActive (false);
+		messagesBadge.SetActive(false);
 	}
 
-	public void HideMyAppointmentsBadge ()
+	public void HideMyAppointmentsBadge()
 	{
-		CheckIfShouldHideHomeBadge (appointmentsBadgesQuantity);
+		CheckIfShouldHideHomeBadge(appointmentsBadgesQuantity);
 		appointmentsBadgesQuantity = 0;
-		myAppointmentsBadge.SetActive (false);
+		myAppointmentsBadge.SetActive(false);
 	}
 
-	public void CheckIfShouldHideHomeBadge (int quantity)
+	public void CheckIfShouldHideHomeBadge(int quantity)
 	{
 		homeBadgesQuantity = homeBadgesQuantity - quantity;
-		if (homeBadgesQuantity <= 0) {
-			HideHomeBadge ();
-		} else {
-			UpdateHomeBadgeText ();
+		if (homeBadgesQuantity <= 0)
+		{
+			HideHomeBadge();
+		}
+		else
+		{
+			UpdateHomeBadgeText();
 		}
 	}
 
-	void UpdateHomeBadgeText ()
+	void UpdateHomeBadgeText()
 	{
-		var homeBadgeText = homeBadge.GetComponentInChildren<Text> ();
-		homeBadgeText.text = homeBadgesQuantity.ToString ();
+		var homeBadgeText = homeBadge.GetComponentInChildren<Text>();
+		homeBadgeText.text = homeBadgesQuantity.ToString();
 	}
 }

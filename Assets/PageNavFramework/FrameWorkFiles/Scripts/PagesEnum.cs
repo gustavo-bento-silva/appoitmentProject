@@ -34,6 +34,7 @@ namespace PageNavFrameWork{
 		CompleteFacebookLoginPage=28,
 		CompanySchedulePage=29,
 		MyCalendarPage=30,
-		ContactPage=31
+		ContactPage=31,
+		LoginPopup=32
 	}
 }

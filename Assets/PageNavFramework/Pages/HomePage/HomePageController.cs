@@ -10,52 +10,71 @@ public class HomePageController : PageController
 	public GameObject userManager;
 	public GameObject promotions;
 
-	void Start ()
+	void Start()
 	{
 		Loading = true;
-		Debug.Log ("MyTag: User's info is loading. User ID: " + DataManager.userID);
-		DataManager.LoadUserInfoAux (DataManager.userID, delegate() {
+		Debug.Log("MyTag: User's info is loading. User ID: " + DataManager.userID);
+		DataManager.LoadUserInfoAux(DataManager.userID, delegate ()
+		{
 			Loading = false;
 			var currentUserType = DataManager.currentUser.userType;
-			if (currentUserType == Constants.UserType.User.ToString ()) {
-				LoadClientHome ();
-			} else if (currentUserType == Constants.UserType.Admin.ToString ()) {
-				LoadAdminHome ();
-			} else if (currentUserType == Constants.UserType.Company.ToString ()) {
-				LoadCompanyHome ();
-			} else if (currentUserType == Constants.UserType.Responsible.ToString ()) {
-				LoadResponsibleHome ();
+			if (currentUserType == Constants.UserType.User.ToString())
+			{
+				LoadClientHome();
 			}
-		}, delegate(string error) {
+			else if (currentUserType == Constants.UserType.Admin.ToString())
+			{
+				LoadAdminHome();
+			}
+			else if (currentUserType == Constants.UserType.Company.ToString())
+			{
+				LoadCompanyHome();
+			}
+			else if (currentUserType == Constants.UserType.Responsible.ToString())
+			{
+				LoadResponsibleHome();
+			}
+			else if (currentUserType == Constants.UserType.Anonymous.ToString())
+			{
+				LoadAnonymousHome();
+			}
+		}, delegate (string error)
+		{
 			Loading = false;
-			Constants.LoadHomePage ();
+			Constants.LoadHomePage();
 		});
 
 	}
 
-	void LoadClientHome ()
+	void LoadClientHome()
 	{
-		MainPageController.GetMainPageInstance ().SetClientMenu ();
-		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.SelectCompany);
-		newAppointmentButton.SetActive (true);
+		MainPageController.GetMainPageInstance().SetClientMenu();
+		PageNavFrameWork.PageNav.GetPageNavInstance().PushPageToStack(PageNavFrameWork.PagesEnum.SelectCompany);
+		newAppointmentButton.SetActive(true);
 	}
 
-	void LoadCompanyHome ()
+	void LoadCompanyHome()
 	{
-		MainPageController.GetMainPageInstance ().SetCompanyMenu ();
-		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.SelectCompany);
-		newAppointmentButton.SetActive (true);
+		MainPageController.GetMainPageInstance().SetCompanyMenu();
+		PageNavFrameWork.PageNav.GetPageNavInstance().PushPageToStack(PageNavFrameWork.PagesEnum.SelectCompany);
+		newAppointmentButton.SetActive(true);
 	}
 
-	void LoadAdminHome ()
+	void LoadAdminHome()
 	{
-		newAppointmentButton.SetActive (true);
+		newAppointmentButton.SetActive(true);
 	}
 
-	void LoadResponsibleHome ()
+	void LoadResponsibleHome()
 	{
-		MainPageController.GetMainPageInstance ().SetResponsibleMenu ();
-		PageNavFrameWork.PageNav.GetPageNavInstance ().PushPageToStack (PageNavFrameWork.PagesEnum.SelectCompany);
-		newAppointmentButton.SetActive (true);
+		MainPageController.GetMainPageInstance().SetResponsibleMenu();
+		PageNavFrameWork.PageNav.GetPageNavInstance().PushPageToStack(PageNavFrameWork.PagesEnum.SelectCompany);
+		newAppointmentButton.SetActive(true);
+	}
+
+	void LoadAnonymousHome()
+	{
+		MainPageController.GetMainPageInstance().SetAnonymousMenu();
+		newAppointmentButton.SetActive(true);
 	}
 }

@@ -14,6 +14,7 @@ public static class Constants
 		Responsible,
 		Company,
 		Admin,
+		Anonymous,
 		None
 	}
 
@@ -23,9 +24,9 @@ public static class Constants
 		RemoveAppointment
 	}
 
-	public static void LoadHomePage ()
+	public static void LoadHomePage()
 	{
-		SceneManager.LoadSceneAsync ("MainScene");
+		SceneManager.LoadSceneAsync("MainScene");
 	}
-	
+
 }
