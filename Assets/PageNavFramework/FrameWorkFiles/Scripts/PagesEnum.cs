@@ -35,6 +35,8 @@ namespace PageNavFrameWork{
 		CompanySchedulePage=29,
 		MyCalendarPage=30,
 		ContactPage=31,
-		LoginPopup=32
+		LoginPopup=32,
+		LogoutPopup=33,
+		EditProfilePopup=34
 	}
 }

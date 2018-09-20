@@ -15,6 +15,9 @@ public class MainPageController : MonoBehaviour
 
 	public static MainPageController _instance;
 
+	public GameObject editProfilePrefab;
+	public GameObject logoutPrefab;
+
 	public Color purpleColor;
 	public Color greyColor;
 	public Image menuHeader;
@@ -25,7 +28,9 @@ public class MainPageController : MonoBehaviour
 	public GameObject companyAppointments;
 	public GameObject appointmentItem;
 	public GameObject messages;
+	public GameObject editProfile;
 	public GameObject login;
+	public GameObject logout;
 
 	public Text userName;
 	public Canvas canvas;
@@ -88,6 +93,7 @@ public class MainPageController : MonoBehaviour
 	{
 		myAppointment.SetActive(false);
 		login.SetActive(false);
+		editProfile.SetActive(false);
 	}
 
 	public void SetResponsibleMenu()
@@ -107,6 +113,8 @@ public class MainPageController : MonoBehaviour
 		appointmentItem.SetActive(false);
 		myAppointment.SetActive(false);
 		messages.SetActive(false);
+		logout.SetActive(false);
+		editProfile.SetActive(false);
 	}
 
 	public void OnHomeClick()
@@ -169,6 +177,18 @@ public class MainPageController : MonoBehaviour
 	public void OnContactClick()
 	{
 		PageNavFrameWork.PageNav.GetPageNavInstance().PushPageToStack(PageNavFrameWork.PagesEnum.ContactPage);
+		OnMenuClick();
+	}
+
+	public void OnLogoutClick()
+	{
+		PageNavFrameWork.PageNav.GetPageNavInstance().OpenModal(logoutPrefab);
+		OnMenuClick();
+	}
+
+	public void OnEditProfileClick()
+	{
+		PageNavFrameWork.PageNav.GetPageNavInstance().OpenModal(editProfilePrefab);
 		OnMenuClick();
 	}
 

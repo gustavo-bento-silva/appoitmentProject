@@ -398,6 +398,13 @@ public class DataManager : MonoBehaviour
 
 	}
 
+	public static void UpdateCurrentUserData(string name, string phone, Delegates.GeneralListenerSuccess success)
+	{
+		currentUser.name = name;
+		currentUser.phone = phone;
+		FireBaseManager.GetFireBaseInstance().UpdateUserData(currentUser, success);
+	}
+
 	public static void UpdateResponsibleServices(ResponsibleModel responsible, List<ServicesProvidedModel> services, Delegates.GeneralListenerSuccess success, Delegates.GeneralListenerFail fail)
 	{
 		FireBaseManager.GetFireBaseInstance().RemoveAllServcesFromResponsible(responsible.companyID, responsible, delegate ()

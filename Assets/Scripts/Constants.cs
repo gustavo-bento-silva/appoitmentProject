@@ -29,4 +29,9 @@ public static class Constants
 		SceneManager.LoadSceneAsync("MainScene");
 	}
 
+	public static void LoadLoginPage()
+	{
+		SceneManager.LoadSceneAsync("InitialScene");
+	}
+
 }
