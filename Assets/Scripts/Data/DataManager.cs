@@ -91,8 +91,8 @@ public class DataManager : MonoBehaviour
 			}
 			FirebaseMessaging.SubscribeToTopic();
 			MainPageController.GetMainPageInstance().UpdateText();
-			success();
 			ActiveListeners();
+			success();
 		});
 	}
 
