@@ -55,6 +55,29 @@ public class FirebaseAuth : MonoBehaviour
 		auth = null;
 	}
 
+	public void ChangePassword(string newPassword, Delegates.GeneralListenerSuccess successListener, Delegates.GeneralListenerFail failListener)
+	{
+		Firebase.Auth.FirebaseUser user = auth.CurrentUser;
+		if (user != null)
+		{
+			user.UpdatePasswordAsync(newPassword).ContinueWith(task =>
+			{
+				if (task.IsCanceled)
+				{
+					Debug.LogError("UpdatePasswordAsync was canceled.");
+					failListener("A mudança de senha foi cancelada.");
+				}
+				if (task.IsFaulted)
+				{
+					Debug.LogError("UpdatePasswordAsync encountered an error: " + task.Exception);
+					failListener("Ocorreu um erro ao alterar a senha.");
+				}
+
+				successListener();
+			});
+		}
+	}
+
 	public void ForgotPassword(string email, Delegates.GeneralListenerSuccess successListener, Delegates.GeneralListenerFail failListener)
 	{
 		if (user != null)

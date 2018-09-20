@@ -6,6 +6,6 @@
   <string name="project_id" translatable="false">appointmentproject-a7233</string>
   <string name="google_api_key" translatable="false">AIzaSyADdwX-1lEzvdREZ75881oGrS0D75Zh4-Q</string>
   <string name="google_crash_reporting_api_key" translatable="false">AIzaSyADdwX-1lEzvdREZ75881oGrS0D75Zh4-Q</string>
-  <string name="google_app_id" translatable="false">1:975982733515:android:bfafd090eb9d530a</string>
+  <string name="google_app_id" translatable="false">1:975982733515:android:d7e50da379bd7f3d</string>
   <string name="default_web_client_id" translatable="false">975982733515-g160671b5pr30hvvn78oesfdp8ijage2.apps.googleusercontent.com</string>
 </resources>

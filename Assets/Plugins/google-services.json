@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:975982733515:android:bfafd090eb9d530a",
+        "mobilesdk_app_id": "1:975982733515:android:d7e50da379bd7f3d",
         "android_client_info": {
-          "package_name": "com.appointment.android"
+          "package_name": "com.agendai.android"
         }
       },
       "oauth_client": [
