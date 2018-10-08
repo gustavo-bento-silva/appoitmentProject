@@ -12,6 +12,7 @@ public class ScheduleDetailPageController : PageController
 	public RectTransform scrollViewContent;
 	public Transform cellPrefabTransform;
 	public GameObject blockDayButton;
+	public GameObject backDayButton;
 	public GameObject unblockDayButton;
 	public GameObject errorpopup;
 
@@ -27,235 +28,282 @@ public class ScheduleDetailPageController : PageController
 	bool isFromSchedulePage = false;
 	bool isBlockDay = false;
 
-	List<GameObject> cellList = new List<GameObject> ();
+	List<GameObject> cellList = new List<GameObject>();
 
 	DateTime dt;
 
-	public override void InstantiatedWithArgs (Dictionary<string, object> args)
+	public override void InstantiatedWithArgs(Dictionary<string, object> args)
 	{
-		isFromSchedulePage = (bool)args ["isFromScheduleAppointment"];
+		isFromSchedulePage = (bool)args["isFromScheduleAppointment"];
 	}
 
-	void Start ()
+	void Start()
 	{
 		Loading = true;
-		GetAppointmentList ();
+		GetAppointmentList();
 	}
 
-	void GetAppointmentList ()
+	void GetAppointmentList()
 	{
-		CultureInfo provider = new CultureInfo ("pt-BR");
+		CultureInfo provider = new CultureInfo("pt-BR");
 		DateTime date;
-		DataManager.GetResponsibleAppointments (delegate() {
-			DataManager.GetBlockDayByResponsible (DataManager.currentResponsible.userID, delegate(List<BlockDay> blockDayList) {
-				blockDayList.ForEach (x => {
-					date = DateTime.ParseExact (x.data, Constants.dateformat, provider);
-					if (date.Year == DataManager.dateNewAppointment.Year && date.Month == DataManager.dateNewAppointment.Month && date.Day == DataManager.dateNewAppointment.Day) {
+		DataManager.GetResponsibleAppointments(delegate ()
+		{
+			DataManager.GetBlockDayByResponsible(DataManager.currentResponsible.userID, delegate (List<BlockDay> blockDayList)
+			{
+				blockDayList.ForEach(x =>
+				{
+					date = DateTime.ParseExact(x.data, Constants.dateformat, provider);
+					if (date.Year == DataManager.dateNewAppointment.Year && date.Month == DataManager.dateNewAppointment.Month && date.Day == DataManager.dateNewAppointment.Day)
+					{
 						isBlockDay = true;
 					}
 				});
-				Initilize ();
-			}, delegate(string error) {
+				Initilize();
+			}, delegate (string error)
+			{
 				Loading = false;
 				Error = true;
 			});
-		}, delegate(string error) {
+		}, delegate (string error)
+		{
 			Loading = false;
 			Error = true;
 		});
 	}
 
-	void Initilize ()
+	void Initilize()
 	{
-		UpdateTextData ();
+		UpdateTextData();
 		var dtNow = DateTime.Now;
-		dt = new DateTime (appointmentYear, appointmentMonth, appointmentDay, DataManager.currentResponsible.timeToBeginWork [(int)dtNow.DayOfWeek], 0, 0);
-		InitializeScheduleTime ();
+		dt = new DateTime(appointmentYear, appointmentMonth, appointmentDay, DataManager.currentResponsible.timeToBeginWork[(int)dtNow.DayOfWeek], 0, 0);
+		InitializeScheduleTime();
 	}
 
-	public void SetErrorVisibility (bool status)
+	public void SetErrorVisibility(bool status)
 	{
-		errorpopup.SetActive (status);
+		errorpopup.SetActive(status);
 	}
 
-	public void BlockDay ()
+	public void BlockDay()
 	{
-		CultureInfo provider = new CultureInfo ("pt-BR");
+		CultureInfo provider = new CultureInfo("pt-BR");
 		bool thereIsAppointment = false;
 		var day = DataManager.dateNewAppointment.Day;
 		var month = DataManager.dateNewAppointment.Month;
 		var year = DataManager.dateNewAppointment.Year;
-		DateTime mAppointmentDate = new DateTime (year, month, day);
-		DataManager.responsibleAppointmentList.ForEach (x => {
-			if (DateTime.ParseExact (x.data, Constants.dateformat, provider) == mAppointmentDate) {
+		DateTime mAppointmentDate = new DateTime(year, month, day);
+		DataManager.responsibleAppointmentList.ForEach(x =>
+		{
+			if (DateTime.ParseExact(x.data, Constants.dateformat, provider) == mAppointmentDate)
+			{
 				thereIsAppointment = true;
 			}
 		});
-		if (thereIsAppointment) {
-			SetErrorVisibility (true);
-		} else {
+		if (thereIsAppointment)
+		{
+			SetErrorVisibility(true);
+		}
+		else
+		{
 			Loading = true;
-			DataManager.AddBlockDayForResponsible (DataManager.currentResponsible, DataManager.dateNewAppointment, delegate() {
+			DataManager.AddBlockDayForResponsible(DataManager.currentResponsible, DataManager.dateNewAppointment, delegate ()
+			{
 				Loading = false;
-				Constants.LoadHomePage ();
-			}, delegate(string error) {
+				Constants.LoadHomePage();
+			}, delegate (string error)
+			{
 				Loading = false;
 				Error = true;
 			});
 		}
 	}
 
-	public void UnblockDay ()
+	public void UnblockDay()
 	{
 		Loading = true;
-		DataManager.RemoveBlockDayForResponsible (DataManager.currentResponsible, DataManager.dateNewAppointment, delegate() {
+		DataManager.RemoveBlockDayForResponsible(DataManager.currentResponsible, DataManager.dateNewAppointment, delegate ()
+		{
 			Loading = false;
-			Constants.LoadHomePage ();
-		}, delegate(string error) {
+			Constants.LoadHomePage();
+		}, delegate (string error)
+		{
 			Loading = false;
 			Error = true;
 		});
 	}
 
-	void UpdateTextData ()
+	void UpdateTextData()
 	{
 		appointmentDay = DataManager.dateNewAppointment.Day;
 		appointmentMonth = DataManager.dateNewAppointment.Month;
 		appointmentYear = DataManager.dateNewAppointment.Year;
-	
-		if (!isFromSchedulePage) {
-			appointmentData.text = string.Format ("Dia {0}/{1}/{2} \nProfissional: {3} \nServiço: {4}", appointmentDay, appointmentMonth, 
+
+		if (!isFromSchedulePage)
+		{
+			appointmentData.text = string.Format("Dia {0}/{1}/{2} \nProfissional: {3} \nServiço: {4}", appointmentDay, appointmentMonth,
 				appointmentYear, DataManager.currentResponsible.name, DataManager.currentservice.name);
-		} else {
-			if (isBlockDay) {
-				blockDayButton.SetActive (false);
-				unblockDayButton.SetActive (true);
-			} else {
-				blockDayButton.SetActive (true);
-				unblockDayButton.SetActive (false);
+		}
+		else
+		{
+			backDayButton.SetActive(false);
+			if (isBlockDay)
+			{
+				blockDayButton.SetActive(false);
+				unblockDayButton.SetActive(true);
 			}
-			appointmentData.text = string.Format ("Dia {0}/{1}/{2} \nProfissional: {3} ", appointmentDay, appointmentMonth, 
+			else
+			{
+				blockDayButton.SetActive(true);
+				unblockDayButton.SetActive(false);
+			}
+			appointmentData.text = string.Format("Dia {0}/{1}/{2} \nProfissional: {3} ", appointmentDay, appointmentMonth,
 				appointmentYear, DataManager.currentResponsible.name);
 		}
 	}
 
-	List<AppointmentModel> CreateApoointmentList ()
+	List<AppointmentModel> CreateApoointmentList()
 	{
-		var appointmentList = new List<AppointmentModel> ();
-		appointmentList.Add (new AppointmentModel (new DateTime (DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 
-			DataManager.currentResponsible.timeToBeginWork [(int)DateTime.Now.DayOfWeek], 30, 0), "teste", "Teste", "Teste", "Ocupado"));
+		var appointmentList = new List<AppointmentModel>();
+		appointmentList.Add(new AppointmentModel(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day,
+			DataManager.currentResponsible.timeToBeginWork[(int)DateTime.Now.DayOfWeek], 30, 0), "teste", "Teste", "Teste", "Ocupado"));
 		return appointmentList;
 	}
 
-	IEnumerator OnButtonClick ()
+	IEnumerator OnButtonClick()
 	{
-		yield return new WaitForSeconds (0.6f);
-		cellList.ForEach (x => x.transform.SetParent (scrollViewContent, false));
-		ReadjustScrollSize (limit);
+		yield return new WaitForSeconds(0.6f);
+		cellList.ForEach(x => x.transform.SetParent(scrollViewContent, false));
+		ReadjustScrollSize(limit);
 		Loading = false;
 	}
 
-	void ReadjustScrollSize (int size)
+	void ReadjustScrollSize(int size)
 	{
-		scrollViewContent.anchorMax = new Vector2 (1, 1);
-		scrollViewContent.anchorMin = new Vector2 (0, 1);
+		scrollViewContent.anchorMax = new Vector2(1, 1);
+		scrollViewContent.anchorMin = new Vector2(0, 1);
 
-		scrollViewContent.offsetMax = new Vector2 (0, 0);
+		scrollViewContent.offsetMax = new Vector2(0, 0);
 		var number = (((RectTransform)cellPrefabTransform).rect.height * (size + 1));
 
-		scrollViewContent.offsetMin = new Vector2 (0, -number);
+		scrollViewContent.offsetMin = new Vector2(0, -number);
 	}
 
-	void InitializeScheduleTime ()
+	void InitializeScheduleTime()
 	{
 		var initLunchTime = DataManager.currentResponsible.lunchTime.initTime;
 		var endLunchTime = DataManager.currentResponsible.lunchTime.endTime;
-		DateTime lunchTime = new DateTime (appointmentYear, appointmentMonth, appointmentDay, endLunchTime, 0, 0);
+		DateTime lunchTime = new DateTime(appointmentYear, appointmentMonth, appointmentDay, endLunchTime, 0, 0);
 		var dayOfWeek = (int)DataManager.dateNewAppointment.DayOfWeek;
-		limit = DataManager.currentResponsible.timeToFinishWork [dayOfWeek];
-		begin = DataManager.currentResponsible.timeToBeginWork [dayOfWeek];
-		List<AppointmentModel> appointmentList = new List<AppointmentModel> ();
+		limit = DataManager.currentResponsible.timeToFinishWork[dayOfWeek];
+		begin = DataManager.currentResponsible.timeToBeginWork[dayOfWeek];
+		List<AppointmentModel> appointmentList = new List<AppointmentModel>();
 		var isOneInOneHour = PlayerPreferences.oneInOneHour;
 		int index = 0;
-		bool isResponsible = false; 
-		var newAppointmentDate = new DateTime (appointmentYear, appointmentMonth, appointmentDay);
-		CultureInfo provider = new CultureInfo ("pt-BR");
+		bool isResponsible = false;
+		var newAppointmentDate = new DateTime(appointmentYear, appointmentMonth, appointmentDay);
+		CultureInfo provider = new CultureInfo("pt-BR");
 
-		if (DataManager.currentResponsible.userID == DataManager.currentUser.userID || (DataManager.currentUser.userType == Constants.UserType.Company.ToString ())) {
+		if (DataManager.currentResponsible.userID == DataManager.currentUser.userID || (DataManager.currentUser.userType == Constants.UserType.Company.ToString()))
+		{
 			isResponsible = true;
 		}
 
-		DataManager.responsibleAppointmentList.ForEach (x => {
-			if (DateTime.ParseExact (x.data, Constants.dateformat, provider) == newAppointmentDate) {
-				appointmentList.Add (x);
+		DataManager.responsibleAppointmentList.ForEach(x =>
+		{
+			if (DateTime.ParseExact(x.data, Constants.dateformat, provider) == newAppointmentDate)
+			{
+				appointmentList.Add(x);
 			}
 		});
 
 		if (appointmentList != null)
-			appointmentList.Sort ((first, second) => ((new DateTime (appointmentYear, appointmentMonth, appointmentDay, first.hour, first.minute, 0)).CompareTo ((new DateTime (appointmentYear, appointmentMonth, appointmentDay, second.hour, second.minute, 0)))));
+			appointmentList.Sort((first, second) => ((new DateTime(appointmentYear, appointmentMonth, appointmentDay, first.hour, first.minute, 0)).CompareTo((new DateTime(appointmentYear, appointmentMonth, appointmentDay, second.hour, second.minute, 0)))));
 
-		if (!isOneInOneHour) {
+		if (!isOneInOneHour)
+		{
 			limit = (limit - begin) * 2;
 		}
 		var into = false;
 
-		for (var i = 0; i < limit; i++) {
-			if (isBlockDay || dt.CompareTo (DateTime.Now) < 0 || (dt.Hour >= initLunchTime && (dt.CompareTo (lunchTime) <= 0))) {
-				var cell = DayController.Instantiate (cellPrefabTransform, dt.Hour.ToString () + ":" + dt.Minute.ToString ("00"), "Bloqueado", false);
+		for (var i = 0; i < limit; i++)
+		{
+			if (isBlockDay || dt.CompareTo(DateTime.Now) < 0 || (dt.Hour >= initLunchTime && (dt.CompareTo(lunchTime) <= 0)))
+			{
+				var cell = DayController.Instantiate(cellPrefabTransform, dt.Hour.ToString() + ":" + dt.Minute.ToString("00"), "Bloqueado", false);
 				if (isFromSchedulePage)
-					cell.GetComponent<Button> ().interactable = false;
-				cellList.Add (cell);
-				dt = dt.AddMinutes (isOneInOneHour ? 60 : 30);
-			} else if (appointmentList != null && index < appointmentList.Count) {
-				var initAppointmentDateTime = (new DateTime (appointmentYear, appointmentMonth, appointmentDay, appointmentList [index].hour, appointmentList [index].minute, 0));
-				var finishAppointmentDateTime = (new DateTime (appointmentYear, appointmentMonth, appointmentDay, appointmentList [index].hour, appointmentList [index].minute, 0)).AddMinutes (appointmentList [index].durationInMinutes);
+					cell.GetComponent<Button>().interactable = false;
+				cellList.Add(cell);
+				dt = dt.AddMinutes(isOneInOneHour ? 60 : 30);
+			}
+			else if (appointmentList != null && index < appointmentList.Count)
+			{
+				var initAppointmentDateTime = (new DateTime(appointmentYear, appointmentMonth, appointmentDay, appointmentList[index].hour, appointmentList[index].minute, 0));
+				var finishAppointmentDateTime = (new DateTime(appointmentYear, appointmentMonth, appointmentDay, appointmentList[index].hour, appointmentList[index].minute, 0)).AddMinutes(appointmentList[index].durationInMinutes);
 
-				if (into) {
-					if (finishAppointmentDateTime.CompareTo (dt) > 0) {
+				if (into)
+				{
+					if (finishAppointmentDateTime.CompareTo(dt) > 0)
+					{
 						var description = "";
-						if (isResponsible) {
-							description = appointmentList [index].userName;
-						} else {
+						if (isResponsible)
+						{
+							description = appointmentList[index].userName;
+						}
+						else
+						{
 							description = "Ocupado";
 						}
-						var cell = DayController.Instantiate (cellPrefabTransform, dt.Hour.ToString () + ":" + dt.Minute.ToString ("00"), description, false);
-						cell.GetComponent<Button> ().interactable = false;
-						cellList.Add (cell);
+						var cell = DayController.Instantiate(cellPrefabTransform, dt.Hour.ToString() + ":" + dt.Minute.ToString("00"), description, false);
+						cell.GetComponent<Button>().interactable = false;
+						cellList.Add(cell);
 						into = true;
-						dt = dt.AddMinutes (isOneInOneHour ? 60 : 30);
-					} else {
+						dt = dt.AddMinutes(isOneInOneHour ? 60 : 30);
+					}
+					else
+					{
 						into = false;
 						limit++;
 						index++;
 					}
-				} else {
-					if (initAppointmentDateTime.CompareTo (dt) == 0) {
+				}
+				else
+				{
+					if (initAppointmentDateTime.CompareTo(dt) == 0)
+					{
 						var description = "";
-						if (isResponsible) {
-							description = appointmentList [index].userName;
-						} else {
+						if (isResponsible)
+						{
+							description = appointmentList[index].userName;
+						}
+						else
+						{
 							description = "Ocupado";
 						}
-						var cell = DayController.Instantiate (cellPrefabTransform, dt.Hour.ToString () + ":" + dt.Minute.ToString ("00"), description, false);
-						cell.GetComponent<Button> ().interactable = false;
-						cellList.Add (cell);
+						var cell = DayController.Instantiate(cellPrefabTransform, dt.Hour.ToString() + ":" + dt.Minute.ToString("00"), description, false);
+						cell.GetComponent<Button>().interactable = false;
+						cellList.Add(cell);
 						into = true;
-					} else {
-						var cell = DayController.Instantiate (cellPrefabTransform, dt.Hour.ToString () + ":" + dt.Minute.ToString ("00"), "Livre");
-						if (isFromSchedulePage)
-							cell.GetComponent<Button> ().interactable = false;
-						cellList.Add (cell);
 					}
-					dt = dt.AddMinutes (isOneInOneHour ? 60 : 30);
+					else
+					{
+						var cell = DayController.Instantiate(cellPrefabTransform, dt.Hour.ToString() + ":" + dt.Minute.ToString("00"), "Livre");
+						if (isFromSchedulePage)
+							cell.GetComponent<Button>().interactable = false;
+						cellList.Add(cell);
+					}
+					dt = dt.AddMinutes(isOneInOneHour ? 60 : 30);
 				}
-			} else {
-				var cell = DayController.Instantiate (cellPrefabTransform, dt.Hour.ToString () + ":" + dt.Minute.ToString ("00"), "Livre");
+			}
+			else
+			{
+				var cell = DayController.Instantiate(cellPrefabTransform, dt.Hour.ToString() + ":" + dt.Minute.ToString("00"), "Livre");
 				if (isFromSchedulePage)
-					cell.GetComponent<Button> ().interactable = false;
-				cellList.Add (cell);
-				dt = dt.AddMinutes (isOneInOneHour ? 60 : 30);
+					cell.GetComponent<Button>().interactable = false;
+				cellList.Add(cell);
+				dt = dt.AddMinutes(isOneInOneHour ? 60 : 30);
 			}
 		}
-		StartCoroutine (OnButtonClick ());
+		StartCoroutine(OnButtonClick());
 	}
 }

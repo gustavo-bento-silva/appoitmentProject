@@ -62,6 +62,7 @@ public class HomePageController : PageController
 
 	void LoadAdminHome()
 	{
+		MainPageController.GetMainPageInstance().SetAdminMenu();
 		newAppointmentButton.SetActive(true);
 	}
 

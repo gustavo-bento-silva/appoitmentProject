@@ -34,251 +34,294 @@ public class CreateNewResponsibleToCompanyController : PageController
 	private int positionXOffset = 1315;
 
 	Delegates.OnSelectServiceClick selectServiceDelegate;
-	List <GameObject> servicesProvidedCell = new List<GameObject> ();
-	List<ServicesProvidedModel> servicesProvidedList = new List<ServicesProvidedModel> ();
+	List<GameObject> servicesProvidedCell = new List<GameObject>();
+	List<ServicesProvidedModel> servicesProvidedList = new List<ServicesProvidedModel>();
 
-	List<bool> servicesProvidedByResponsible = new List<bool> ();
+	List<bool> servicesProvidedByResponsible = new List<bool>();
 
-	void Start ()
+	void Start()
 	{
-		OnDaysWorkedInit ();
-		OnInitTimeToWorkScreen ();
-		OnFinishTimeToWorkScreen ();
-		OnInitServicesWindow ();
+		OnDaysWorkedInit();
+		OnInitTimeToWorkScreen();
+		OnFinishTimeToWorkScreen();
+		OnInitServicesWindow();
 
 	}
 
-	void OnInitServicesWindow ()
+	void OnInitServicesWindow()
 	{
 		selectServiceDelegate += HandleOnSelectServiceClick;
-		if ((DataManager.currentUser as CompanyModel).servicesProvided != null) {
-			foreach (var key in (DataManager.currentUser as CompanyModel).servicesProvided.Keys) {
-				servicesProvidedList.Add ((ServicesProvidedModel)(DataManager.currentUser as CompanyModel).servicesProvided [key]);
+		if ((DataManager.currentUser as CompanyModel).servicesProvided != null)
+		{
+			foreach (var key in (DataManager.currentUser as CompanyModel).servicesProvided.Keys)
+			{
+				servicesProvidedList.Add((ServicesProvidedModel)(DataManager.currentUser as CompanyModel).servicesProvided[key]);
 			}
 		}
-		if (servicesProvidedList != null && servicesProvidedList.Count != 0) {
-			FillServicesList ();
-		} else {
-			nullListMessage.SetActive (true);
+		if (servicesProvidedList != null && servicesProvidedList.Count != 0)
+		{
+			nullListMessage.SetActive(false);
+			FillServicesList();
 		}
 	}
 
-	void HandleOnSelectServiceClick (ServicesProvidedModel serviceprovided, bool status)
+	void HandleOnSelectServiceClick(ServicesProvidedModel serviceprovided, bool status)
 	{
-		servicesProvidedByResponsible [servicesProvidedList.IndexOf (serviceprovided)] = status;
+		servicesProvidedByResponsible[servicesProvidedList.IndexOf(serviceprovided)] = status;
 	}
 
-	void OnDaysWorkedInit ()
+	void OnDaysWorkedInit()
 	{
 		var index = 0;
-		(DataManager.currentUser as CompanyModel).daysOfWork.ForEach (x => {
-			daysWorked [index++].isOn = x;
+		(DataManager.currentUser as CompanyModel).daysOfWork.ForEach(x =>
+		{
+			daysWorked[index++].isOn = x;
 		});
 	}
 
-	void OnInitTimeToWorkScreen ()
+	void OnInitTimeToWorkScreen()
 	{
 		int index = 0;
-		(DataManager.currentUser as CompanyModel).timeToBeginWork.ForEach (x => {
-			initTimeToWork [index++].text = x.ToString ();
+		(DataManager.currentUser as CompanyModel).timeToBeginWork.ForEach(x =>
+		{
+			initTimeToWork[index++].text = x.ToString();
 		});
 	}
 
-	void OnFinishTimeToWorkScreen ()
+	void OnFinishTimeToWorkScreen()
 	{
 		int index = 0;
-		(DataManager.currentUser as CompanyModel).timeToFinishWork.ForEach (x => {
-			endTimeToWork [index++].text = x.ToString ();
+		(DataManager.currentUser as CompanyModel).timeToFinishWork.ForEach(x =>
+		{
+			endTimeToWork[index++].text = x.ToString();
 		});
 	}
 
-	void FillServicesList ()
+	void FillServicesList()
 	{
-		servicesProvidedList.ForEach (x => {
-			servicesProvidedCell.Add (ServicesProvidedCell.Instantiate (cellPrefab, x, selectServiceDelegate));
-			servicesProvidedByResponsible.Add (false);
+		servicesProvidedList.ForEach(x =>
+		{
+			servicesProvidedCell.Add(ServicesProvidedCell.Instantiate(cellPrefab, x, selectServiceDelegate));
+			servicesProvidedByResponsible.Add(false);
 		});
-		StartCoroutine (OnFillServicesList ());
+		StartCoroutine(OnFillServicesList());
 	}
 
-	IEnumerator OnFillServicesList ()
+	IEnumerator OnFillServicesList()
 	{
-		yield return new WaitForSeconds (1f);
-		servicesProvidedCell.ForEach (x => x.transform.SetParent (scrollContentList, false));
-		ReadjustScrollSize (servicesProvidedCell.Count);
+		yield return new WaitForSeconds(1f);
+		servicesProvidedCell.ForEach(x => x.transform.SetParent(scrollContentList, false));
+		ReadjustScrollSize(servicesProvidedCell.Count);
 	}
 
-	void CreateUserLogin ()
+	void CreateUserLogin()
 	{
 		Loading = true;
-		FirebaseAPIHelper.GetFireBaseAPIHelperInstance ().AddUser (email.text, password.text, delegate(string userID) {
-			CreateNewResponsibleToCompany (userID);
-		}, delegate(string error) {
+		FirebaseAPIHelper.GetFireBaseAPIHelperInstance().AddUser(email.text, password.text, delegate (string userID)
+		{
+			CreateNewResponsibleToCompany(userID);
+		}, delegate (string error)
+		{
 			Error = true;
 		});
 	}
 
-	void CreateNewResponsibleToCompany (string userID)
+	void CreateNewResponsibleToCompany(string userID)
 	{
-		DataManager.CreateNewResponsibleToCompanyAsUser (userID, name.text, GetServices (), GetDaysWorked (), GetInitTime (), GetEndTime (), int.Parse (initLunchTime.text), int.Parse (endLunchTime.text));
+		DataManager.CreateNewResponsibleToCompanyAsUser(userID, name.text, GetServices(), GetDaysWorked(), GetInitTime(), GetEndTime(), int.Parse(initLunchTime.text), int.Parse(endLunchTime.text));
 		Loading = false;
-		Constants.LoadHomePage ();
+		Constants.LoadHomePage();
 	}
 
-	void ReadjustScrollSize (int size)
+	void ReadjustScrollSize(int size)
 	{
-		scrollContentList.anchorMax = new Vector2 (1, 1);
-		scrollContentList.anchorMin = new Vector2 (0, 1);
+		scrollContentList.anchorMax = new Vector2(1, 1);
+		scrollContentList.anchorMin = new Vector2(0, 1);
 
-		scrollContentList.offsetMax = new Vector2 (0, 0);
+		scrollContentList.offsetMax = new Vector2(0, 0);
 		var number = (((RectTransform)cellPrefab).rect.height * (size + 1));
 
-		scrollContentList.offsetMin = new Vector2 (0, -number);
+		scrollContentList.offsetMin = new Vector2(0, -number);
 	}
 
-	public void OnNextButtonClick ()
+	public void OnNextButtonClick()
 	{
 		bool everythingOk = true;
-		if (actualPositionIndex == 0) {
-			everythingOk = FirstStepVerify ();
-		} else if (actualPositionIndex == 1) {
-			everythingOk = SecondStepVerify ();
-		} else if (actualPositionIndex == 2) {
-			everythingOk = ThirdStepVerify ();
-		} else if (actualPositionIndex == 3) {
-			everythingOk = FourthStepVerify ();
+		if (actualPositionIndex == 0)
+		{
+			everythingOk = FirstStepVerify();
+		}
+		else if (actualPositionIndex == 1)
+		{
+			everythingOk = SecondStepVerify();
+		}
+		else if (actualPositionIndex == 2)
+		{
+			everythingOk = ThirdStepVerify();
+		}
+		else if (actualPositionIndex == 3)
+		{
+			everythingOk = FourthStepVerify();
 		}
 
-		if (everythingOk) {
-			if (actualPositionIndex == 3) {
-				CreateUserLogin ();
-			} else {
+		if (everythingOk)
+		{
+			if (actualPositionIndex == 3)
+			{
+				CreateUserLogin();
+			}
+			else
+			{
 				actualPositionIndex++;
 				var position = container.transform.localPosition.x - positionXOffset;
-				iTween.MoveTo (container, iTween.Hash ("x", position, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInBack));	
+				iTween.MoveTo(container, iTween.Hash("x", position, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInBack));
 			}
 		}
 	}
 
-	public void OnBackButtonClick ()
+	public void OnBackButtonClick()
 	{
 		actualPositionIndex--;
 		var position = container.transform.localPosition.x + positionXOffset;
-		iTween.MoveTo (container, iTween.Hash ("x", position, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInBack));
+		iTween.MoveTo(container, iTween.Hash("x", position, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInBack));
 
 	}
 
-	public bool FirstStepVerify ()
+	public bool FirstStepVerify()
 	{
-		if (string.IsNullOrEmpty (name.text)) {
-			nameError.SetActive (true);
+		if (string.IsNullOrEmpty(name.text))
+		{
+			nameError.SetActive(true);
 			return false;
-		} else {
-			nameError.SetActive (false);
 		}
-		if (string.IsNullOrEmpty (email.text) || !email.text.Contains ("@")) {
-			emailError.SetActive (true);
-			return false;
-		} else {
-			emailError.SetActive (false);
+		else
+		{
+			nameError.SetActive(false);
 		}
-		if (password.text.Length < 6) {
-			passwordError.SetActive (true);
+		if (string.IsNullOrEmpty(email.text) || !email.text.Contains("@"))
+		{
+			emailError.SetActive(true);
 			return false;
-		} else {
-			passwordError.SetActive (false);
+		}
+		else
+		{
+			emailError.SetActive(false);
+		}
+		if (password.text.Length < 6)
+		{
+			passwordError.SetActive(true);
+			return false;
+		}
+		else
+		{
+			passwordError.SetActive(false);
 		}
 		return true;
 	}
 
-	public bool SecondStepVerify ()
+	public bool SecondStepVerify()
 	{
 		int isOn = 0;
-		if (servicesProvidedByResponsible == null || servicesProvidedByResponsible.Count == 0) {
-			serviceError.SetActive (true);
+		if (servicesProvidedByResponsible == null || servicesProvidedByResponsible.Count == 0)
+		{
+			serviceError.SetActive(true);
 			return false;
 		}
-		servicesProvidedByResponsible.ForEach (x => {
+		servicesProvidedByResponsible.ForEach(x =>
+		{
 			if (x)
 				isOn++;
 		});
-		if (isOn > 0) {
-			serviceError.SetActive (false);
+		if (isOn > 0)
+		{
+			serviceError.SetActive(false);
 			return true;
-		} 
-		serviceError.SetActive (true);
+		}
+		serviceError.SetActive(true);
 		return false;
 	}
 
-	public bool ThirdStepVerify ()
+	public bool ThirdStepVerify()
 	{
 		int isOn = 0;
-		if (daysWorked == null || daysWorked.Count == 0) {
-			daysError.SetActive (true);
+		if (daysWorked == null || daysWorked.Count == 0)
+		{
+			daysError.SetActive(true);
 			return false;
 		}
-		daysWorked.ForEach (x => {
+		daysWorked.ForEach(x =>
+		{
 			if (x.isOn)
 				isOn++;
 		});
-		if (isOn > 0) {
-			daysError.SetActive (false);
+		if (isOn > 0)
+		{
+			daysError.SetActive(false);
 			return true;
-		} 
-		daysError.SetActive (true);
+		}
+		daysError.SetActive(true);
 		return false;
 	}
 
-	public bool FourthStepVerify ()
+	public bool FourthStepVerify()
 	{
-		var initTime = int.Parse (initLunchTime.text);
-		var finishTIme = int.Parse (endLunchTime.text);
-		if (initTime <= finishTIme) {
-			lunchTimeError.SetActive (false);
+		var initTime = int.Parse(initLunchTime.text);
+		var finishTIme = int.Parse(endLunchTime.text);
+		if (initTime <= finishTIme)
+		{
+			lunchTimeError.SetActive(false);
 			return true;
-		} else {
-			lunchTimeError.SetActive (true);
+		}
+		else
+		{
+			lunchTimeError.SetActive(true);
 			return false;
 		}
 	}
 
-	public List<ServicesProvidedModel> GetServices ()
+	public List<ServicesProvidedModel> GetServices()
 	{
 		int index = 0;
-		List<ServicesProvidedModel> services = new List<ServicesProvidedModel> ();
-		servicesProvidedByResponsible.ForEach (x => {
-			if (x) {
-				services.Add (servicesProvidedList [index]);
+		List<ServicesProvidedModel> services = new List<ServicesProvidedModel>();
+		servicesProvidedByResponsible.ForEach(x =>
+		{
+			if (x)
+			{
+				services.Add(servicesProvidedList[index]);
 				index++;
 			}
 		});
 		return services;
 	}
 
-	public List<bool> GetDaysWorked ()
+	public List<bool> GetDaysWorked()
 	{
-		List<bool> mDaysWorked = new List<bool> ();
-		daysWorked.ForEach (x => {
-			if (x.isOn) {
-				mDaysWorked.Add (true);
-			} else {
-				mDaysWorked.Add (false);
+		List<bool> mDaysWorked = new List<bool>();
+		daysWorked.ForEach(x =>
+		{
+			if (x.isOn)
+			{
+				mDaysWorked.Add(true);
+			}
+			else
+			{
+				mDaysWorked.Add(false);
 			}
 		});
 		return mDaysWorked;
 	}
 
-	public List<int> GetInitTime ()
+	public List<int> GetInitTime()
 	{
-		List<int> initTimeToWorkList = new List<int> ();
-		initTimeToWork.ForEach (x => initTimeToWorkList.Add (int.Parse (x.text)));
+		List<int> initTimeToWorkList = new List<int>();
+		initTimeToWork.ForEach(x => initTimeToWorkList.Add(int.Parse(x.text)));
 		return initTimeToWorkList;
 	}
 
-	public List<int> GetEndTime ()
+	public List<int> GetEndTime()
 	{
-		List<int> endTimeToWorkList = new List<int> ();
-		endTimeToWork.ForEach (x => endTimeToWorkList.Add (int.Parse (x.text)));
+		List<int> endTimeToWorkList = new List<int>();
+		endTimeToWork.ForEach(x => endTimeToWorkList.Add(int.Parse(x.text)));
 		return endTimeToWorkList;
 	}
 }

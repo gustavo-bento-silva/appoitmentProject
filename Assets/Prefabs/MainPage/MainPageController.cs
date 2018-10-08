@@ -29,6 +29,7 @@ public class MainPageController : MonoBehaviour
 	public GameObject appointmentItem;
 	public GameObject messages;
 	public GameObject editProfile;
+	public GameObject newCompanyButton;
 	public GameObject login;
 	public GameObject logout;
 
@@ -87,6 +88,11 @@ public class MainPageController : MonoBehaviour
 		companyAppointments.SetActive(false);
 		appointmentItem.SetActive(false);
 		login.SetActive(false);
+	}
+
+	public void SetAdminMenu()
+	{
+		newCompanyButton.SetActive(true);
 	}
 
 	public void SetCompanyMenu()
@@ -189,6 +195,12 @@ public class MainPageController : MonoBehaviour
 	public void OnEditProfileClick()
 	{
 		PageNavFrameWork.PageNav.GetPageNavInstance().OpenModal(editProfilePrefab);
+		OnMenuClick();
+	}
+
+	public void OnNewCompanyRegisterClick()
+	{
+		PageNavFrameWork.PageNav.GetPageNavInstance().PushPageToStack(PageNavFrameWork.PagesEnum.CreateNewCompanyPage);
 		OnMenuClick();
 	}
 
