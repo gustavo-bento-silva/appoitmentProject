@@ -48,7 +48,7 @@ public class DataManager : MonoBehaviour
 	{
 		//		Empresa:
 		//ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
-		ID = "CMxh26n5hZZTQdznBT0OJZn57rO2";
+		//ID = "CMxh26n5hZZTQdznBT0OJZn57rO2";
 		//		Gustavo:
 		//		ID = "7Mu4RNXJUbNPiONAZN05y62HMcv1";
 
