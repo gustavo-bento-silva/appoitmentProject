@@ -48,7 +48,7 @@ public class DataManager : MonoBehaviour
 	{
 		//		Empresa:
 		//ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
-		//ID = "CMxh26n5hZZTQdznBT0OJZn57rO2";
+		ID = "CMxh26n5hZZTQdznBT0OJZn57rO2";
 		//		Gustavo:
 		//		ID = "7Mu4RNXJUbNPiONAZN05y62HMcv1";
 
@@ -171,7 +171,7 @@ public class DataManager : MonoBehaviour
 		//		});
 	}
 
-	public static void CreateNewResponsibleToCompanyAsUser(string reponsibleID, string name, List<ServicesProvidedModel> services, List<bool> daysWorked, List<int> initTime, List<int> finishTime, int initLunchTime, int endLunchTime, string phone = "")
+	public static void CreateNewResponsibleToCompanyAsUser(string reponsibleID, string name, List<ServicesProvidedModel> services, List<bool> daysWorked, List<float> initTime, List<float> finishTime, float initLunchTime, float endLunchTime, string phone = "")
 	{
 		var mPhone = phone;
 		if (string.IsNullOrEmpty(phone))
@@ -214,7 +214,7 @@ public class DataManager : MonoBehaviour
 		});
 	}
 
-	public static void CreateCompanyData(string companyID, string companyName, string phone, string city, string address, string cep, int[] timeToInit, int[] timeToFinish, bool[] daysOfWork)
+	public static void CreateCompanyData(string companyID, string companyName, string phone, string city, string address, string cep, float[] timeToInit, float[] timeToFinish, bool[] daysOfWork)
 	{
 		companyData = FireBaseManager.GetFireBaseInstance().CreateNewCompany(companyID, companyName, phone, city, address, cep, timeToInit, timeToFinish, daysOfWork);
 
@@ -498,7 +498,7 @@ public class DataManager : MonoBehaviour
 
 	static void GetAllInitWorkFromCompanyAsUser()
 	{
-		Delegates.GetDaysTimeWorked getInitDaysWorkedCallBack = delegate (List<int> initTimeDays)
+		Delegates.GetDaysTimeWorked getInitDaysWorkedCallBack = delegate (List<float> initTimeDays)
 		{
 			(currentUser as CompanyModel).timeToBeginWork = initTimeDays;
 		};
@@ -508,7 +508,7 @@ public class DataManager : MonoBehaviour
 
 	static void GetAllEndWorkFromCompanyAsUser()
 	{
-		Delegates.GetDaysTimeWorked getFinishDaysWorkedCallBack = delegate (List<int> finishTimeDays)
+		Delegates.GetDaysTimeWorked getFinishDaysWorkedCallBack = delegate (List<float> finishTimeDays)
 		{
 			(currentUser as CompanyModel).timeToFinishWork = finishTimeDays;
 		};

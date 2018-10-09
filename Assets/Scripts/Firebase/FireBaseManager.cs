@@ -259,15 +259,15 @@ public class FireBaseManager : MonoBehaviour
 		});
 	}
 
-	public CompanyModel CreateNewCompany(string companyID, string name, string phone, string city, string address, string cep, int[] timeToBegin = null, int[] timeToFinish = null, bool[] daysWorked = null)
+	public CompanyModel CreateNewCompany(string companyID, string name, string phone, string city, string address, string cep, float[] timeToBegin = null, float[] timeToFinish = null, bool[] daysWorked = null)
 	{
 		if (timeToBegin == null)
 		{
-			timeToBegin = new int[] { 9, 9, 9, 9, 9, 9, 9 };
+			timeToBegin = new float[] { 9, 9, 9, 9, 9, 9, 9 };
 		}
 		if (timeToFinish == null)
 		{
-			timeToFinish = new int[] { 18, 18, 18, 18, 18, 18, 18 };
+			timeToFinish = new float[] { 18, 18, 18, 18, 18, 18, 18 };
 		}
 		if (daysWorked == null)
 		{
@@ -518,7 +518,7 @@ public class FireBaseManager : MonoBehaviour
 		});
 	}
 
-	public ResponsibleModel CreateNewResponsibleToCompany(string responsibleID, string companyID, string name, List<ServicesProvidedModel> servicesProvided, List<bool> daysWorked, List<int> initTime, List<int> finishTime, string phone, int initLunchTime, int endLunchtime)
+	public ResponsibleModel CreateNewResponsibleToCompany(string responsibleID, string companyID, string name, List<ServicesProvidedModel> servicesProvided, List<bool> daysWorked, List<float> initTime, List<float> finishTime, string phone, float initLunchTime, float endLunchtime)
 	{
 		LunchTime mLunchTime = new LunchTime(initLunchTime, endLunchtime);
 		ResponsibleModel responsable = new ResponsibleModel(new UserModel(responsibleID, name, phone), companyID, servicesProvided, daysWorked, initTime, finishTime, mLunchTime);
@@ -642,10 +642,10 @@ public class FireBaseManager : MonoBehaviour
 				else if (task.IsCompleted)
 				{
 					DataSnapshot snapshot = task.Result;
-					List<int> daysTime = new List<int>();
+					List<float> daysTime = new List<float>();
 					foreach (var daytime in snapshot.Children)
 					{
-						daysTime.Add((int)daytime.Value);
+						daysTime.Add((float)daytime.Value);
 					}
 					daysTimeWorkedCallBack(daysTime);
 				}
@@ -686,10 +686,10 @@ public class FireBaseManager : MonoBehaviour
 				else if (task.IsCompleted)
 				{
 					DataSnapshot snapshot = task.Result;
-					List<int> daysTime = new List<int>();
+					List<float> daysTime = new List<float>();
 					foreach (var daytime in snapshot.Children)
 					{
-						daysTime.Add((int)daytime.Value);
+						daysTime.Add((float)daytime.Value);
 					}
 					daysTimeWorkedCallBack(daysTime);
 				}

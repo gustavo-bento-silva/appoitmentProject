@@ -10,9 +10,9 @@ public class ResponsibleModel : UserModel
 	public string companyID;
 	public Dictionary<string, object> servicesProvided;
 	[SerializeField]
-	public List<int> timeToBeginWork;
+	public List<float> timeToBeginWork;
 	[SerializeField]
-	public List<int> timeToFinishWork;
+	public List<float> timeToFinishWork;
 	[SerializeField]
 	public List<bool> daysOfWork;
 	[SerializeField]
@@ -20,26 +20,26 @@ public class ResponsibleModel : UserModel
 	[SerializeField]
 	public LunchTime lunchTime;
 
-	public ResponsibleModel (UserModel user) : base (user.userID, user.name, user.phone, Constants.UserType.Responsible)
+	public ResponsibleModel(UserModel user) : base(user.userID, user.name, user.phone, Constants.UserType.Responsible)
 	{
 		this.companyID = "";
-		servicesProvided = new Dictionary<string, object> ();
-		this.daysOfWork = new List<bool> (new bool[] { false, true, true, true, true, true, true });
-		timeToBeginWork = new List<int> (new int[] { 8, 8, 8, 8, 8, 8, 8 });
-		timeToFinishWork = new List<int> (new int[] { 17, 17, 17, 17, 17, 17, 17 });
-		blockDayList = new List<BlockDay> ();
-		lunchTime = new LunchTime (0, 0);
+		servicesProvided = new Dictionary<string, object>();
+		this.daysOfWork = new List<bool>(new bool[] { false, true, true, true, true, true, true });
+		timeToBeginWork = new List<float>(new float[] { 8f, 8f, 8f, 8f, 8f, 8f, 8f });
+		timeToFinishWork = new List<float>(new float[] { 17, 17, 17, 17, 17, 17, 17 });
+		blockDayList = new List<BlockDay>();
+		lunchTime = new LunchTime(0, 0);
 	}
 
-	public ResponsibleModel (UserModel user, string companyID, List<ServicesProvidedModel> services, List<bool> daysWorked, List<int> timeToBeginWork, List<int> timeToFinishWork, LunchTime lunchTime) : base (user.userID, user.name, user.phone, Constants.UserType.Responsible)
+	public ResponsibleModel(UserModel user, string companyID, List<ServicesProvidedModel> services, List<bool> daysWorked, List<float> timeToBeginWork, List<float> timeToFinishWork, LunchTime lunchTime) : base(user.userID, user.name, user.phone, Constants.UserType.Responsible)
 	{
 		this.companyID = companyID;
-		servicesProvided = new Dictionary<string, object> ();
-		servicesProvided = services.ToDictionary (x => x.serviceID, x => (object)x);
+		servicesProvided = new Dictionary<string, object>();
+		servicesProvided = services.ToDictionary(x => x.serviceID, x => (object)x);
 		this.daysOfWork = daysWorked;
 		this.timeToBeginWork = timeToBeginWork;
 		this.timeToFinishWork = timeToFinishWork;
-		blockDayList = new List<BlockDay> ();
+		blockDayList = new List<BlockDay>();
 		lunchTime = lunchTime;
 	}
 }
@@ -50,24 +50,24 @@ public class BlockDay
 	public string id;
 	public string data;
 
-	public BlockDay (DateTime mData)
+	public BlockDay(DateTime mData)
 	{
 		id = "";
-		data = mData.ToString (Constants.dateformat);
+		data = mData.ToString(Constants.dateformat);
 	}
 }
 
 [System.Serializable]
 public class LunchTime
 {
-	public int initTime;
-	public int endTime;
+	public float initTime;
+	public float endTime;
 
-	public LunchTime ()
+	public LunchTime()
 	{
 	}
 
-	public LunchTime (int initTime, int endTime)
+	public LunchTime(float initTime, float endTime)
 	{
 		this.initTime = initTime;
 		this.endTime = endTime;

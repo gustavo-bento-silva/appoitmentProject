@@ -76,7 +76,11 @@ public class ScheduleDetailPageController : PageController
 	{
 		UpdateTextData();
 		var dtNow = DateTime.Now;
-		dt = new DateTime(appointmentYear, appointmentMonth, appointmentDay, DataManager.currentResponsible.timeToBeginWork[(int)dtNow.DayOfWeek], 0, 0);
+		var resp = DataManager.currentResponsible;
+		var temp = DataManager.currentResponsible.timeToBeginWork[(int)dtNow.DayOfWeek];
+		var hour = Mathf.FloorToInt(DataManager.currentResponsible.timeToBeginWork[(int)dtNow.DayOfWeek]);
+		var minute = (int)((DataManager.currentResponsible.timeToBeginWork[(int)dtNow.DayOfWeek] - hour) * 60);
+		dt = new DateTime(appointmentYear, appointmentMonth, appointmentDay, hour, minute, 0);
 		InitializeScheduleTime();
 	}
 
@@ -166,7 +170,7 @@ public class ScheduleDetailPageController : PageController
 	{
 		var appointmentList = new List<AppointmentModel>();
 		appointmentList.Add(new AppointmentModel(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day,
-			DataManager.currentResponsible.timeToBeginWork[(int)DateTime.Now.DayOfWeek], 30, 0), "teste", "Teste", "Teste", "Ocupado"));
+			(int)DataManager.currentResponsible.timeToBeginWork[(int)DateTime.Now.DayOfWeek], 30, 0), "teste", "Teste", "Teste", "Ocupado"));
 		return appointmentList;
 	}
 
@@ -193,10 +197,14 @@ public class ScheduleDetailPageController : PageController
 	{
 		var initLunchTime = DataManager.currentResponsible.lunchTime.initTime;
 		var endLunchTime = DataManager.currentResponsible.lunchTime.endTime;
-		DateTime lunchTime = new DateTime(appointmentYear, appointmentMonth, appointmentDay, endLunchTime, 0, 0);
+
+		var hour = Mathf.FloorToInt(DataManager.currentResponsible.lunchTime.endTime);
+		var minute = (int)((DataManager.currentResponsible.lunchTime.endTime - hour) * 60);
+
+		DateTime lunchTime = new DateTime(appointmentYear, appointmentMonth, appointmentDay, hour, minute, 0);
 		var dayOfWeek = (int)DataManager.dateNewAppointment.DayOfWeek;
-		limit = DataManager.currentResponsible.timeToFinishWork[dayOfWeek];
-		begin = DataManager.currentResponsible.timeToBeginWork[dayOfWeek];
+		limit = Mathf.FloorToInt(DataManager.currentResponsible.timeToFinishWork[dayOfWeek]);
+		begin = Mathf.FloorToInt(DataManager.currentResponsible.timeToBeginWork[dayOfWeek]);
 		List<AppointmentModel> appointmentList = new List<AppointmentModel>();
 		var isOneInOneHour = PlayerPreferences.oneInOneHour;
 		int index = 0;

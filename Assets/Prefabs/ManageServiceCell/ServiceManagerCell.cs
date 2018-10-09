@@ -43,7 +43,7 @@ public class ServiceManagerCell : MonoBehaviour
 		}
 		else
 		{
-			text = serviceModel.name;
+			text = string.Format("{0} \n Duração: {1}h", serviceModel.name, serviceModel.duration);
 		}
 		myMessageController.service.text = text;
 		myMessageController.mServiceModel = serviceModel;

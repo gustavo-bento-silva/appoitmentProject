@@ -20,77 +20,82 @@ public class CreateNewCompanyPageController : PageController
 
 	public float offset;
 
-	void Start ()
+	void Start()
 	{
 
 	}
 
-	void Update ()
+	void Update()
 	{
 
 	}
 
-	public void OnButtonClick ()
+	public void OnButtonClick()
 	{
-		CreateNewCompany ();
+		CreateNewCompany();
 	}
 
-	public void ShowCompanyData ()
+	public void ShowCompanyData()
 	{
-		iTween.MoveTo (container, iTween.Hash ("x", container.transform.localPosition.x + offset, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInOutBack));
+		iTween.MoveTo(container, iTween.Hash("x", container.transform.localPosition.x + offset, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInOutBack));
 	}
 
-	public void ShowTimeToWork ()
+	public void ShowTimeToWork()
 	{
-		iTween.MoveTo (container, iTween.Hash ("x", container.transform.localPosition.x - offset, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInOutBack));
+		iTween.MoveTo(container, iTween.Hash("x", container.transform.localPosition.x - offset, "islocal", true, "time", 0.7, "easetype", iTween.EaseType.easeInOutBack));
 	}
 
-	void CreateNewCompany ()
+	void CreateNewCompany()
 	{
-		FirebaseAuth.GetFireBaseAuthInstance ().CreateNewCompanyWithEmailAndPassword (companyName.text, email.text, password.text, delegate (string userID) {
-			CloseModal ();
+		FirebaseAuth.GetFireBaseAuthInstance().CreateNewCompanyWithEmailAndPassword(companyName.text, email.text, password.text, delegate (string userID)
+		{
+			CloseModal();
 			Loading = false;
 			Success = true;
-			CreateNewCompanyDataBase (userID);
-		}, delegate(string error) {
+			CreateNewCompanyDataBase(userID);
+		}, delegate (string error)
+		{
 			Loading = false;
-			OpenErrorPopup (error);
+			OpenErrorPopup(error);
 		});
 	}
 
-	void CreateNewCompanyDataBase (string userID)
+	void CreateNewCompanyDataBase(string userID)
 	{
-		DataManager.CreateCompanyData (userID, companyName.text, phone.text, city.text, address.text, cep.text, GetInitialTime (), GetFinishTime (), GetDaysWorked ());
+		DataManager.CreateCompanyData(userID, companyName.text, phone.text, city.text, address.text, cep.text, GetInitialTime(), GetFinishTime(), GetDaysWorked());
 	}
 
-	bool[] GetDaysWorked ()
+	bool[] GetDaysWorked()
 	{
 		var days = new bool[daysWorked.Length];
 		int index = 0;
-		foreach (var day in daysWorked) {
-			days [index] = day.isOn;
+		foreach (var day in daysWorked)
+		{
+			days[index] = day.isOn;
 			index++;
 		}
 		return days;
 	}
 
-	int[] GetInitialTime ()
+	float[] GetInitialTime()
 	{
-		var mInitTime = new int[initTime.Length];
+		var mInitTime = new float[initTime.Length];
 		int index = 0;
-		foreach (var time in initTime) {
-			mInitTime [index] = int.Parse (time.text);
+		foreach (var time in initTime)
+		{
+			mInitTime[index] = float.Parse(time.text);
 			index++;
 		}
 		return mInitTime;
 	}
 
-	int[] GetFinishTime ()
+	float[] GetFinishTime()
 	{
-		var mFinishTime = new int[endTime.Length];
+		var mFinishTime = new float[endTime.Length];
 		int index = 0;
-		foreach (var time in endTime) {
-			mFinishTime [index] = int.Parse (time.text);
+		foreach (var time in endTime)
+		{
+			mFinishTime[index] = float.Parse(time.text);
 			index++;
 		}
 		return mFinishTime;

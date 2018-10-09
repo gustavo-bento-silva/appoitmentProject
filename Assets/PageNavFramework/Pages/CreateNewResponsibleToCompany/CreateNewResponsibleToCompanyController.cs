@@ -128,7 +128,7 @@ public class CreateNewResponsibleToCompanyController : PageController
 
 	void CreateNewResponsibleToCompany(string userID)
 	{
-		DataManager.CreateNewResponsibleToCompanyAsUser(userID, name.text, GetServices(), GetDaysWorked(), GetInitTime(), GetEndTime(), int.Parse(initLunchTime.text), int.Parse(endLunchTime.text));
+		DataManager.CreateNewResponsibleToCompanyAsUser(userID, name.text, GetServices(), GetDaysWorked(), GetInitTime(), GetEndTime(), float.Parse(initLunchTime.text), float.Parse(endLunchTime.text));
 		Loading = false;
 		Constants.LoadHomePage();
 	}
@@ -265,8 +265,8 @@ public class CreateNewResponsibleToCompanyController : PageController
 
 	public bool FourthStepVerify()
 	{
-		var initTime = int.Parse(initLunchTime.text);
-		var finishTIme = int.Parse(endLunchTime.text);
+		var initTime = float.Parse(initLunchTime.text);
+		var finishTIme = float.Parse(endLunchTime.text);
 		if (initTime <= finishTIme)
 		{
 			lunchTimeError.SetActive(false);
@@ -311,17 +311,17 @@ public class CreateNewResponsibleToCompanyController : PageController
 		return mDaysWorked;
 	}
 
-	public List<int> GetInitTime()
+	public List<float> GetInitTime()
 	{
-		List<int> initTimeToWorkList = new List<int>();
-		initTimeToWork.ForEach(x => initTimeToWorkList.Add(int.Parse(x.text)));
+		List<float> initTimeToWorkList = new List<float>();
+		initTimeToWork.ForEach(x => initTimeToWorkList.Add(float.Parse(x.text)));
 		return initTimeToWorkList;
 	}
 
-	public List<int> GetEndTime()
+	public List<float> GetEndTime()
 	{
-		List<int> endTimeToWorkList = new List<int>();
-		endTimeToWork.ForEach(x => endTimeToWorkList.Add(int.Parse(x.text)));
+		List<float> endTimeToWorkList = new List<float>();
+		endTimeToWork.ForEach(x => endTimeToWorkList.Add(float.Parse(x.text)));
 		return endTimeToWorkList;
 	}
 }
