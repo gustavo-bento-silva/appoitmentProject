@@ -25,6 +25,8 @@ public class ScheduleDetailPageController : PageController
 	int limit;
 	int begin;
 
+	int appointmentIndex = 0;
+
 	bool isFromSchedulePage = false;
 	bool isBlockDay = false;
 
@@ -196,12 +198,15 @@ public class ScheduleDetailPageController : PageController
 	bool isThereAppointmentBeginningAtTime(DateTime time, List<AppointmentModel> appointmentList)
 	{
 		bool isThere = false;
+		int index = 0;
 		appointmentList.ForEach(x =>
 		{
 			if (x.hour == time.Hour && x.minute == time.Minute)
 			{
+				appointmentIndex = index;
 				isThere = true;
 			}
+			index++;
 		});
 		return isThere;
 	}
@@ -242,6 +247,9 @@ public class ScheduleDetailPageController : PageController
 		if (appointmentList != null)
 			appointmentList.Sort((first, second) => ((new DateTime(appointmentYear, appointmentMonth, appointmentDay, first.hour, first.minute, 0)).CompareTo((new DateTime(appointmentYear, appointmentMonth, appointmentDay, second.hour, second.minute, 0)))));
 
+		DataManager.todayResponsibleAppointmentList.Clear();
+		DataManager.todayResponsibleAppointmentList = appointmentList;
+
 		if (!isOneInOneHour)
 		{
 			limit = (limit - begin) * 2;
@@ -260,8 +268,8 @@ public class ScheduleDetailPageController : PageController
 			}
 			else if (appointmentList != null && index < appointmentList.Count)
 			{
-				var initAppointmentDateTime = (new DateTime(appointmentYear, appointmentMonth, appointmentDay, appointmentList[index].hour, appointmentList[index].minute, 0));
-				var finishAppointmentDateTime = (new DateTime(appointmentYear, appointmentMonth, appointmentDay, appointmentList[index].hour, appointmentList[index].minute, 0)).AddMinutes(appointmentList[index].durationInMinutes);
+				var initAppointmentDateTime = (new DateTime(appointmentYear, appointmentMonth, appointmentDay, appointmentList[appointmentIndex].hour, appointmentList[appointmentIndex].minute, 0));
+				var finishAppointmentDateTime = (new DateTime(appointmentYear, appointmentMonth, appointmentDay, appointmentList[appointmentIndex].hour, appointmentList[appointmentIndex].minute, 0)).AddMinutes(appointmentList[index].durationInMinutes);
 
 				if (into)
 				{
@@ -270,7 +278,7 @@ public class ScheduleDetailPageController : PageController
 						var description = "";
 						if (isResponsible)
 						{
-							description = appointmentList[index].userName;
+							description = appointmentList[appointmentIndex].userName;
 						}
 						else
 						{
@@ -291,12 +299,12 @@ public class ScheduleDetailPageController : PageController
 				}
 				else
 				{
-					if (initAppointmentDateTime.CompareTo(dt) == 0)
+					if (isThereAppointmentBeginningAtTime(dt, appointmentList))
 					{
 						var description = "";
 						if (isResponsible)
 						{
-							description = appointmentList[index].userName;
+							description = appointmentList[appointmentIndex].userName;
 						}
 						else
 						{

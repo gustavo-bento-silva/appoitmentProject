@@ -35,8 +35,15 @@ public class DayController : MonoBehaviour
 		int[] time = new int[2];
 		time = GetTime();
 		DataManager.dateNewAppointment = new System.DateTime(date.Year, date.Month, date.Day, time[0], time[1], 0);
-		var page = pageNav.GetPagePrefabByEnum(PagesEnum.ConfirmAppointmentPopup);
-		pageNav.OpenModal(page);
+		if (DataManager.CurrentResponsibleIsBusyAtTime(DataManager.dateNewAppointment))
+		{
+			pageNav.SetErrorVisibility(true, "infelizmente o serviço solicitado não se encaixa no tempo livre. Tente agendar em outro horário!");
+		}
+		else
+		{
+			var page = pageNav.GetPagePrefabByEnum(PagesEnum.ConfirmAppointmentPopup);
+			pageNav.OpenModal(page);
+		}
 	}
 
 	//0 -> hour, 1 -> minute

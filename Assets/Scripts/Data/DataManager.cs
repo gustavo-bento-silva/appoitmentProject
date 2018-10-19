@@ -16,6 +16,7 @@ public class DataManager : MonoBehaviour
 	public static ServicesProvidedModel currentservice;
 	public static List<CompanyModel> companiesList = new List<CompanyModel>();
 	public static List<ResponsibleModel> responsibles = new List<ResponsibleModel>();
+	public static List<AppointmentModel> todayResponsibleAppointmentList = new List<AppointmentModel>();
 
 	public static DateTime dateNewAppointment;
 
@@ -797,10 +798,57 @@ public class DataManager : MonoBehaviour
 		currentUser.appoitments = appointments.ToDictionary(x => x.appointmentID, x => (object)x);
 	}
 
-	//	void CreateAppointments()
-	//	{
-	//		FireBaseManager.GetFireBaseInstance().CreateNewAppoitment(DateTime.Today, new UserModel("1", "Gustavo"), new ResponsableModel("1", "Bento"));
-	//		FireBaseManager.GetFireBaseInstance().CreateNewAppoitment(DateTime.Today, new UserModel("2", "Thamyris"), new ResponsableModel("2", "Galvão"));
-	//		FireBaseManager.GetFireBaseInstance().CreateNewAppoitment(DateTime.Today, new UserModel("3", "Marcia"), new ResponsableModel("3", "Perli"));
-	//	}
+	public static bool CurrentResponsibleIsBusyAtTime(DateTime date)
+	{
+		CultureInfo provider = new CultureInfo("pt-BR");
+		var dateAux = date;
+		bool isBusy = false;
+		DateTime endDateAppointment = dateAux.AddMinutes(currentservice.duration * 60);
+		todayResponsibleAppointmentList.ForEach(x =>
+				{
+					var dateTimeAux = DateTime.ParseExact(x.data, Constants.dateformat, provider);
+					var dateTime = new DateTime(dateTimeAux.Year, dateTimeAux.Month, dateTimeAux.Day, x.hour, x.minute, 0);
+
+					while (dateAux.CompareTo(endDateAppointment) <= 0)
+					{
+						if (endDateAppointment.CompareTo(dateTime) == 0)
+						{
+							isBusy = false;
+						}
+						else if (dateTime.CompareTo(dateAux) == 0)
+						{
+							isBusy = true;
+						}
+						dateAux = dateAux.AddMinutes(30);
+					}
+				});
+
+		if (!isBusy)
+		{
+			dateAux = date;
+			var initHour = Mathf.FloorToInt(currentResponsible.lunchTime.initTime);
+			var initMinute = (int)((currentResponsible.lunchTime.initTime - initHour) * 60);
+			var endHour = Mathf.FloorToInt(currentResponsible.lunchTime.endTime);
+			var endMinute = (int)((currentResponsible.lunchTime.endTime - endHour) * 60);
+			var dateLunchTime = new DateTime(date.Year, date.Month, date.Day, endHour, endMinute, 0);
+
+			if (endDateAppointment.Hour == initHour && endDateAppointment.Minute == initMinute)
+			{
+				isBusy = false;
+			}
+			else
+			{
+				while (dateAux.CompareTo(endDateAppointment) <= 0)
+				{
+					if ((dateAux.Hour >= currentResponsible.lunchTime.initTime)
+						&& dateAux.CompareTo(dateLunchTime) < 0)
+					{
+						isBusy = true;
+					}
+					dateAux = dateAux.AddMinutes(30);
+				}
+			}
+		}
+		return isBusy;
+	}
 }
