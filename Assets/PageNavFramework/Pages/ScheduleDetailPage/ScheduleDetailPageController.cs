@@ -193,6 +193,19 @@ public class ScheduleDetailPageController : PageController
 		scrollViewContent.offsetMin = new Vector2(0, -number);
 	}
 
+	bool isThereAppointmentBeginningAtTime(DateTime time, List<AppointmentModel> appointmentList)
+	{
+		bool isThere = false;
+		appointmentList.ForEach(x =>
+		{
+			if (x.hour == time.Hour && x.minute == time.Minute)
+			{
+				isThere = true;
+			}
+		});
+		return isThere;
+	}
+
 	void InitializeScheduleTime()
 	{
 		var initLunchTime = DataManager.currentResponsible.lunchTime.initTime;
@@ -217,6 +230,7 @@ public class ScheduleDetailPageController : PageController
 			isResponsible = true;
 		}
 
+		var responsibles = DataManager.responsibleAppointmentList;
 		DataManager.responsibleAppointmentList.ForEach(x =>
 		{
 			if (DateTime.ParseExact(x.data, Constants.dateformat, provider) == newAppointmentDate)

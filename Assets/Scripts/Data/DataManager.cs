@@ -50,7 +50,7 @@ public class DataManager : MonoBehaviour
 		//ID = "z0iJvJUBK2aK2BP2OAuACDrNMSn1";
 		//ID = "CMxh26n5hZZTQdznBT0OJZn57rO2";
 		//		Gustavo:
-		//		ID = "7Mu4RNXJUbNPiONAZN05y62HMcv1";
+		//ID = "4sBhR6eBcSWD7JJKyVZWB5xiFsD2";
 
 		if (ID == "-1")
 		{
@@ -663,6 +663,7 @@ public class DataManager : MonoBehaviour
 		FireBaseManager.GetFireBaseInstance().ActiveUserMessagesListener(currentUser.userID, currentUser.userType, delegate (List<MessageModel> messages)
 		{
 			SetCurrentUserMessages(messages);
+			userMessages.Clear();
 			userMessages = messages;
 			DefineMessagesBadges();
 		});

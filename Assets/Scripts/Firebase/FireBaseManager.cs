@@ -861,7 +861,6 @@ public class FireBaseManager : MonoBehaviour
 
 	public void GetResponsibleAppointments(string responsibleID, Delegates.GetResponsibleAppointments success, Delegates.GeneralListenerFail fail)
 	{
-
 		FirebaseDatabase.DefaultInstance.GetReference(DBTable.Responsible.ToString()).Child(responsibleID).Child(Parameters.appointments.ToString())
 				.GetValueAsync().ContinueWith(task =>
 				{
