@@ -78,10 +78,11 @@ public class ScheduleDetailPageController : PageController
 	{
 		UpdateTextData();
 		var dtNow = DateTime.Now;
+		var appointmentDate = new DateTime(appointmentYear, appointmentMonth, appointmentDay);
 		var resp = DataManager.currentResponsible;
 		var temp = DataManager.currentResponsible.timeToBeginWork[(int)dtNow.DayOfWeek];
 		var hour = Mathf.FloorToInt(DataManager.currentResponsible.timeToBeginWork[(int)dtNow.DayOfWeek]);
-		var minute = (int)((DataManager.currentResponsible.timeToBeginWork[(int)dtNow.DayOfWeek] - hour) * 60);
+		var minute = (int)((DataManager.currentResponsible.timeToBeginWork[(int)appointmentDate.DayOfWeek] - hour) * 60);
 		dt = new DateTime(appointmentYear, appointmentMonth, appointmentDay, hour, minute, 0);
 		InitializeScheduleTime();
 	}
